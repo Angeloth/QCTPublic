@@ -105,8 +105,6 @@
 
         DataGridView2.AutoResizeRowHeadersWidth(DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders)
 
-
-
         DataGridView2.AdvancedCellBorderStyle.Left = DataGridViewAdvancedCellBorderStyle.None
 
         DataGridView2.AdvancedCellBorderStyle.Right = DataGridViewAdvancedCellBorderStyle.None
@@ -249,6 +247,22 @@
             'validación de mayorque ó menor que!
             'ultiCats.Tables(CatSelected).Columns(CStr(DataGridView1.Rows(e.RowIndex).Tag)).ExtendedProperties.Item("isText")
             'falta este form!
+            If MatchConditions = "" Then
+                MsgBox("For a validation between numbers, please define at least one matching field!!", vbCritical, "DQCT")
+                Exit Sub
+            End If
+
+            'aqui se debe hacer la validación > ó <
+            'OJO, falta:
+            '1. Check de mayor que menor que de rango de números
+            '2. Terminar en check records de la validacion vs numeros en vs catalog
+            '3. Mencionar el tema de la estructura de los mandantes por objeto
+            '4. Regla extra de regla de construccion vs objeto externo
+            '5. Regla extra de validacion de dependant field vs condicionales internas, matching fields!!!!
+            '6. 
+
+            Form12.ShowDialog()
+
 
         End If
 
