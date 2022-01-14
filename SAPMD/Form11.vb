@@ -40,6 +40,8 @@
 
         CatSelected = ""
 
+        ToolStripTextBox1.Text = ""
+
         EstoyAgregandoRows = False
 
         DataGridView1.Columns.Clear()
@@ -159,6 +161,8 @@
 
         FieldMaster.PrimaryKey = Nothing
         FieldMaster.Clear()
+        FieldMaster.Rows.Clear()
+        FieldMaster.Columns.Clear()
         AsignaYavePrimariaATabla(FieldMaster, "FieldCode", False)
         FieldMaster.Columns.Add("FieldDescription", GetType(String))
         'Agregamos de base la Company Code

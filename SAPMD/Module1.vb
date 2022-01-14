@@ -1061,7 +1061,7 @@ Module Module1
                                     Case Else
 
                                         'xSet.Tables(xSet.Tables.Count - 1).Rows.Add({item.Name & "#" & catitem.Name, item.Name, "", catitem.Name, "", "", 0, ""})
-                                        xSet.Tables(xSet.Tables.Count - 1).Rows.Add({item.Name & "#" & catitem.Name, item.Name, "", catitem.Name, "", "", 0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "None", "To Condition"})
+                                        xSet.Tables(xSet.Tables.Count - 1).Rows.Add({item.Name & "#" & catitem.Name, item.Name, "", catitem.Name, "", "", 0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "None", "To Condition", "", "", ""})
 
                                         deDatos = catitem.Value.Children.ToList()
 

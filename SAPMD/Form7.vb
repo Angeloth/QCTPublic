@@ -1,7 +1,9 @@
 ﻿Public Class Form7
+    Public TablaDatos As DataTable
     Public ConsObject As String
     Public ConsTable As String
     Public ConsField As String
+    Public ConsModule As String
     Public BuildDs As DataSet
     Public MisCatas As DataSet
     Public posiTabla As Integer
@@ -9,6 +11,7 @@
     Private miCols As New DataSet
     Private reglaSelected As String
     Public maxCharLimit As Integer
+    Private EstoyAgregandoRows As Boolean
 
     Private Sub Form7_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'Form para las reglas de construccion
@@ -20,6 +23,8 @@
         'ROUTE-0002
         'ROUTE-0003
         'ROUTE-0004
+        EstoyAgregandoRows = False
+
         reglaSelected = ""
 
         ListView1.Items.Clear()
@@ -68,11 +73,11 @@
         FillRule.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox
         FillRule.DisplayStyleForCurrentCellOnly = True
 
-        DataGridView1.Columns.Add("Consec", "#'s")
-        DataGridView1.Columns.Add(FillRule)
-        DataGridView1.Columns.Add("Value", "Value")
-        DataGridView1.Columns.Add("CharLen", "Char Length")
-        DataGridView1.Columns.Add("Signo", "Signo")
+        DataGridView1.Columns.Add("Consec", "#'s") '0
+        DataGridView1.Columns.Add(FillRule) '1
+        DataGridView1.Columns.Add("Value", "Value") '1
+        DataGridView1.Columns.Add("CharLen", "Char Length") '2
+        DataGridView1.Columns.Add("Signo", "Signo") '3
 
         For i = 0 To DataGridView1.Columns.Count - 1
             DataGridView1.Columns(i).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
@@ -186,27 +191,39 @@
 
             'Que guarde la ruta del catálogo: gb#gb0007, por ejemplo!
 
+            EstoyAgregandoRows = True
+
             For i = 0 To filterDt.Rows.Count - 1
                 DataGridView1.Rows.Add()
                 DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(0).Value = filterDt.Rows(i).Item(4)
                 DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(1).Value = filterDt.Rows(i).Item(5)
 
+
                 Select Case filterDt.Rows(i).Item(5)
                     Case Is = "A - From Catalog"
-                        posiTab = MisCatas.Tables.IndexOf(CStr(filterDt.Rows(i).Item(6)))
-                        If posiTab >= 0 Then
-                            xObj = Split(CStr(filterDt.Rows(i).Item(6)), "#")
-                            DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = CStr(xObj(0)) & " " & MisCatas.Tables(posiTab).Columns(0).ColumnName
+                        'posiTab = MisCatas.Tables.IndexOf(CStr(filterDt.Rows(i).Item(6)))
+                        'If posiTab >= 0 Then
+                        '    xObj = Split(CStr(filterDt.Rows(i).Item(6)), "#")
+                        '    DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = CStr(xObj(0)) & " " & MisCatas.Tables(posiTab).Columns(0).ColumnName
+                        'End If
+                        If CStr(filterDt.Rows(i).Item(6)) = "" Then
+                            DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = "None"
+                        Else
+                            DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = CStr(filterDt.Rows(i).Item(6))
                         End If
+                        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).ReadOnly = True
 
                     Case Is = "B - Free Text"
                         DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = filterDt.Rows(i).Item(6)
+                        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).ReadOnly = False
 
                     Case Is = "C - Running number"
                         DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = filterDt.Rows(i).Item(6)
+                        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).ReadOnly = False
 
                     Case Is = "D - Fixed Value"
                         DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = filterDt.Rows(i).Item(6)
+                        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).ReadOnly = False
 
                 End Select
 
@@ -214,6 +231,9 @@
                 DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(4).Value = filterDt.Rows(i).Item(8)
 
             Next
+
+            EstoyAgregandoRows = False
+
         Else
             reglaSelected = ""
             ToolStripLabel1.Text = "Ready"
@@ -326,19 +346,20 @@
             Select Case DataGridView1.Rows(i).Cells(1).Value
                 Case Is = "A - From Catalog"
                     'verificamos que el renglon tenga dato en el dataset!
-                    If DataGridView1.Rows(i).Cells(2).Value = "" Then
+                    If DataGridView1.Rows(i).Cells(2).Value = "" Or DataGridView1.Rows(i).Cells(2).Value = "None" Then
                         MsgBox("Please check the data row", vbCritical, "SAP MD")
                         Exit Sub
                     End If
 
-                    enCuentra = miCols.Tables(0).Rows.Find(DataGridView1.Rows(i).Cells(2).Value)
-                    If IsNothing(enCuentra) = True Then
-                        MsgBox("The catalog name you provided on the Value column for row " & CStr(i + 1) & " doesn't exists!!, please verify!", vbCritical, "SAP MD")
-                        Exit Sub
-                    End If
-                    'z = catDs.Tables(Posi).Rows.IndexOf(encuentra)
-                    posiColumna = miCols.Tables(0).Rows.IndexOf(enCuentra)
-                    valorColumna = miCols.Tables(0).Rows(posiColumna).Item(1)
+                    valorColumna = DataGridView1.Rows(i).Cells(2).Value
+
+                    'enCuentra = miCols.Tables(0).Rows.Find(DataGridView1.Rows(i).Cells(2).Value)
+                    'If IsNothing(enCuentra) = True Then
+                    '    MsgBox("The catalog name you provided on the Value column for row " & CStr(i + 1) & " doesn't exists!!, please verify!", vbCritical, "SAP MD")
+                    '    Exit Sub
+                    'End If
+                    'posiColumna = miCols.Tables(0).Rows.IndexOf(enCuentra)
+                    'valorColumna = miCols.Tables(0).Rows(posiColumna).Item(1)
 
 
                 Case Is = "B - Free Text"
@@ -517,6 +538,102 @@
 
         End If
 
+
+    End Sub
+
+    Private Sub DataGridView1_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellDoubleClick
+
+
+
+        Select Case e.ColumnIndex
+
+            Case Is = 1
+
+
+            Case Is = 2
+                'valor!
+                If DataGridView1.Rows(e.RowIndex).Cells(1).Value = "A - From Catalog" Then
+                    'abrimos el form11
+                    Dim miTag As Object = DataGridView1.Rows(e.RowIndex).Cells(2).Value
+                    If miTag = "None" Then
+                        'va directo a load
+
+                        Form11.toyLeyendo = False
+                        Form11.resCatCode = ""
+                        Form11.resCatModule = ""
+                        Form11.resCatMC = ""
+                        Form11.resCatMF = ""
+
+                    Else
+                        'carga condiciones iniciales
+                        Dim xObj As Object = Nothing
+                        xObj = Split(miTag, ":")
+
+                        If UBound(xObj) <> 3 Then
+                            Form11.toyLeyendo = False
+                            Form11.resCatCode = ""
+                            Form11.resCatModule = ""
+                            Form11.resCatMC = ""
+                            Form11.resCatMF = ""
+                        Else
+                            Form11.toyLeyendo = True
+                            Form11.resCatModule = CStr(xObj(0))
+                            Form11.resCatCode = CStr(xObj(1))
+                            Form11.resCatMF = CStr(xObj(2))
+                            Form11.resCatMC = CStr(xObj(3))
+                        End If
+
+                    End If
+
+                    Form11.tablaTemp = TablaDatos ' tempDs.Tables(tablaNombre)
+                    Form11.objetoModule = ConsModule 'moduloSelek
+                    Form11.objetoCode = ConsObject ' objetoSelek
+                    Form11.TablaCode = ConsTable ' tableSelek
+                    Form11.elCampoCode = ConsField ' CStr(DataGridView1.Rows(e.RowIndex).Cells(0).Value)
+                    'Form11.Modulo1 = "gb"
+                    'Form11.Modulo2 = moduloSelek
+                    Form11.ultiCats = MisCatas
+                    Form11.elEnfoque = "B" 'de construccion
+                    Form11.ShowDialog()
+
+                    If Form11.huboExito = False Then Exit Sub
+
+                    DataGridView1.Rows(e.RowIndex).Cells(2).Value = Form11.resCatModule & ":" & Form11.resCatCode & ":" & Form11.resCatMF & ":" & Form11.resCatMC
+
+                End If
+
+        End Select
+
+    End Sub
+
+    Private Sub DataGridView1_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellValueChanged
+
+        If EstoyAgregandoRows = True Then Exit Sub
+
+        Select Case e.ColumnIndex
+
+            Case Is = 0
+
+
+            Case Is = 1
+                If DataGridView1.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = "A - From Catalog" Then
+                    DataGridView1.Rows(e.RowIndex).Cells(2).Value = "None"
+                    DataGridView1.Rows(e.RowIndex).Cells(2).ReadOnly = True
+                Else
+                    DataGridView1.Rows(e.RowIndex).Cells(2).ReadOnly = False
+                    DataGridView1.Rows(e.RowIndex).Cells(2).Value = ""
+                End If
+
+
+            Case Is = 2
+
+
+
+            Case Is = 3
+
+
+
+        End Select
 
     End Sub
 End Class

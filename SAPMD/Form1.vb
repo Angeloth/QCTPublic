@@ -35,6 +35,7 @@ Public Class Form1
     Private moduloSelek As String
     Private objetoName As String
     Private tablaNombre As String
+    Private compaSelekted As String
 
     Private ValidaDt As New DataTable
 
@@ -615,10 +616,10 @@ Public Class Form1
                         'la encontramos!
                         For j = 0 To catDs.Tables(i).Rows.Count - 1
                             If catDs.Tables(i).Rows(j).Item(0) = "CatalogName" Then Continue For
-                            TreeView1.Nodes(0).Nodes.Add(catDs.Tables(i).Rows(j).Item(0), catDs.Tables(i).Rows(j).Item(0) & " / " & catDs.Tables(i).Rows(j).Item(1), 2, 2)
-                            TreeView1.Nodes(0).Nodes(TreeView1.Nodes(0).Nodes.Count - 1).Tag = catDs.Tables(i).Rows(j).Item(1)
-                            MySource.Add(catDs.Tables(i).Rows(j).Item(0))
-                            MySource.Add(catDs.Tables(i).Rows(j).Item(1))
+                            TreeView1.Nodes(0).Nodes.Add(catDs.Tables(i).Rows(j).Item("A"), catDs.Tables(i).Rows(j).Item("A") & " / " & catDs.Tables(i).Rows(j).Item("ZZ"), 2, 2)
+                            TreeView1.Nodes(0).Nodes(TreeView1.Nodes(0).Nodes.Count - 1).Tag = catDs.Tables(i).Rows(j).Item("ZZ")
+                            MySource.Add(catDs.Tables(i).Rows(j).Item("A"))
+                            MySource.Add(catDs.Tables(i).Rows(j).Item("ZZ"))
                         Next
 
                         Exit For
@@ -961,10 +962,11 @@ Public Class Form1
 
             Case Is = 3 'records, primero se jala de que compañía quiere ver
                 'se sacan los catálogos, y templates!
-                usaDataset.Tables(0).Rows.Add({"catalogs"})
+                usaDataset.Tables(0).Rows.Add({"catpro"})
                 catDs.Tables.Clear()
-                catDs = Await PullUrlWs(usaDataset, "catalogs")
-                Call ReloadCatSimple()
+                catDs = Await PullUrlWs(usaDataset, "catpro")
+                ReloadCatPro()
+                'Call ReloadCatSimple()
 
                 usaDataset.Tables(0).Rows.Clear()
                 usaDataset.Tables(0).Rows.Add({"templates"})
@@ -1498,6 +1500,8 @@ Public Class Form1
 
                 Label1.Text = "Records"
                 Label2.Text = elNode.Parent.Parent.Name & " / " & elNode.Parent.Parent.Tag & " / " & elNode.Parent.Name & " / " & elNode.Parent.Tag & " / " & elNode.Name & " / " & elNode.Tag
+
+                compaSelekted = elNode.Parent.Parent.Name
 
                 If NodoNameActual = "" Then
                     NodoNameActual = tablaFind
@@ -4864,7 +4868,7 @@ Public Class Form1
 
                 Else
                     '
-                    If e.ColumnIndex = 22 Then
+                    If e.ColumnIndex = 23 Then
                         'construction rule!
                         If DataGridView1.Rows(e.RowIndex).Cells(4).Value <> "B - Construction" Then
                             MsgBox("Please select filling rule 'B - Construction' for setting this rule", vbCritical, "SAP MD")
@@ -4873,11 +4877,14 @@ Public Class Form1
 
                         If catDs.Tables.Count = 0 Then
                             usaDataset.Tables(0).Rows.Clear()
-                            usaDataset.Tables(0).Rows.Add({"catalogs"})
+                            usaDataset.Tables(0).Rows.Add({"catpro"})
                             catDs.Tables.Clear()
-                            catDs = Await PullUrlWs(usaDataset, "catalogs")
+                            catDs = Await PullUrlWs(usaDataset, "catpro")
+                            ReloadCatPro()
                         End If
 
+                        Form7.TablaDatos = tempDs.Tables(tablaNombre)
+                        Form7.ConsModule = moduloSelek
                         Form7.ConsObject = objetoSelek
                         Form7.ConsTable = tableSelek
                         Form7.ConsField = DataGridView1.Rows(e.RowIndex).Cells(0).Value
@@ -4895,6 +4902,10 @@ Public Class Form1
                         Form7.ShowDialog()
 
                         'hacer reload de la info!
+                        usaDataset.Tables(0).Rows.Clear()
+                        usaDataset.Tables(0).Rows.Add({"construction"})
+                        ConstruDs.Tables.Clear()
+                        ConstruDs = Await PullUrlWs(usaDataset, "construction")
 
                     Else
 
@@ -5201,6 +5212,7 @@ Public Class Form1
                 Dim expText As String = ""
                 'Dim xObj As Object = Nothing
                 Dim yObj As Object = Nothing
+                Dim zObj As Object = Nothing
                 'Dim enCuentra As DataRow
                 'Randomize()
                 'Dim value As Integer = CInt(Int((6 * Rnd()) + 1))
@@ -5656,14 +5668,141 @@ Public Class Form1
                                 'CStr(ValidaDt.Rows(z).Item(14))'tiene posicion del catálogo, con 
                                 'este buscamos y ubicamos la tabla a buscar!
                                 'tm#gb0001
-
-                                unComodin = Microsoft.VisualBasic.Left(CStr(ValidaDt.Rows(z).Item(14)), 2) & "#" & CStr(ValidaDt.Rows(z).Item(14))
-                                findAnother = catDs.Tables(unComodin).Rows.Find(valEvaluar)
-
-                                If IsNothing(findAnother) = True Then
-                                    PintaCeldaDeError(i, j, "The value " & valEvaluar & " does not exists on the " & CStr(ValidaDt.Rows(z).Item(15)) & " catalog")
+                                '
+                                'ValidaDt.Rows(z).Item(14)' catalog code
+                                'ValidaDt.Rows(z).Item(29)'catalog module
+                                'ValidaDt.Rows(z).Item(30)'match field
+                                'ValidaDt.Rows(z).Item(31)'match conditions
+                                unComodin = CStr(ValidaDt.Rows(z).Item(29)) & "#" & ValidaDt.Rows(z).Item(14)
+                                If catDs.Tables.IndexOf(unComodin) < 0 Then
+                                    anchoTru(j) = True 'se pone OK, pero hay warnings!
+                                    PintaCeldaDeWarning(i, j, "Unable to found catalog related!")
                                     Continue For
+                                Else
+
+                                    Dim yTabla As New DataTable
+                                    yTabla = catDs.Tables(unComodin).Clone()
+
+                                    Dim rowX() As DataRow
+                                    Dim mixCade As String = ""
+                                    Dim cadCOmp As String = ""
+                                    yObj = Nothing
+                                    zObj = Nothing
+
+                                    If ValidaDt.Rows(z).Item(31) = "" Or ValidaDt.Rows(z).Item(31) = "None" Then
+                                        'match directo a la columna, sin filtros
+                                        If CStr(ValidaDt.Rows(z).Item(30)).Contains(">") = True Or CStr(ValidaDt.Rows(z).Item(30)).Contains("<") = True Then
+                                            'es entre 2 numeros
+                                            'OJOO, SI ESTA BIEEN, solo falta obligar al usuario a requerir un match condicional!!
+                                            'Aqui si o SI debe haber un match field!
+
+                                            If CStr(ValidaDt.Rows(z).Item(30)).Contains(">") = True Then
+                                                yObj = Split(CStr(ValidaDt.Rows(z).Item(30)), ">")
+                                                cadCOmp = ">"
+                                            Else
+                                                yObj = Split(CStr(ValidaDt.Rows(z).Item(30)), "<")
+                                                cadCOmp = "<"
+                                            End If
+
+                                            rowX = catDs.Tables(unComodin).Select(mixCade)
+
+                                            For Each row As DataRow In rowX
+                                                yTabla.ImportRow(row)
+                                            Next
+
+                                            'Validación extra!!
+                                            If yTabla.Rows.Count = 0 Then
+                                                PintaCeldaDeError(i, j, "The value " & valEvaluar & " does not exists on the " & CStr(ValidaDt.Rows(z).Item(15)) & " catalog")
+                                                Continue For
+                                            End If
+
+
+                                        Else
+                                            rowX = catDs.Tables(unComodin).Select(CStr(ValidaDt.Rows(z).Item(30)) & " = '" & valEvaluar & "'")
+                                            For Each row As DataRow In rowX
+                                                yTabla.ImportRow(row)
+                                            Next
+                                            'Directo
+                                            If yTabla.Rows.Count = 0 Then
+                                                PintaCeldaDeError(i, j, "The value " & valEvaluar & " does not exists on the " & CStr(ValidaDt.Rows(z).Item(15)) & " catalog")
+                                                Continue For
+                                            End If
+
+                                        End If
+
+                                    Else
+
+                                        yObj = Split(CStr(ValidaDt.Rows(z).Item(31)), "-")
+                                        mixCade = ""
+                                        For w = 0 To UBound(yObj)
+                                            zObj = Split(CStr(yObj(w)), "#")
+                                            '0 para el grid, 1 para el catalogo
+                                            If mixCade <> "" Then mixCade = mixCade & " AND "
+
+                                            If CStr(zObj(0)) = "Company Code" Then
+                                                'hace match vs el nodo!
+                                                mixCade = mixCade & CStr(zObj(1)) & " = " & compaSelekted
+                                            Else
+                                                mixCade = mixCade & CStr(zObj(1)) & " = " & DataGridView1.Rows(i).Cells(CStr(zObj(0))).Value
+                                            End If
+
+                                        Next
+
+                                        'match con filtros adicionales
+                                        If CStr(ValidaDt.Rows(z).Item(30)).Contains(">") = True Or CStr(ValidaDt.Rows(z).Item(30)).Contains("<") = True Then
+                                            'es entre 2 numeros
+                                            'AQUI FALTA la Concatenacion adicional para 
+                                            If CStr(ValidaDt.Rows(z).Item(30)).Contains(">") = True Then
+                                                yObj = Split(CStr(ValidaDt.Rows(z).Item(30)), ">")
+                                                cadCOmp = ">"
+                                            Else
+                                                yObj = Split(CStr(ValidaDt.Rows(z).Item(30)), "<")
+                                                cadCOmp = "<"
+                                            End If
+
+                                            rowX = catDs.Tables(unComodin).Select(mixCade)
+
+                                            For Each row As DataRow In rowX
+                                                yTabla.ImportRow(row)
+                                            Next
+                                            'validacion extra!
+
+                                            If yTabla.Rows.Count = 0 Then
+                                                PintaCeldaDeError(i, j, "The value " & valEvaluar & " does not exists on the " & CStr(ValidaDt.Rows(z).Item(15)) & " catalog")
+                                                Continue For
+                                            End If
+
+
+
+                                        Else
+                                            'match ultimo
+                                            mixCade = mixCade & " AND " & CStr(ValidaDt.Rows(z).Item(30)) & " = " & valEvaluar
+                                            rowX = catDs.Tables(unComodin).Select(mixCade)
+
+                                            For Each row As DataRow In rowX
+                                                yTabla.ImportRow(row)
+                                            Next
+
+                                            If yTabla.Rows.Count = 0 Then
+                                                PintaCeldaDeError(i, j, "The value " & valEvaluar & " does not exists on the " & CStr(ValidaDt.Rows(z).Item(15)) & " catalog")
+                                                Continue For
+                                            End If
+
+                                        End If
+
+                                    End If
+
+
+                                    'unComodin = Microsoft.VisualBasic.Left(CStr(ValidaDt.Rows(z).Item(14)), 2) & "#" & CStr(ValidaDt.Rows(z).Item(14))
+                                    'findAnother = catDs.Tables(unComodin).Rows.Find(valEvaluar)
+                                    'If IsNothing(findAnother) = True Then
+                                    '    PintaCeldaDeError(i, j, "The value " & valEvaluar & " does not exists on the " & CStr(ValidaDt.Rows(z).Item(15)) & " catalog")
+                                    '    Continue For
+                                    'End If
+
                                 End If
+
+
 
                             Case Is = "B - Construction"
                                 'este falta!, llamar a la validacion de construccion!
