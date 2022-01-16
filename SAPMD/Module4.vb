@@ -256,7 +256,7 @@ Module Module4
             Return False
         End If
 
-        If elValor = "X" Or elValor = " " Then
+        If elValor = "X" Or elValor = "" Then '
             Return True
         Else
             elError = "This is an indicator field, please type either X or a white space"

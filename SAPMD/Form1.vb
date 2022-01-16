@@ -184,6 +184,10 @@ Public Class Form1
         Label1.Text = "No object selected"
         Label2.Text = ""
 
+        'Upload from excel
+        'https://www.freecodespot.com/blog/csharp-import-excel/
+
+
         'ftp read write:
         'Application.StartupPath
         'https://www.codeguru.com/visual-basic/ftp-and-vb-net/
@@ -4192,7 +4196,7 @@ Public Class Form1
                 pathBuild = pathBuild & "/" & elNode.Name
 
                 cadeFb = RaizFire
-                cadeFb = cadeFb & "/catalogs/" & xObj(0)
+                cadeFb = cadeFb & "/catpro/" & xObj(0)
                 cadeFb = cadeFb & "/" & elNode.Name
 
                 Form2.huboExito = False
@@ -4796,6 +4800,7 @@ Public Class Form1
                         Exit Sub
                     End If
 
+                    Form3.elEnfoque = "D" 'dependencia directa
                     Form3.xtraDs = tempDs
                     Form3.yTraDs = depeDs
                     Form3.depeTemplate = objetoSelek ' elNode.Parent.Name
@@ -4852,8 +4857,6 @@ Public Class Form1
                     xDs.Tables(0).Rows.Add({"MatchingFields", Form3.resMachFields}) '10
                     xDs.Tables(0).Rows.Add({"ConditionalScope", Form3.resScope}) '11
 
-                    'MatchingFields
-
                     Await HazPutEnFireBase(pathBuild, xDs)
 
                     'aqui le ponemos la dependencia en las columnas!
@@ -4883,6 +4886,9 @@ Public Class Form1
                             ReloadCatPro()
                         End If
 
+
+                        Form7.allDepes = depeDs
+                        Form7.allTemps = tempDs
                         Form7.TablaDatos = tempDs.Tables(tablaNombre)
                         Form7.ConsModule = moduloSelek
                         Form7.ConsObject = objetoSelek
@@ -5167,6 +5173,45 @@ Public Class Form1
                         Next
 
 
+                        For i = 0 To TabCons.Tables.Count - 1
+                            'revisamos que YA este la tabla de dependencias agregada a tabcons, en caso de reglas externas
+                            For j = 0 To TabCons.Tables(i).Rows.Count - 1
+                                If TabCons.Tables(i).Rows(j).Item(5) = "E - External object" Then
+                                    'lo tomamos el valor y lo explosionamos
+                                    'mm:md21:md21-0001:MATNR:MAKTX#MTBN-MAKNT#MATH:MATCH
+                                    xObj = Split(TabCons.Tables(i).Rows(j).Item(6), ":")
+
+                                    If UBound(xObj) <> 5 Then Continue For
+
+                                    yDs.Tables.Clear()
+
+                                    usaDataset.Tables(0).Rows.Clear()
+                                    usaDataset.Tables(0).Rows.Add({"records"})
+                                    usaDataset.Tables(0).Rows.Add({elNode.Parent.Parent.Name})
+                                    usaDataset.Tables(0).Rows.Add({CStr(xObj(1))})
+                                    usaDataset.Tables(0).Rows.Add({CStr(xObj(2))})
+                                    usaDataset.Tables(0).Rows.Add({"records"})
+
+                                    yDs = Await PullUrlWs(usaDataset, "records")
+
+                                    If yDs.Tables.Count = 0 Then Continue For
+
+                                    If multiDepe.Tables.IndexOf(CStr(xObj(1)) & "#" & CStr(xObj(2)) & "#" & CStr(xObj(3))) < 0 Then
+                                        'la agregamos
+                                        multiDepe.Tables.Add(yDs.Tables(0).Copy())
+                                        multiDepe.Tables(multiDepe.Tables.Count - 1).TableName = CStr(xObj(1)) & "#" & CStr(xObj(2)) & "#" & CStr(xObj(3))
+                                        'multiDepe.Tables(multiDepe.Tables.Count - 1).ExtendedProperties.Add("ObjectName", "")
+                                        'multiDepe.Tables(multiDepe.Tables.Count - 1).ExtendedProperties.Add("TableName", "")
+                                    End If
+
+
+                                End If
+
+                            Next
+
+
+                        Next
+
                     End If
 
                 Else
@@ -5213,6 +5258,9 @@ Public Class Form1
                 'Dim xObj As Object = Nothing
                 Dim yObj As Object = Nothing
                 Dim zObj As Object = Nothing
+                Dim mixNombreTab As String = ""
+                Dim buskEst As String = ""
+                Dim valBus As String = ""
                 'Dim enCuentra As DataRow
                 'Randomize()
                 'Dim value As Integer = CInt(Int((6 * Rnd()) + 1))
@@ -5323,12 +5371,11 @@ Public Class Form1
                                     'desde aqui podria continuar si NO cumple
                                     'Si cumple la condicion, entonces valida con la regla que se haya puesto
                                     'Si cumple la condicion, debe existir la informacion en la otra hoja
-                                    Dim buskEst As String = ""
-                                    Dim valBus As String = ""
+
 
                                     'Dim elRows() As DataRow
                                     'Dim elMio As DataRow
-                                    Dim mixNombreTab As String = ""
+
                                     xObj = Nothing
                                     Dim misRows() As DataRow
                                     Dim mixPobl As String = ""
@@ -5575,10 +5622,27 @@ Public Class Form1
 
                         If continuoEvaluacion = False Then Continue For
 
-                        If esMandatorio = True And valEvaluar = "" Then
-                            PintaCeldaDeError(i, j, "This field is mandatory!, please fill it accordingly!!")
-                            Continue For
+
+                        If esMandatorio = True Then
+
+                            If valEvaluar = "" Then
+                                If CStr(ValidaDt.Rows(z).Item(10)) = "Indicator" Then
+                                    PintaCeldaDeWarning(i, j, "This field is mandatory to set as indicator (True or False = 'X' or 'blank'), currently is set to False. Just review this the correct setting")
+                                    anchoTru(j) = True
+                                    Continue For
+                                Else
+                                    'Se pone errors!!
+                                    PintaCeldaDeError(i, j, "This field is mandatory!, please fill it accordingly!!")
+                                    Continue For
+                                End If
+                            End If
+
                         End If
+
+                        'If esMandatorio = True And valEvaluar = "" Then
+                        '    PintaCeldaDeError(i, j, "This field is mandatory!, please fill it accordingly!!")
+                        '    Continue For
+                        'End If
 
                         'aplica!
                         'si es campo llave, es mandatorio!!
@@ -5603,7 +5667,9 @@ Public Class Form1
                         End If
 
                         Select Case CStr(ValidaDt.Rows(z).Item(10))'data type
+
                             Case Is = "No selection", ""
+
 
 
                             Case Is = "Number"
@@ -5695,7 +5761,10 @@ Public Class Form1
                                             'es entre 2 numeros
                                             'OJOO, SI ESTA BIEEN, solo falta obligar al usuario a requerir un match condicional!!
                                             'Aqui si o SI debe haber un match field!
-
+                                            '1000>2000
+                                            '1000<2000
+                                            'Entonces este caso se supondría imposible!
+                                            'este caso nunca va a entrar!
                                             If CStr(ValidaDt.Rows(z).Item(30)).Contains(">") = True Then
                                                 yObj = Split(CStr(ValidaDt.Rows(z).Item(30)), ">")
                                                 cadCOmp = ">"
@@ -5718,6 +5787,7 @@ Public Class Form1
 
 
                                         Else
+                                            'Comparación directa!
                                             rowX = catDs.Tables(unComodin).Select(CStr(ValidaDt.Rows(z).Item(30)) & " = '" & valEvaluar & "'")
                                             For Each row As DataRow In rowX
                                                 yTabla.ImportRow(row)
@@ -5741,9 +5811,9 @@ Public Class Form1
 
                                             If CStr(zObj(0)) = "Company Code" Then
                                                 'hace match vs el nodo!
-                                                mixCade = mixCade & CStr(zObj(1)) & " = " & compaSelekted
+                                                mixCade = mixCade & CStr(zObj(1)) & " = '" & compaSelekted & "'"
                                             Else
-                                                mixCade = mixCade & CStr(zObj(1)) & " = " & DataGridView1.Rows(i).Cells(CStr(zObj(0))).Value
+                                                mixCade = mixCade & CStr(zObj(1)) & " = '" & DataGridView1.Rows(i).Cells(CStr(zObj(0))).Value & "'"
                                             End If
 
                                         Next
@@ -5751,14 +5821,7 @@ Public Class Form1
                                         'match con filtros adicionales
                                         If CStr(ValidaDt.Rows(z).Item(30)).Contains(">") = True Or CStr(ValidaDt.Rows(z).Item(30)).Contains("<") = True Then
                                             'es entre 2 numeros
-                                            'AQUI FALTA la Concatenacion adicional para 
-                                            If CStr(ValidaDt.Rows(z).Item(30)).Contains(">") = True Then
-                                                yObj = Split(CStr(ValidaDt.Rows(z).Item(30)), ">")
-                                                cadCOmp = ">"
-                                            Else
-                                                yObj = Split(CStr(ValidaDt.Rows(z).Item(30)), "<")
-                                                cadCOmp = "<"
-                                            End If
+                                            'AQUI FALTA la Concatenacion adicional para
 
                                             rowX = catDs.Tables(unComodin).Select(mixCade)
 
@@ -5768,15 +5831,56 @@ Public Class Form1
                                             'validacion extra!
 
                                             If yTabla.Rows.Count = 0 Then
-                                                PintaCeldaDeError(i, j, "The value " & valEvaluar & " does not exists on the " & CStr(ValidaDt.Rows(z).Item(15)) & " catalog")
+                                                PintaCeldaDeWarning(i, j, "Unable yo define if the value " & valEvaluar & " is in the correct range due to missing match with catalog traceability: " & CStr(ValidaDt.Rows(z).Item(15)))
                                                 Continue For
                                             End If
 
+                                            '0,1
+                                            '2000>x>1000
+                                            '1000<x<2000
 
+                                            If CStr(ValidaDt.Rows(z).Item(30)).Contains(">") = True Then
+                                                yObj = Split(CStr(ValidaDt.Rows(z).Item(30)), ">")
+                                                cadCOmp = ">"
+                                            Else
+                                                yObj = Split(CStr(ValidaDt.Rows(z).Item(30)), "<")
+                                                cadCOmp = "<"
+                                            End If
+
+                                            If cadCOmp = ">" Then
+                                                If CDec(valEvaluar) > CDec(yObj(1)) Then
+
+                                                    If CDec(valEvaluar) < CDec(yObj(0)) Then
+                                                        'Ok!
+                                                    Else
+                                                        'error!
+                                                        PintaCeldaDeError(i, j, "The value " & valEvaluar & " must be between " & CStr(yObj(1)) & " and " & CStr(yObj(0)))
+                                                        Continue For
+                                                    End If
+
+                                                Else
+                                                    PintaCeldaDeError(i, j, "The value " & valEvaluar & " must be between " & CStr(yObj(1)) & " and " & CStr(yObj(0)))
+                                                    Continue For
+                                                End If
+                                            Else
+                                                If CDec(valEvaluar) > CDec(yObj(0)) Then
+                                                    If CDec(valEvaluar) < CDec(yObj(1)) Then
+                                                        'ok!
+                                                    Else
+                                                        PintaCeldaDeError(i, j, "The value " & valEvaluar & " must be between " & CStr(yObj(0)) & " and " & CStr(yObj(1)))
+                                                        Continue For
+                                                    End If
+                                                Else
+                                                    PintaCeldaDeError(i, j, "The value " & valEvaluar & " must be between " & CStr(yObj(0)) & " and " & CStr(yObj(1)))
+                                                    Continue For
+                                                End If
+
+
+                                            End If
 
                                         Else
                                             'match ultimo
-                                            mixCade = mixCade & " AND " & CStr(ValidaDt.Rows(z).Item(30)) & " = " & valEvaluar
+                                            mixCade = mixCade & " AND " & CStr(ValidaDt.Rows(z).Item(30)) & " = '" & valEvaluar & "'"
                                             rowX = catDs.Tables(unComodin).Select(mixCade)
 
                                             For Each row As DataRow In rowX
@@ -5852,25 +5956,87 @@ Public Class Form1
 
                                                 Case Is = "A - From Catalog"
 
+                                                    xObj = Split(CStr(xTabla.Rows(r).Item(6)), ":")
+
+                                                    If UBound(xObj) <> 3 Then
+
+                                                        meQuedolaRegla = False
+
+                                                        cadError = "Unable to find the proper catalog to find this matching rule: " & CStr(xTabla.Rows(r).Item(6)) & " , please review with dev team"
+
+                                                        Exit For
+
+                                                    End If
+
+                                                    mixNombreTab = CStr(xObj(0)) & "#" & CStr(xObj(1))
+
+                                                    If catDs.Tables.IndexOf(mixNombreTab) < 0 Then
+                                                        meQuedolaRegla = False
+
+                                                        cadError = "Unable to find the proper catalog to find this matching rule: " & CStr(xTabla.Rows(r).Item(6)) & " , please review with dev team"
+
+                                                        Exit For
+                                                    End If
+
+
                                                     partCad = Mid(cadLeft, poSiclo, poSiclo + numChars - 1)
 
                                                     If partCad.Length <= numChars Then
 
-                                                        unComodin = CStr(xTabla.Rows(r).Item(6)) 'Microsoft.VisualBasic.Left(CStr(ValidaDt.Rows(z).Item(14)), 2) & "#" & CStr(ValidaDt.Rows(z).Item(14))
+                                                        'gb:gb0001:A:None
 
-                                                        If catDs.Tables.IndexOf(CStr(unComodin)) < 0 Then Exit For 'no se puede validar!
+                                                        buskEst = ""
 
-                                                        findAnother = catDs.Tables(unComodin).Rows.Find(partCad)
+                                                        If CStr(xObj(3)) <> "None" And CStr(xObj(3)) <> "" Then
+                                                            'se requiere validación match adicional!
+                                                            'del campo mio al campo del objeto externo
+                                                            yObj = Split(CStr(xObj(3)), "-")
+                                                            For p = 0 To UBound(yObj)
 
-                                                        If IsNothing(findAnother) = True Then
+                                                                If p <> 0 Then buskEst = buskEst & " AND "
+
+                                                                zObj = Split(CStr(yObj(p)), "#")
+
+                                                                buskEst = buskEst & CStr(zObj(1)) & " = '"
+
+                                                                buskEst = buskEst & DataGridView1.Rows(i).Cells(CStr(zObj(0))).Value & "'"
+
+                                                            Next
+
+                                                        End If
+
+                                                        If buskEst <> "" Then buskEst = buskEst & " AND "
+
+                                                        buskEst = buskEst & CStr(xObj(2)) & " = '" & partCad & "'"
+
+                                                        Dim fatRows() As DataRow
+                                                        fatRows = catDs.Tables(mixNombreTab).Select(buskEst)
+
+                                                        If fatRows.Length = 0 Then
+                                                            '
+                                                            cadError = "The is no matches on the catalog: '" & catDs.Tables(mixNombreTab).ExtendedProperties.Item("CatalogName") & "' for this value, please check!"
 
                                                             meQuedolaRegla = False
-
-                                                            cadError = "The " & partCad & " doesn't exists in the '" & catDs.Tables(unComodin).Columns(0).ColumnName & "' catalog, please review!"
 
                                                             Exit For
 
                                                         End If
+
+                                                        'unComodin = CStr(xTabla.Rows(r).Item(6)) 'Microsoft.VisualBasic.Left(CStr(ValidaDt.Rows(z).Item(14)), 2) & "#" & CStr(ValidaDt.Rows(z).Item(14))
+
+                                                        'If catDs.Tables.IndexOf(CStr(unComodin)) < 0 Then Exit For 'no se puede validar!
+
+                                                        'findAnother = catDs.Tables(unComodin).Rows.Find(partCad)
+
+                                                        'If IsNothing(findAnother) = True Then
+
+                                                        '    meQuedolaRegla = False
+
+                                                        '    cadError = "The " & partCad & " doesn't exists in the '" & catDs.Tables(unComodin).Columns(0).ColumnName & "' catalog, please review!"
+
+                                                        '    Exit For
+
+                                                        'End If
 
                                                         cadFix = cadFix & partCad
 
@@ -5883,8 +6049,6 @@ Public Class Form1
                                                         Else
 
                                                             partCad = Mid(cadLeft, poSiclo + CInt(numChars), Len(CStr(xTabla.Rows(r).Item(8))))
-
-
 
                                                             If partCad = CStr(xTabla.Rows(r).Item(8)) Then
 
@@ -5958,7 +6122,7 @@ Public Class Form1
 
                                                         If CStr(xTabla.Rows(r).Item(8)) = "" Then
 
-                                                            cadError = "There is no concatenation character to bind, pleas review!"
+                                                            cadError = "There is no concatenation character to bind, please review!"
 
                                                             meQuedolaRegla = False
 
@@ -5970,11 +6134,7 @@ Public Class Form1
 
                                                             partCad = CStr(miObjeto(0))
 
-
-
                                                             pedX = Mid(cadLeft, poSiclo + Len(partCad), Len(CStr(xTabla.Rows(r).Item(8))))
-
-
 
                                                             If pedX = CStr(xTabla.Rows(r).Item(8)) Then
 
@@ -6086,8 +6246,6 @@ Public Class Form1
                                                             partCad = CStr(miObjeto(0))
 
                                                             pedX = Mid(cadLeft, poSiclo + Len(partCad), Len(CStr(xTabla.Rows(r).Item(8))))
-
-
 
                                                             If pedX = CStr(xTabla.Rows(r).Item(8)) Then
 
@@ -6212,6 +6370,110 @@ Public Class Form1
                                                         Exit For
 
                                                     End If
+
+
+                                                Case Is = "E - External object"
+
+                                                    pedX = ""
+                                                    pedX = CStr(xTabla.Rows(r).Item(8))
+
+                                                    If r = xTabla.Rows.Count - 1 Then
+                                                        'es el último, NO lleva al final caracter de concatenación!
+                                                        partCad = cadLeft
+                                                    Else
+                                                        'partCad = Mid(cadLeft, poSiclo, poSiclo + numChars - 1)
+                                                        'quitar el catacter de concatenación!
+                                                        If CStr(xTabla.Rows(r).Item(8)) <> "" Then
+                                                            'se hace split!
+                                                            miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
+
+                                                            If CStr(miObjeto(UBound(miObjeto))) = CStr(xTabla.Rows(r).Item(8)) Then
+                                                                'Ok!
+                                                                're concatenamos la parte inicial y reasignamos partcad
+                                                                partCad = ""
+                                                                For u = 0 To UBound(miObjeto) - 1
+                                                                    partCad = partCad & CStr(miObjeto(u))
+                                                                Next
+                                                                'partCad = Mid(partCad, poSiclo, poSiclo + partCad.Length - CStr(xTabla.Rows(r).Item(8)).Length)
+
+                                                            Else
+                                                                'No OK!
+                                                                cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please check!"
+
+                                                                meQuedolaRegla = False
+
+                                                                Exit For
+
+                                                            End If
+                                                        Else
+                                                            partCad = cadLeft
+                                                        End If
+
+                                                    End If
+
+
+                                                    xObj = Split(CStr(xTabla.Rows(r).Item(6)), ":") '
+                                                    'mm:md21:md21-0001:MATNR:MAKTX#MTBN-MAKNT#MATH:MATCH
+                                                    mixNombreTab = CStr(xObj(1)) & "#" & CStr(xObj(2)) & "#" & CStr(xObj(3))
+                                                    If multiDepe.Tables.IndexOf(mixNombreTab) < 0 Then
+
+                                                        cadError = "The required object to evaluate this field is not available or has not yet builded: '" & CStr(xObj(1)) & " > " & CStr(xObj(2)) & " > " & CStr(xObj(3)) & ""
+
+                                                        meQuedolaRegla = False
+
+                                                        Exit For
+
+                                                    End If
+
+                                                    buskEst = ""
+
+                                                    If CStr(xObj(4)) <> "None" And CStr(xObj(4)) <> "" Then
+                                                        'se requiere validación match adicional!
+                                                        'del campo mio al campo del objeto externo
+                                                        yObj = Split(CStr(xObj(4)), "-")
+                                                        For p = 0 To UBound(yObj)
+
+                                                            If p <> 0 Then buskEst = buskEst & " AND "
+
+                                                            zObj = Split(CStr(yObj(p)), "#")
+
+                                                            buskEst = buskEst & CStr(zObj(1)) & " = '"
+
+                                                            buskEst = buskEst & DataGridView1.Rows(i).Cells(CStr(zObj(0))).Value & "'"
+
+                                                        Next
+
+                                                    End If
+
+                                                    If buskEst <> "" Then buskEst = buskEst & " AND "
+
+                                                    buskEst = buskEst & CStr(xObj(3)) & " = '" & partCad & "'"
+
+                                                    Dim fatRows() As DataRow
+                                                    fatRows = multiDepe.Tables(mixNombreTab).Select(buskEst)
+
+                                                    If fatRows.Length = 0 Then
+                                                        '
+                                                        cadError = "There is no matchs on the external object required > " & CStr(xObj(1)) & " > " & CStr(xObj(2)) & " > " & CStr(xObj(3))
+
+                                                        meQuedolaRegla = False
+
+                                                        Exit For
+
+                                                    End If
+                                                    '
+                                                    'si llega aqui entonces SI paso, y debe redefinirse cadleft
+
+                                                    'cadLeft = Mid(cadLeft, poSiclo + numChars + pedX.Length, Len(cadLeft) - (poSiclo - 1))
+                                                    cadLeft = cadLeft.Substring(poSiclo + partCad.Length + pedX.Length)
+                                                    'Dim xTabF As DataTable
+                                                    'xTabF = multiDepe.Tables(mixNombreTab).Clone()
+                                                    'For Each row In fatRows
+                                                    '    xTabF.ImportRow(row)
+                                                    'Next
+
+
+
 
                                             End Select
 

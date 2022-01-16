@@ -1,4 +1,7 @@
 ﻿Public Class Form7
+
+    Public allTemps As DataSet
+    Public allDepes As DataSet
     Public TablaDatos As DataTable
     Public ConsObject As String
     Public ConsTable As String
@@ -68,16 +71,17 @@
         FillRule.Items.Add("B - Free Text")
         FillRule.Items.Add("C - Running number")
         FillRule.Items.Add("D - Fixed Value")
-        'FillRule.Items.Add("E - External dependencie")?
+        FillRule.Items.Add("E - External object") 'OJOO, puede ser de un objeto local ó externo!!, todos menos su mismo campo!!
+
         FillRule.DefaultCellStyle.BackColor = Color.White
         FillRule.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox
         FillRule.DisplayStyleForCurrentCellOnly = True
 
         DataGridView1.Columns.Add("Consec", "#'s") '0
         DataGridView1.Columns.Add(FillRule) '1
-        DataGridView1.Columns.Add("Value", "Value") '1
-        DataGridView1.Columns.Add("CharLen", "Char Length") '2
-        DataGridView1.Columns.Add("Signo", "Signo") '3
+        DataGridView1.Columns.Add("Value", "Value") '2
+        DataGridView1.Columns.Add("CharLen", "Char Length") '3
+        DataGridView1.Columns.Add("Signo", "Signo") '4
 
         For i = 0 To DataGridView1.Columns.Count - 1
             DataGridView1.Columns(i).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
@@ -225,6 +229,14 @@
                         DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = filterDt.Rows(i).Item(6)
                         DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).ReadOnly = False
 
+                    Case Is = "E - External object"
+                        If CStr(filterDt.Rows(i).Item(6)) = "" Then
+                            DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = "None"
+                        Else
+                            DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).Value = CStr(filterDt.Rows(i).Item(6))
+                        End If
+                        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(2).ReadOnly = True
+
                 End Select
 
                 DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(3).Value = filterDt.Rows(i).Item(7)
@@ -347,7 +359,7 @@
                 Case Is = "A - From Catalog"
                     'verificamos que el renglon tenga dato en el dataset!
                     If DataGridView1.Rows(i).Cells(2).Value = "" Or DataGridView1.Rows(i).Cells(2).Value = "None" Then
-                        MsgBox("Please check the data row", vbCritical, "SAP MD")
+                        MsgBox("Please make sure to set a catalog on row " & CStr(i), vbCritical, "QDT")
                         Exit Sub
                     End If
 
@@ -387,6 +399,13 @@
 
                     valorColumna = DataGridView1.Rows(i).Cells(2).Value
 
+
+                Case Is = "E - External object"
+                    If DataGridView1.Rows(i).Cells(2).Value = "" Or DataGridView1.Rows(i).Cells(2).Value = "None" Then
+                        MsgBox("Please make sure to set a external object traceability for row " & CStr(i), vbCritical, "QDT")
+                        Exit Sub
+                    End If
+                    valorColumna = DataGridView1.Rows(i).Cells(2).Value
 
             End Select
 
@@ -551,56 +570,97 @@
 
 
             Case Is = 2
+
                 'valor!
-                If DataGridView1.Rows(e.RowIndex).Cells(1).Value = "A - From Catalog" Then
-                    'abrimos el form11
-                    Dim miTag As Object = DataGridView1.Rows(e.RowIndex).Cells(2).Value
-                    If miTag = "None" Then
-                        'va directo a load
+                Select Case DataGridView1.Rows(e.RowIndex).Cells(1).Value
 
-                        Form11.toyLeyendo = False
-                        Form11.resCatCode = ""
-                        Form11.resCatModule = ""
-                        Form11.resCatMC = ""
-                        Form11.resCatMF = ""
+                    Case Is = "A - From Catalog"
+                        'abrimos el form11
+                        Dim miTag As Object = DataGridView1.Rows(e.RowIndex).Cells(2).Value
+                        If miTag = "None" Then
+                            'va directo a load
 
-                    Else
-                        'carga condiciones iniciales
-                        Dim xObj As Object = Nothing
-                        xObj = Split(miTag, ":")
-
-                        If UBound(xObj) <> 3 Then
                             Form11.toyLeyendo = False
                             Form11.resCatCode = ""
                             Form11.resCatModule = ""
                             Form11.resCatMC = ""
                             Form11.resCatMF = ""
+
                         Else
-                            Form11.toyLeyendo = True
-                            Form11.resCatModule = CStr(xObj(0))
-                            Form11.resCatCode = CStr(xObj(1))
-                            Form11.resCatMF = CStr(xObj(2))
-                            Form11.resCatMC = CStr(xObj(3))
+                            'carga condiciones iniciales
+                            Dim xObj As Object = Nothing
+                            xObj = Split(miTag, ":")
+
+                            If UBound(xObj) <> 3 Then
+                                Form11.toyLeyendo = False
+                                Form11.resCatCode = ""
+                                Form11.resCatModule = ""
+                                Form11.resCatMC = ""
+                                Form11.resCatMF = ""
+                            Else
+                                Form11.toyLeyendo = True
+                                Form11.resCatModule = CStr(xObj(0))
+                                Form11.resCatCode = CStr(xObj(1))
+                                Form11.resCatMF = CStr(xObj(2))
+                                Form11.resCatMC = CStr(xObj(3))
+                            End If
+
                         End If
 
-                    End If
+                        Form11.tablaTemp = TablaDatos ' tempDs.Tables(tablaNombre)
+                        Form11.objetoModule = ConsModule 'moduloSelek
+                        Form11.objetoCode = ConsObject ' objetoSelek
+                        Form11.TablaCode = ConsTable ' tableSelek
+                        Form11.elCampoCode = ConsField ' CStr(DataGridView1.Rows(e.RowIndex).Cells(0).Value)
+                        Form11.ultiCats = MisCatas
+                        Form11.elEnfoque = "B" 'de construccion
+                        Form11.ShowDialog()
 
-                    Form11.tablaTemp = TablaDatos ' tempDs.Tables(tablaNombre)
-                    Form11.objetoModule = ConsModule 'moduloSelek
-                    Form11.objetoCode = ConsObject ' objetoSelek
-                    Form11.TablaCode = ConsTable ' tableSelek
-                    Form11.elCampoCode = ConsField ' CStr(DataGridView1.Rows(e.RowIndex).Cells(0).Value)
-                    'Form11.Modulo1 = "gb"
-                    'Form11.Modulo2 = moduloSelek
-                    Form11.ultiCats = MisCatas
-                    Form11.elEnfoque = "B" 'de construccion
-                    Form11.ShowDialog()
+                        If Form11.huboExito = False Then Exit Sub
 
-                    If Form11.huboExito = False Then Exit Sub
+                        DataGridView1.Rows(e.RowIndex).Cells(2).Value = Form11.resCatModule & ":" & Form11.resCatCode & ":" & Form11.resCatMF & ":" & Form11.resCatMC
 
-                    DataGridView1.Rows(e.RowIndex).Cells(2).Value = Form11.resCatModule & ":" & Form11.resCatCode & ":" & Form11.resCatMF & ":" & Form11.resCatMC
+                    Case Is = "E - External object"
 
-                End If
+                        Form3.elEnfoque = "B" 'Build!
+                        Form3.xtraDs = allTemps
+                        Form3.yTraDs = allDepes ' depeDs
+                        Form3.depeTemplate = ConsObject ' elNode.Parent.Name
+                        Form3.depeTabla = ConsTable ' tableSelek ' elNode.Name
+
+                        Form3.resDepFieldCode = ""
+                        Form3.resDepFieldName = ""
+                        Form3.resConTempCode = ""
+                        Form3.resConTempName = ""
+                        Form3.resConTempModule = ""
+                        Form3.resConTableCode = ""
+                        Form3.resConTableName = ""
+                        Form3.resConFieldCode = ""
+                        Form3.resConFieldName = ""
+
+                        Form3.resConType = ""
+                        Form3.resConRule = ""
+                        Form3.resConVal = ""
+                        Form3.resMachFields = ""
+
+                        Form3.depeCampo = ConsField ' DataGridView1.Rows(e.RowIndex).Cells(0).Value
+
+                        'dep/objeto/tabla
+                        Form3.elPath = "construction/" & ConsObject & "/" & ConsTable
+
+                        Form3.huboExito = False
+
+                        Form3.ShowDialog()
+
+                        If Form3.huboExito = False Then Exit Sub
+
+                        'se pega la estructura!
+                        DataGridView1.Rows(e.RowIndex).Cells(2).Value = Form3.resConTempModule & ":" & Form3.resConTempCode & ":" & Form3.resConTableCode & ":" & Form3.resConFieldCode & ":" & Form3.resMachFields & ":" & Form3.resConRule
+
+
+
+                End Select
+
 
         End Select
 
@@ -616,13 +676,21 @@
 
 
             Case Is = 1
-                If DataGridView1.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = "A - From Catalog" Then
-                    DataGridView1.Rows(e.RowIndex).Cells(2).Value = "None"
-                    DataGridView1.Rows(e.RowIndex).Cells(2).ReadOnly = True
-                Else
-                    DataGridView1.Rows(e.RowIndex).Cells(2).ReadOnly = False
-                    DataGridView1.Rows(e.RowIndex).Cells(2).Value = ""
-                End If
+
+                Select Case DataGridView1.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
+                    Case Is = "A - From Catalog"
+                        DataGridView1.Rows(e.RowIndex).Cells(2).Value = "None"
+                        DataGridView1.Rows(e.RowIndex).Cells(2).ReadOnly = True
+
+                    Case Is = "E - External object"
+                        DataGridView1.Rows(e.RowIndex).Cells(2).Value = "None"
+                        DataGridView1.Rows(e.RowIndex).Cells(2).ReadOnly = True
+
+                    Case Else
+                        DataGridView1.Rows(e.RowIndex).Cells(2).ReadOnly = False
+                        DataGridView1.Rows(e.RowIndex).Cells(2).Value = ""
+
+                End Select
 
 
             Case Is = 2
@@ -634,6 +702,18 @@
 
 
         End Select
+
+    End Sub
+
+    Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
+
+        If IsNothing(DataGridView1.CurrentCell) = True Then Exit Sub
+
+        DataGridView1.Rows.RemoveAt(DataGridView1.CurrentCell.RowIndex)
+
+        For i = 0 To DataGridView1.Rows.Count - 1
+            DataGridView1.Rows(i).Cells(0).Value = CStr(i + 1)
+        Next
 
     End Sub
 End Class

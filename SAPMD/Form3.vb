@@ -3,6 +3,8 @@
     Private depFieldOk As Boolean
     Private conFieldOk As Boolean
 
+    Public elEnfoque As String
+
     Public elPath As String
     Public elDepds As New DataSet
     Public xtraDs As New DataSet
@@ -453,7 +455,12 @@
 
             conFieldOk = True
 
-            ComboBox2.Enabled = True
+            If elEnfoque = "B" Then 'si es de construccion, entonces SIEMPRE será apply!
+                ComboBox2.SelectedIndex = 1 '
+                ComboBox2.Enabled = False
+            Else
+                ComboBox2.Enabled = True
+            End If
 
             Call LlenaCombos()
 
@@ -461,6 +468,9 @@
 
     End Sub
     Private Sub LlenaCombos()
+
+        'la unica diferencia es que si viene de Scope de Construction, debe ponerse SIEMPRE regla Apply
+        'Y deshabilitar el textbox10!
 
         ComboBox1.Items.Clear()
         If conFieldOk = False Then
@@ -520,7 +530,6 @@
         Else
             Label13.Text = "External"
 
-
             If ComboBox2.SelectedIndex = 0 Then
                 ComboBox1.Items.Add("OR")
                 ComboBox1.Items.Add("NULL")
@@ -540,8 +549,15 @@
         End If
 
         'dependencias entre hojas
-        ComboBox1.Enabled = True
-        ComboBox1.SelectedIndex = 0
+        If elEnfoque = "B" Then
+            ComboBox1.SelectedIndex = 0
+            ComboBox1.Enabled = False 'La regla SIEMPRE va a ser MATCHS! para construccion!
+        Else
+            ComboBox1.Enabled = True
+            ComboBox1.SelectedIndex = 0
+        End If
+
+
 
     End Sub
 
@@ -580,17 +596,22 @@
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
 
-        Select Case CStr(ComboBox1.Items(ComboBox1.SelectedIndex))
-            Case Is = "NULL", "NOTNULL"
-                TextBox10.Text = ""
-                TextBox10.Enabled = False
+        If elEnfoque = "B" Then
+            TextBox10.Text = ""
+            TextBox10.Enabled = False
+        Else
+            Select Case CStr(ComboBox1.Items(ComboBox1.SelectedIndex))
+                Case Is = "NULL", "NOTNULL"
+                    TextBox10.Text = ""
+                    TextBox10.Enabled = False
 
-            Case Else
+                Case Else
 
-                TextBox10.Text = ""
-                TextBox10.Enabled = True
+                    TextBox10.Text = ""
+                    TextBox10.Enabled = True
+            End Select
 
-        End Select
+        End If
 
     End Sub
 
