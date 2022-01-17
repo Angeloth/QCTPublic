@@ -184,8 +184,14 @@ Public Class Form1
         Label1.Text = "No object selected"
         Label2.Text = ""
 
+        '1 a 1 puede ser con CSV, muchos a muchos es con Interop Excel o con OleDb
+        'Mucho a muchos export es con Interop Excel NO hay mas!
+
         'Upload from excel
         'https://www.freecodespot.com/blog/csharp-import-excel/
+        'https://www.c-sharpcorner.com/UploadFile/ankurmee/import-data-from-excel-to-datagridview-in-C-Sharp/
+        'https://www.csharp-console-examples.com/winform/c-program-to-read-csv-file-and-display-data-in-datagridview/
+        'https://stackoverflow.com/questions/16293643/import-excel-to-datagridview
 
 
         'ftp read write:
@@ -1514,6 +1520,7 @@ Public Class Form1
                     NodoNameActual = tablaFind
                 End If
 
+                DataGridView1.DataSource = Nothing
                 DataGridView1.Rows.Clear()
                 DataGridView1.Columns.Clear()
 
@@ -1551,6 +1558,7 @@ Public Class Form1
 
                         For j = 0 To filterDT.Rows.Count - 1
                             DataGridView1.Columns.Add(filterDT.Rows(j).Item(3), filterDT.Rows(j).Item(4))
+                            DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = filterDT.Rows(j).Item(3)
                             DataGridView1.Columns(DataGridView1.Columns.Count - 1).Tag = filterDT.Rows(j).Item(5) 'si es campo Yave o no!
                         Next
 
@@ -3909,10 +3917,10 @@ Public Class Form1
 
     End Sub
 
-    Private Async Sub ToolStripButton11_Click(sender As Object, e As EventArgs) Handles ToolStripButton11.Click
+    Private Sub ToolStripButton11_Click(sender As Object, e As EventArgs) Handles ToolStripButton11.Click
 
+        'este boton va ser para importar registros de un excel
         If CategSelected <> 3 Then Exit Sub
-        'bajar info de firebase
         If IsNothing(elNode) = True Then
             MsgBox("Please select a valid node!", vbCritical, "SAP MD")
             Exit Sub
@@ -3926,46 +3934,43 @@ Public Class Form1
             Exit Sub
         End If
 
-        Dim elCamino As String = RaizFire
-        elCamino = elCamino & "/records/" & elNode.Parent.Parent.Name 'compania
-        elCamino = elCamino & "/" & elNode.Parent.Name 'objeto
-        elCamino = elCamino & "/" & elNode.Name 'la tabla
-        elCamino = elCamino & "/records"
+        Dim diLOg As New OpenFileDialog
+        Dim oFileName As String
+        oFileName = ""
+        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
+        diLOg.Filter = "Excel CSV File (*.csv)|*.csv" '"Excel File (*.xls)|*.xls"
 
-        usaDataset.Tables(0).Rows.Clear()
-        usaDataset.Tables(0).Rows.Add({"records"})
-        usaDataset.Tables(0).Rows.Add({elNode.Parent.Parent.Name})
-        usaDataset.Tables(0).Rows.Add({elNode.Parent.Name})
-        usaDataset.Tables(0).Rows.Add({elNode.Name})
-        usaDataset.Tables(0).Rows.Add({"records"})
+        'al importar hay varias opciones
+        '1. Importar una hoja simple
+        '2. Importar todo el template!
+        '3. Darle en importar y guardar
+        '4. Exportar una hoja simple
+        '5. Exportar todo el template!
 
-        Dim xDs As New DataSet
-        xDs = Await PullUrlWs(usaDataset, "records")
 
-        DataGridView1.Rows.Clear()
+        Dim borroRecords As Boolean = False
 
-        DataGridView1.AllowUserToAddRows = False
-        DataGridView1.AllowUserToDeleteRows = False
+        If diLOg.ShowDialog() = Windows.Forms.DialogResult.OK Then
 
-        If xDs.Tables.Count > 0 Then
-            Dim k As Integer = 0
-            For i = 0 To xDs.Tables(0).Rows.Count - 1
+            Dim path As String = diLOg.FileName
 
-                DataGridView1.Rows.Add()
-                DataGridView1.Rows(DataGridView1.Rows.Count - 1).HeaderCell.Value = CStr(i + 1)
-                For j = 0 To xDs.Tables(0).Columns.Count - 1
-                    DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(xDs.Tables(0).Columns(j).ColumnName).Value = xDs.Tables(0).Rows(i).Item(j)
-                Next
+            Dim elDt As New DataTable
 
-            Next
-            'MsgBox("All records downloaded!", vbInformation, "SAP MD")
-        Else
-            MsgBox("No records found for this object!!", vbInformation, "SAP MD")
+            elDt = LoadFromCSV(path)
+
+            If elDt.Rows.Count = 0 Then Exit Sub
+
+            If borroRecords = True Then DataGridView1.Rows.Clear()
+
+            Dim bS As New BindingSource
+
+            bS.DataSource = elDt
+
+            DataGridView1.AutoGenerateColumns = False
+
+            DataGridView1.DataSource = bS
+
         End If
-
-        DataGridView1.AllowUserToAddRows = True
-        DataGridView1.AllowUserToDeleteRows = True
-
 
     End Sub
 
@@ -4139,6 +4144,10 @@ Public Class Form1
     End Sub
 
     Private Sub ToolStripButton12_Click(sender As Object, e As EventArgs) Handles ToolStripButton12.Click
+
+
+        'Exportar todo el 
+
         If DataGridView1.Rows.Count - 1 < 0 Then
             MsgBox("Deploy some information first!!", vbCritical, "Clever Costs")
             Exit Sub
@@ -4152,7 +4161,9 @@ Public Class Form1
         'diLOg.Filter = "Excel File (*.xls)|*.xls|Todos los archivos (*.*)|*.*"
         If diLOg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
 
-            Call DataGridToCSV(DataGridView1, "", diLOg.FileName)
+            'Call datagridto
+            Call ExportToCsv2(DataGridView1, diLOg.FileName)
+
 
         End If
     End Sub
@@ -4661,6 +4672,8 @@ Public Class Form1
             Case Is = 2
 
             Case Is = 3
+                'records!
+                DataGridView1.Rows(e.RowIndex).HeaderCell.Value = CStr(e.RowIndex + 1)
 
             Case Is = 4
                 'templates
@@ -7510,4 +7523,61 @@ Public Class Form1
 
     End Sub
 
+    Private Async Sub ToolStripButton17_Click(sender As Object, e As EventArgs) Handles ToolStripButton17.Click
+        'boton para hacer refresh de los registros guardados!
+        If CategSelected <> 3 Then Exit Sub
+        'bajar info de firebase
+        If IsNothing(elNode) = True Then
+            MsgBox("Please select a valid node!", vbCritical, "SAP MD")
+            Exit Sub
+        End If
+
+        Dim xObj As Object
+        xObj = Split(elNode.FullPath, "\")
+
+        If xObj.Length < 4 Then
+            MsgBox("Please select a node at a table level!", vbCritical, "SAP MD")
+            Exit Sub
+        End If
+
+        Dim elCamino As String = RaizFire
+        elCamino = elCamino & "/records/" & elNode.Parent.Parent.Name 'compania
+        elCamino = elCamino & "/" & elNode.Parent.Name 'objeto
+        elCamino = elCamino & "/" & elNode.Name 'la tabla
+        elCamino = elCamino & "/records"
+
+        usaDataset.Tables(0).Rows.Clear()
+        usaDataset.Tables(0).Rows.Add({"records"})
+        usaDataset.Tables(0).Rows.Add({elNode.Parent.Parent.Name})
+        usaDataset.Tables(0).Rows.Add({elNode.Parent.Name})
+        usaDataset.Tables(0).Rows.Add({elNode.Name})
+        usaDataset.Tables(0).Rows.Add({"records"})
+
+        Dim xDs As New DataSet
+        xDs = Await PullUrlWs(usaDataset, "records")
+
+        DataGridView1.Rows.Clear()
+
+        DataGridView1.AllowUserToAddRows = False
+        DataGridView1.AllowUserToDeleteRows = False
+
+        If xDs.Tables.Count > 0 Then
+            Dim k As Integer = 0
+            For i = 0 To xDs.Tables(0).Rows.Count - 1
+
+                DataGridView1.Rows.Add()
+                DataGridView1.Rows(DataGridView1.Rows.Count - 1).HeaderCell.Value = CStr(i + 1)
+                For j = 0 To xDs.Tables(0).Columns.Count - 1
+                    DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(xDs.Tables(0).Columns(j).ColumnName).Value = xDs.Tables(0).Rows(i).Item(j)
+                Next
+
+            Next
+            'MsgBox("All records downloaded!", vbInformation, "SAP MD")
+        Else
+            MsgBox("No records found for this object!!", vbInformation, "SAP MD")
+        End If
+
+        DataGridView1.AllowUserToAddRows = True
+        DataGridView1.AllowUserToDeleteRows = True
+    End Sub
 End Class
