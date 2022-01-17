@@ -5929,6 +5929,8 @@ Public Class Form1
                                     'Dim partCad As String = ""
 
                                     Dim cadError As String = ""
+                                    Dim longAcum As Integer = 0
+                                    Dim charResta As Integer = 0
 
                                     Dim pedX As String = ""
                                     For w = 0 To tab1.Rows.Count - 1
@@ -5945,6 +5947,8 @@ Public Class Form1
                                         cadFix = ""
                                         cadLeft = valEvaluar
                                         meQuedolaRegla = True
+                                        longAcum = 0
+                                        charResta = 0
                                         'aqui verificamos de una!
                                         For r = 0 To xTabla.Rows.Count - 1
 
@@ -5978,43 +5982,43 @@ Public Class Form1
                                                         Exit For
                                                     End If
 
+                                                    'regla puede quedar:
+                                                    '1. Si hay caracter de concatenación al final, se hace split, y se toma el primer valor SIEMPRE
+                                                    '2. A ese primer valor se le quitan los espacios en blanco al inicio y final con trim
+                                                    '3. Se compara vs el ancho de caracteres y vs el catalogo, si todo OK, continua
+                                                    '4. Se recalcula cadleft!
 
-                                                    partCad = Mid(cadLeft, poSiclo, poSiclo + numChars - 1)
+                                                    buskEst = ""
 
-                                                    If partCad.Length <= numChars Then
+                                                    If CStr(xObj(3)) <> "None" And CStr(xObj(3)) <> "" Then
+                                                        'se requiere validación match adicional!
+                                                        'del campo mio al campo del objeto externo
+                                                        yObj = Split(CStr(xObj(3)), "-")
+                                                        For p = 0 To UBound(yObj)
 
-                                                        'gb:gb0001:A:None
+                                                            If p <> 0 Then buskEst = buskEst & " AND "
 
-                                                        buskEst = ""
+                                                            zObj = Split(CStr(yObj(p)), "#")
 
-                                                        If CStr(xObj(3)) <> "None" And CStr(xObj(3)) <> "" Then
-                                                            'se requiere validación match adicional!
-                                                            'del campo mio al campo del objeto externo
-                                                            yObj = Split(CStr(xObj(3)), "-")
-                                                            For p = 0 To UBound(yObj)
+                                                            buskEst = buskEst & CStr(zObj(1)) & " = '"
 
-                                                                If p <> 0 Then buskEst = buskEst & " AND "
+                                                            buskEst = buskEst & DataGridView1.Rows(i).Cells(CStr(zObj(0))).Value & "'"
 
-                                                                zObj = Split(CStr(yObj(p)), "#")
+                                                        Next
 
-                                                                buskEst = buskEst & CStr(zObj(1)) & " = '"
+                                                    End If
 
-                                                                buskEst = buskEst & DataGridView1.Rows(i).Cells(CStr(zObj(0))).Value & "'"
+                                                    If buskEst <> "" Then buskEst = buskEst & " AND "
 
-                                                            Next
 
-                                                        End If
+                                                    'otra forma:
+                                                    pedX = ""
+                                                    If CStr(xTabla.Rows(r).Item(8)) <> "" Then
+                                                        'tiene caracter de concatenación, se hace split
 
-                                                        If buskEst <> "" Then buskEst = buskEst & " AND "
+                                                        If cadLeft.Contains(CStr(xTabla.Rows(r).Item(8))) = False Then
 
-                                                        buskEst = buskEst & CStr(xObj(2)) & " = '" & partCad & "'"
-
-                                                        Dim fatRows() As DataRow
-                                                        fatRows = catDs.Tables(mixNombreTab).Select(buskEst)
-
-                                                        If fatRows.Length = 0 Then
-                                                            '
-                                                            cadError = "The is no matches on the catalog: '" & catDs.Tables(mixNombreTab).ExtendedProperties.Item("CatalogName") & "' for this value, please check!"
+                                                            cadError = "Couldn't found the concatenation character required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please review!"
 
                                                             meQuedolaRegla = False
 
@@ -6022,64 +6026,37 @@ Public Class Form1
 
                                                         End If
 
-                                                        'unComodin = CStr(xTabla.Rows(r).Item(6)) 'Microsoft.VisualBasic.Left(CStr(ValidaDt.Rows(z).Item(14)), 2) & "#" & CStr(ValidaDt.Rows(z).Item(14))
-
-                                                        'If catDs.Tables.IndexOf(CStr(unComodin)) < 0 Then Exit For 'no se puede validar!
-
-                                                        'findAnother = catDs.Tables(unComodin).Rows.Find(partCad)
-
-                                                        'If IsNothing(findAnother) = True Then
-
-                                                        '    meQuedolaRegla = False
-
-                                                        '    cadError = "The " & partCad & " doesn't exists in the '" & catDs.Tables(unComodin).Columns(0).ColumnName & "' catalog, please review!"
-
-                                                        '    Exit For
-
-                                                        'End If
-
-                                                        cadFix = cadFix & partCad
-
-                                                        If CStr(xTabla.Rows(r).Item(8)) = "" Then
-
-                                                            poSiclo = poSiclo + CInt(numChars)
-
-                                                            cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
-
+                                                        pedX = CStr(xTabla.Rows(r).Item(8))
+                                                        miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
+                                                        partCad = CStr(miObjeto(0))
+                                                        partCad = partCad.Trim() 'se quitan los espacios en bblanco!
+                                                    Else
+                                                        'se toma el ancho de caracteres
+                                                        If numChars <= cadLeft.Length Then
+                                                            partCad = cadLeft.Substring(0, numChars) 'otra forma para lo mismo!
                                                         Else
-
-                                                            partCad = Mid(cadLeft, poSiclo + CInt(numChars), Len(CStr(xTabla.Rows(r).Item(8))))
-
-                                                            If partCad = CStr(xTabla.Rows(r).Item(8)) Then
-
-                                                                'esta OK, fue igual al caracter próximo!
-
-                                                                cadFix = cadFix & CStr(xTabla.Rows(r).Item(8))
-
-                                                                poSiclo = poSiclo + CInt(numChars) + Len(CStr(xTabla.Rows(r).Item(8)))
-
-                                                                cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
-
+                                                            If r = xTabla.Rows.Count - 1 Then
+                                                                partCad = cadLeft
                                                             Else
+                                                                'solo si NO es el último paso
+                                                                If TengoCataMatch(catDs.Tables(mixNombreTab), cadLeft, buskEst, CStr(xObj(2)), partCad) = True Then
 
-                                                                'NO esta OK!
+                                                                Else
+                                                                    cadError = "The is no matches on the catalog: '" & catDs.Tables(mixNombreTab).ExtendedProperties.Item("CatalogName") & "' for the value '" & cadLeft & "', please check!"
 
-                                                                meQuedolaRegla = False
+                                                                    meQuedolaRegla = False
 
-                                                                cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(7)) & "', please check!"
-
-                                                                Exit For
+                                                                    Exit For
+                                                                End If
 
                                                             End If
-
                                                         End If
 
+                                                        'partCad = Mid(cadLeft, poSiclo, poSiclo + numChars - 1)
+                                                    End If
 
-
-
-
-                                                    Else
-
+                                                    If partCad.Length > numChars Then
+                                                        'salimos
                                                         cadError = "The length for " & partCad & " doesn't meet the current required that is as maximum " & numChars & " characters length!"
 
                                                         meQuedolaRegla = False
@@ -6088,9 +6065,96 @@ Public Class Form1
 
                                                     End If
 
+                                                    buskEst = buskEst & CStr(xObj(2)) & " = '" & partCad & "'"
+
+                                                    Dim fatRows() As DataRow
+                                                    fatRows = catDs.Tables(mixNombreTab).Select(buskEst)
+
+                                                    If fatRows.Length = 0 Then
+                                                        '
+                                                        cadError = "The is no matches on the catalog: '" & catDs.Tables(mixNombreTab).ExtendedProperties.Item("CatalogName") & "' for the value '" & partCad & "', please check!"
+
+                                                        meQuedolaRegla = False
+
+                                                        Exit For
+
+                                                    End If
+
+                                                    cadLeft = cadLeft.Substring(partCad.Length + pedX.Length)
+
+                                                    longAcum = longAcum + partCad.Length + pedX.Length
+                                                    charResta = valEvaluar.Length - longAcum
+                                                    'If partCad.Length <= numChars Then
+
+                                                    '    'gb:gb0001:A:None
+
+                                                    '    'unComodin = CStr(xTabla.Rows(r).Item(6)) 'Microsoft.VisualBasic.Left(CStr(ValidaDt.Rows(z).Item(14)), 2) & "#" & CStr(ValidaDt.Rows(z).Item(14))
+
+                                                    '    'If catDs.Tables.IndexOf(CStr(unComodin)) < 0 Then Exit For 'no se puede validar!
+
+                                                    '    'findAnother = catDs.Tables(unComodin).Rows.Find(partCad)
+
+                                                    '    'If IsNothing(findAnother) = True Then
+
+                                                    '    '    meQuedolaRegla = False
+
+                                                    '    '    cadError = "The " & partCad & " doesn't exists in the '" & catDs.Tables(unComodin).Columns(0).ColumnName & "' catalog, please review!"
+
+                                                    '    '    Exit For
+
+                                                    '    'End If
+
+                                                    '    cadFix = cadFix & partCad
+
+                                                    '    If CStr(xTabla.Rows(r).Item(8)) = "" Then
+
+                                                    '        poSiclo = poSiclo + CInt(numChars)
+
+                                                    '        cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
+
+                                                    '    Else
+
+                                                    '        partCad = Mid(cadLeft, poSiclo + CInt(numChars), Len(CStr(xTabla.Rows(r).Item(8))))
+
+                                                    '        If partCad = CStr(xTabla.Rows(r).Item(8)) Then
+
+                                                    '            'esta OK, fue igual al caracter próximo!
+
+                                                    '            cadFix = cadFix & CStr(xTabla.Rows(r).Item(8))
+
+                                                    '            poSiclo = poSiclo + CInt(numChars) + Len(CStr(xTabla.Rows(r).Item(8)))
+
+                                                    '            cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
+
+                                                    '        Else
+
+                                                    '            'NO esta OK!
+
+                                                    '            meQuedolaRegla = False
+
+                                                    '            cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(7)) & "', please check!"
+
+                                                    '            Exit For
+
+                                                    '        End If
+
+                                                    '    End If
+
+                                                    'Else
+
+                                                    '    cadError = "The length for " & partCad & " doesn't meet the current required that is as maximum " & numChars & " characters length!"
+
+                                                    '    meQuedolaRegla = False
+
+                                                    '    Exit For
+
+                                                    'End If
+
 
 
                                                 Case Is = "B - Free Text"
+
+                                                    pedX = ""
 
                                                     If r = xTabla.Rows.Count - 1 Then
 
@@ -6120,53 +6184,14 @@ Public Class Form1
 
                                                     Else
 
-                                                        If CStr(xTabla.Rows(r).Item(8)) = "" Then
+                                                        pedX = ""
 
-                                                            cadError = "There is no concatenation character to bind, please review!"
+                                                        If CStr(xTabla.Rows(r).Item(8)) <> "" Then
+                                                            'tiene caracter de concatenación, se hace split
 
-                                                            meQuedolaRegla = False
+                                                            If cadLeft.Contains(CStr(xTabla.Rows(r).Item(8))) = False Then
 
-                                                            Exit For
-
-                                                        Else
-
-                                                            miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
-
-                                                            partCad = CStr(miObjeto(0))
-
-                                                            pedX = Mid(cadLeft, poSiclo + Len(partCad), Len(CStr(xTabla.Rows(r).Item(8))))
-
-                                                            If pedX = CStr(xTabla.Rows(r).Item(8)) Then
-
-                                                                'coincide, todo ok!
-
-                                                                If Len(partCad) <= CInt(numChars) Then
-
-                                                                    'ok
-
-                                                                    cadFix = cadFix & partCad
-
-                                                                    poSiclo = poSiclo + Len(CStr(miObjeto(0))) + Len(CStr(xTabla.Rows(r).Item(8)))
-
-                                                                    cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
-
-                                                                Else
-
-                                                                    'error
-
-                                                                    cadError = "The length of " & partCad & " exceeds the limit of " & CInt(numChars) & " characters length!"
-
-                                                                    meQuedolaRegla = False
-
-                                                                    Exit For
-
-                                                                End If
-
-                                                            Else
-
-                                                                'NO coincide!
-
-                                                                cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please check!"
+                                                                cadError = "Couldn't found the concatenation character required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please review!"
 
                                                                 meQuedolaRegla = False
 
@@ -6174,9 +6199,101 @@ Public Class Form1
 
                                                             End If
 
+                                                            pedX = CStr(xTabla.Rows(r).Item(8))
+                                                            miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
+                                                            partCad = CStr(miObjeto(0))
+                                                            partCad = partCad.Trim() 'se quitan los espacios en bblanco!
+                                                        Else
+                                                            'se toma el ancho de caracteres
+                                                            'ir hacia adelante, tomar la 
+                                                            'hay un caracter de concatenación missing!
+                                                            If numChars <= cadLeft.Length Then
+                                                                'se puede tomar
+                                                                partCad = cadLeft.Substring(0, numChars)
+                                                            Else
+                                                                'NO se puede definir la cantidad de caracteres a tomar
+                                                                cadError = "Unable to define the number of characters due to missing concatenation character please review with dev team or consultants!"
 
+                                                                meQuedolaRegla = False
+
+                                                                Exit For
+
+                                                            End If
+                                                            'otra forma para lo mismo!
+                                                            'partCad = Mid(cadLeft, poSiclo, poSiclo + numChars - 1)
+                                                        End If
+
+                                                        If partCad.Length > numChars Then
+                                                            'salimos
+                                                            cadError = "The length for " & partCad & " doesn't meet the current required that is as maximum " & numChars & " characters length!"
+
+                                                            meQuedolaRegla = False
+
+                                                            Exit For
 
                                                         End If
+
+                                                        'el valor que quea de partcad esta bien porque es free text!!
+
+                                                        cadLeft = cadLeft.Substring(partCad.Length + pedX.Length)
+
+                                                        'If CStr(xTabla.Rows(r).Item(8)) = "" Then
+
+                                                        '    cadError = "There is no concatenation character to bind, please review!"
+
+                                                        '    meQuedolaRegla = False
+
+                                                        '    Exit For
+
+                                                        'Else
+
+                                                        '    miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
+
+                                                        '    partCad = CStr(miObjeto(0))
+
+                                                        '    pedX = Mid(cadLeft, poSiclo + Len(partCad), Len(CStr(xTabla.Rows(r).Item(8))))
+
+                                                        '    If pedX = CStr(xTabla.Rows(r).Item(8)) Then
+
+                                                        '        'coincide, todo ok!
+
+                                                        '        If Len(partCad) <= CInt(numChars) Then
+
+                                                        '            'ok
+
+                                                        '            cadFix = cadFix & partCad
+
+                                                        '            poSiclo = poSiclo + Len(CStr(miObjeto(0))) + Len(CStr(xTabla.Rows(r).Item(8)))
+
+                                                        '            cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
+
+                                                        '        Else
+
+                                                        '            'error
+
+                                                        '            cadError = "The length of " & partCad & " exceeds the limit of " & CInt(numChars) & " characters length!"
+
+                                                        '            meQuedolaRegla = False
+
+                                                        '            Exit For
+
+                                                        '        End If
+
+                                                        '    Else
+
+                                                        '        'NO coincide!
+
+                                                        '        cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please check!"
+
+                                                        '        meQuedolaRegla = False
+
+                                                        '        Exit For
+
+                                                        '    End If
+
+
+
+                                                        'End If
 
 
 
@@ -6186,6 +6303,8 @@ Public Class Form1
 
                                                 Case Is = "C - Running number"
 
+                                                    pedX = ""
+
                                                     If r = xTabla.Rows.Count - 1 Then
 
                                                         partCad = cadLeft
@@ -6194,15 +6313,15 @@ Public Class Form1
 
                                                             'es numero
 
-                                                            If Len(partCad) <= CInt(numChars) Then
-
-
+                                                            If partCad.Length = numChars Then
+                                                                'cumple el largo de numeros
+                                                                'debe cuadrarlo a la totalidad de caracteres que puso
                                                                 poSiclo = poSiclo + Len(partCad) + Len(CStr(xTabla.Rows(r).Item(8)))
 
                                                                 cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
 
                                                             Else
-
+                                                                'NO lo cumple
                                                                 cadError = "This part of the construction rule exceeds the maximum character limit : '" & CInt(numChars) & "', please check!"
 
                                                                 meQuedolaRegla = False
@@ -6210,6 +6329,23 @@ Public Class Form1
                                                                 Exit For
 
                                                             End If
+
+                                                            'If Len(partCad) <= CInt(numChars) Then
+
+
+                                                            '    poSiclo = poSiclo + Len(partCad) + Len(CStr(xTabla.Rows(r).Item(8)))
+
+                                                            '    cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
+
+                                                            'Else
+
+                                                            '    cadError = "This part of the construction rule exceeds the maximum character limit : '" & CInt(numChars) & "', please check!"
+
+                                                            '    meQuedolaRegla = False
+
+                                                            '    Exit For
+
+                                                            'End If
 
 
 
@@ -6225,75 +6361,15 @@ Public Class Form1
 
                                                         End If
 
-
-
                                                     Else
 
-                                                        If CStr(xTabla.Rows(r).Item(8)) = "" Then
+                                                        partCad = cadLeft.Substring(0, numChars)
 
-                                                            'error!
+                                                        If CStr(xTabla.Rows(r).Item(8)) <> "" Then
 
-                                                            cadError = "There is no concatenation character to bind, please review with dev team!"
+                                                            pedX = cadLeft.Substring(numChars, CStr(xTabla.Rows(r).Item(8)).Length)
 
-                                                            meQuedolaRegla = False
-
-                                                            Exit For
-
-                                                        Else
-
-                                                            miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
-
-                                                            partCad = CStr(miObjeto(0))
-
-                                                            pedX = Mid(cadLeft, poSiclo + Len(partCad), Len(CStr(xTabla.Rows(r).Item(8))))
-
-                                                            If pedX = CStr(xTabla.Rows(r).Item(8)) Then
-
-
-
-                                                                If IsNumeric(partCad) = True Then
-
-                                                                    'es numero
-
-                                                                    If Len(partCad) <= CInt(numChars) Then
-
-                                                                        poSiclo = poSiclo + Len(partCad) + Len(CStr(xTabla.Rows(r).Item(8)))
-
-                                                                        cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
-
-
-
-                                                                    Else
-
-
-
-                                                                        cadError = "This part of the construction rule exceeds the maximum character limit : '" & CInt(numChars) & "', please check!"
-
-                                                                        meQuedolaRegla = False
-
-                                                                        Exit For
-
-                                                                    End If
-
-
-
-                                                                Else
-
-                                                                    'No es numero!
-
-                                                                    cadError = "This part of the construction rule must be a valid running number, curently you have: '" & partCad & "', please check!"
-
-                                                                    meQuedolaRegla = False
-
-                                                                    Exit For
-
-                                                                End If
-
-
-
-
-
-                                                            Else
+                                                            If pedX <> CStr(xTabla.Rows(r).Item(8)) Then
 
                                                                 'NO coincide!
 
@@ -6305,9 +6381,105 @@ Public Class Form1
 
                                                             End If
 
+                                                        End If
 
+
+                                                        If IsNumeric(partCad) = True Then
+
+                                                            If partCad.Length = numChars Then
+                                                                'cumple el largo de numeros
+                                                                'debe cuadrarlo a la totalidad de caracteres que puso
+                                                                poSiclo = poSiclo + Len(partCad) + Len(CStr(xTabla.Rows(r).Item(8)))
+
+                                                                cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
+
+                                                            Else
+                                                                'NO lo cumple
+                                                                cadError = "This part of the construction rule exceeds the maximum character limit : '" & CInt(numChars) & "', please check!"
+
+                                                                meQuedolaRegla = False
+
+                                                                Exit For
+
+                                                            End If
+
+                                                        Else
+                                                            cadError = "This part of the construction rule must be a valid running number, curently you have: '" & partCad & "', please check!"
+
+                                                            meQuedolaRegla = False
+
+                                                            Exit For
 
                                                         End If
+
+
+                                                        'If CStr(xTabla.Rows(r).Item(8)) = "" Then
+
+                                                        '    'error!
+
+                                                        '    cadError = "There is no concatenation character to bind, please review with dev team!"
+
+                                                        '    meQuedolaRegla = False
+
+                                                        '    Exit For
+
+                                                        'Else
+
+                                                        '    miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
+
+                                                        '    partCad = CStr(miObjeto(0))
+
+                                                        '    pedX = Mid(cadLeft, poSiclo + Len(partCad), Len(CStr(xTabla.Rows(r).Item(8))))
+
+                                                        '    If pedX = CStr(xTabla.Rows(r).Item(8)) Then
+
+
+
+                                                        '        If IsNumeric(partCad) = True Then
+
+                                                        '            'es numero
+
+                                                        '            If Len(partCad) <= CInt(numChars) Then
+
+                                                        '                poSiclo = poSiclo + Len(partCad) + Len(CStr(xTabla.Rows(r).Item(8)))
+
+                                                        '                cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
+
+                                                        '            Else
+
+                                                        '                cadError = "This part of the construction rule exceeds the maximum character limit : '" & CInt(numChars) & "', please check!"
+
+                                                        '                meQuedolaRegla = False
+
+                                                        '                Exit For
+
+                                                        '            End If
+
+                                                        '        Else
+
+                                                        '            'No es numero!
+
+                                                        '            cadError = "This part of the construction rule must be a valid running number, curently you have: '" & partCad & "', please check!"
+
+                                                        '            meQuedolaRegla = False
+
+                                                        '            Exit For
+
+                                                        '        End If
+
+                                                        '    Else
+
+                                                        '        'NO coincide!
+
+                                                        '        cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please check!"
+
+                                                        '        meQuedolaRegla = False
+
+                                                        '        Exit For
+
+                                                        '    End If
+
+                                                        'End If
 
                                                     End If
 
@@ -6375,55 +6547,11 @@ Public Class Form1
                                                 Case Is = "E - External object"
 
                                                     pedX = ""
-                                                    pedX = CStr(xTabla.Rows(r).Item(8))
 
-                                                    If r = xTabla.Rows.Count - 1 Then
-                                                        'es el último, NO lleva al final caracter de concatenación!
-                                                        partCad = cadLeft
-                                                    Else
-                                                        'partCad = Mid(cadLeft, poSiclo, poSiclo + numChars - 1)
-                                                        'quitar el catacter de concatenación!
-                                                        If CStr(xTabla.Rows(r).Item(8)) <> "" Then
-                                                            'se hace split!
-                                                            miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
-
-                                                            If CStr(miObjeto(UBound(miObjeto))) = CStr(xTabla.Rows(r).Item(8)) Then
-                                                                'Ok!
-                                                                're concatenamos la parte inicial y reasignamos partcad
-                                                                partCad = ""
-                                                                For u = 0 To UBound(miObjeto) - 1
-                                                                    partCad = partCad & CStr(miObjeto(u))
-                                                                Next
-                                                                'partCad = Mid(partCad, poSiclo, poSiclo + partCad.Length - CStr(xTabla.Rows(r).Item(8)).Length)
-
-                                                            Else
-                                                                'No OK!
-                                                                cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please check!"
-
-                                                                meQuedolaRegla = False
-
-                                                                Exit For
-
-                                                            End If
-                                                        Else
-                                                            partCad = cadLeft
-                                                        End If
-
-                                                    End If
-
-
-                                                    xObj = Split(CStr(xTabla.Rows(r).Item(6)), ":") '
+                                                    xObj = Split(CStr(xTabla.Rows(r).Item(6)), ":")
+                                                    'desde aqui, si el template code y el table code es el mismo, entonces va sobre su mismo renglon!!
                                                     'mm:md21:md21-0001:MATNR:MAKTX#MTBN-MAKNT#MATH:MATCH
                                                     mixNombreTab = CStr(xObj(1)) & "#" & CStr(xObj(2)) & "#" & CStr(xObj(3))
-                                                    If multiDepe.Tables.IndexOf(mixNombreTab) < 0 Then
-
-                                                        cadError = "The required object to evaluate this field is not available or has not yet builded: '" & CStr(xObj(1)) & " > " & CStr(xObj(2)) & " > " & CStr(xObj(3)) & ""
-
-                                                        meQuedolaRegla = False
-
-                                                        Exit For
-
-                                                    End If
 
                                                     buskEst = ""
 
@@ -6447,25 +6575,114 @@ Public Class Form1
 
                                                     If buskEst <> "" Then buskEst = buskEst & " AND "
 
-                                                    buskEst = buskEst & CStr(xObj(3)) & " = '" & partCad & "'"
+                                                    If CStr(xTabla.Rows(r).Item(8)) <> "" Then
+                                                        'se hace split!
 
-                                                    Dim fatRows() As DataRow
-                                                    fatRows = multiDepe.Tables(mixNombreTab).Select(buskEst)
+                                                        If cadLeft.Contains(CStr(xTabla.Rows(r).Item(8))) = False Then
 
-                                                    If fatRows.Length = 0 Then
-                                                        '
-                                                        cadError = "There is no matchs on the external object required > " & CStr(xObj(1)) & " > " & CStr(xObj(2)) & " > " & CStr(xObj(3))
+                                                            cadError = "Couldn't found the concatenation character required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please review!"
 
-                                                        meQuedolaRegla = False
+                                                            meQuedolaRegla = False
 
-                                                        Exit For
+                                                            Exit For
+
+                                                        End If
+
+                                                        pedX = CStr(xTabla.Rows(r).Item(8))
+                                                        miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
+                                                        partCad = CStr(miObjeto(0))
+                                                        partCad = partCad.Trim() 'se quitan los espacios en bblanco!
+
+                                                    Else
+
+                                                        If r = xTabla.Rows.Count - 1 Then
+                                                            partCad = cadLeft
+                                                        Else
+                                                            'solo si NO es el último paso
+                                                            If CStr(xObj(1)) = objetoSelek And CStr(xObj(2)) = tableSelek Then
+                                                                'que alguna parte del objeto cuadre
+                                                                'Aquii falta una funcion para buscar dentro de cadleft un valor que le cuadre al datagridview.cells.
+
+
+                                                            Else
+                                                                If TengoCataMatch(multiDepe.Tables(mixNombreTab), cadLeft, buskEst, CStr(xObj(3)), partCad) = True Then
+
+                                                                Else
+                                                                    cadError = "The is no matches on the catalog: '" & catDs.Tables(mixNombreTab).ExtendedProperties.Item("CatalogName") & "' for the value '" & cadLeft & "', please check!"
+
+                                                                    meQuedolaRegla = False
+
+                                                                    Exit For
+                                                                End If
+
+                                                            End If
+
+                                                        End If
 
                                                     End If
-                                                    '
+
+
+
+                                                    'If r = xTabla.Rows.Count - 1 Then
+                                                    '    'es el último, NO lleva al final caracter de concatenación!
+                                                    '    partCad = cadLeft
+                                                    'Else
+
+                                                    '    partCad = cadLeft.Substring(0, numChars)
+                                                    '    pedX = cadLeft.Substring(numChars, CStr(xTabla.Rows(r).Item(8)).Length)
+                                                    '    'primero evaluarmos partcad
+
+                                                    'End If
+
+                                                    If CStr(xObj(1)) = objetoSelek And CStr(xObj(2)) = tableSelek Then
+                                                        'es local, misma template, misma hoja
+                                                        'se supone que SIEMPRE sera con None en match fields
+                                                        If partCad <> DataGridView1.Rows(i).Cells(CStr(xObj(3))).Value Then
+
+                                                            cadError = "There is no matchs on the external object required > " & CStr(xObj(1)) & " > " & CStr(xObj(2)) & " > " & CStr(xObj(3))
+
+                                                            meQuedolaRegla = False
+
+                                                            Exit For
+
+                                                        End If
+
+                                                    Else
+                                                        '
+
+                                                        If multiDepe.Tables.IndexOf(mixNombreTab) < 0 Then
+
+                                                            cadError = "The required object to evaluate this field is not available or has not yet builded: '" & CStr(xObj(1)) & " > " & CStr(xObj(2)) & " > " & CStr(xObj(3)) & ""
+
+                                                            meQuedolaRegla = False
+
+                                                            Exit For
+
+                                                        End If
+
+                                                        buskEst = buskEst & CStr(xObj(3)) & " = '" & partCad & "'"
+
+                                                        Dim fatRows() As DataRow
+                                                        fatRows = multiDepe.Tables(mixNombreTab).Select(buskEst)
+
+                                                        If fatRows.Length = 0 Then
+                                                            '
+                                                            cadError = "There is no matchs on the external object required > " & CStr(xObj(1)) & " > " & CStr(xObj(2)) & " > " & CStr(xObj(3))
+
+                                                            meQuedolaRegla = False
+
+                                                            Exit For
+
+                                                        End If
+
+                                                    End If
+
                                                     'si llega aqui entonces SI paso, y debe redefinirse cadleft
 
+
+
                                                     'cadLeft = Mid(cadLeft, poSiclo + numChars + pedX.Length, Len(cadLeft) - (poSiclo - 1))
-                                                    cadLeft = cadLeft.Substring(poSiclo + partCad.Length + pedX.Length)
+                                                    cadLeft = cadLeft.Substring(partCad.Length + pedX.Length)
                                                     'Dim xTabF As DataTable
                                                     'xTabF = multiDepe.Tables(mixNombreTab).Clone()
                                                     'For Each row In fatRows

@@ -1723,5 +1723,30 @@ Module Module1
         xTab.PrimaryKey = iAveprim
 
     End Sub
+    Public Function TengoCataMatch(ByVal elDt As DataTable, ByVal laCadena As String, ByVal lasCondis As String, ByVal elFieldMach As String, ByRef cadeMach As String) As Boolean
+
+        'el data table para la comparación
+        Dim querCom As String = ""
+        Dim cadPruf As String = ""
+        Dim siEncontre As Boolean = False
+        cadeMach = ""
+        For i = 1 To laCadena.Length
+            cadPruf = laCadena.Substring(0, i)
+            querCom = lasCondis & elFieldMach & " = '" & cadPruf & "'"
+            Dim misRows() As DataRow
+            misRows = elDt.Select(querCom)
+            If misRows.Length >= 1 Then
+                'ya dimos!
+                cadeMach = cadPruf
+                siEncontre = True
+                Exit For
+            End If
+
+        Next
+
+
+        Return siEncontre
+
+    End Function
 
 End Module
