@@ -1749,4 +1749,26 @@ Module Module1
 
     End Function
 
+    Public Function HayCadenainsideCadena(ByVal cadGral As String, ByVal cadBusca As String, ByRef cadResult As String) As Boolean
+
+        'cadgral es cadleft
+        Dim i As Integer
+        Dim cadQuer As String = ""
+        Dim siHayMach As Boolean = False
+        For i = 1 To cadGral.Length
+            cadQuer = cadGral.Substring(0, i)
+
+            If cadQuer = cadBusca Then
+                cadResult = cadQuer
+                siHayMach = True
+                Exit For
+            End If
+
+        Next
+
+        Return siHayMach
+
+    End Function
+
+
 End Module

@@ -10,7 +10,7 @@ Module Module4
         If elTexto.Length <= elLargo Then
             estaOk = True
         Else
-            elError = "The maximum character limit for this field is " & elLargo & ", currently is exceeded by " & elLargo - elTexto.Length & " characters!, please review."
+            elError = "The maximum character limit for this field is " & elLargo & ", currently is exceeded by " & elTexto.Length - elLargo & " character(s)!, please review."
         End If
 
         Return estaOk

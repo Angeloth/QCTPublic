@@ -6602,17 +6602,31 @@ Public Class Form1
                                                             If CStr(xObj(1)) = objetoSelek And CStr(xObj(2)) = tableSelek Then
                                                                 'que alguna parte del objeto cuadre
                                                                 'Aquii falta una funcion para buscar dentro de cadleft un valor que le cuadre al datagridview.cells.
+                                                                'DataGridView1.Rows(i).Cells(CStr(xObj(3))).Value'esta es la 
+                                                                'cadleft es la cadena en la que se va a buscar
+                                                                'Datagridview es ciclo de cadena a buscar!
 
+                                                                If HayCadenainsideCadena(cadLeft, DataGridView1.Rows(i).Cells(CStr(xObj(3))).Value, partCad) = False Then
 
-                                                            Else
-                                                                If TengoCataMatch(multiDepe.Tables(mixNombreTab), cadLeft, buskEst, CStr(xObj(3)), partCad) = True Then
-
-                                                                Else
-                                                                    cadError = "The is no matches on the catalog: '" & catDs.Tables(mixNombreTab).ExtendedProperties.Item("CatalogName") & "' for the value '" & cadLeft & "', please check!"
+                                                                    cadError = "The is no match on the referenced column: '" & DataGridView1.Columns(CStr(xObj(3))).HeaderText & "' inside the string: '" & cadLeft & "', please check!, there should be a match with this string: " & DataGridView1.Rows(i).Cells(CStr(xObj(3))).Value
 
                                                                     meQuedolaRegla = False
 
                                                                     Exit For
+
+                                                                End If
+
+
+                                                            Else
+
+                                                                If TengoCataMatch(multiDepe.Tables(mixNombreTab), cadLeft, buskEst, CStr(xObj(3)), partCad) = False Then
+
+                                                                    cadError = "The is no matches on the External object>: '" & CStr(xObj(1)) & " > " & CStr(xObj(2)) & " > " & CStr(xObj(3)) & " for the value '" & cadLeft & "', please check!"
+
+                                                                    meQuedolaRegla = False
+
+                                                                    Exit For
+
                                                                 End If
 
                                                             End If
