@@ -4,7 +4,6 @@ Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 Imports System.Net
 Imports System.IO
-Imports MySql.Data.MySqlClient
 Imports System.Text
 Imports System.Security.Cryptography
 Module Module1
@@ -1557,72 +1556,6 @@ Module Module1
         Next
 
         Return "ok"
-
-    End Function
-
-    Public Async Sub EscribeDatosEnFireBase()
-
-        Dim Konn As New MySqlConnection
-
-        Konn = Await MakeConnection()
-
-        If Konn Is Nothing Then
-
-            Exit Sub
-        End If
-
-        Dim cMo As New MySqlCommand
-        Dim da As New MySqlDataAdapter
-        Dim ds As New DataSet
-
-        'Dim i As Long
-
-        Dim elModulo As String = "gb"
-        Dim laTabla As String = "gbaaab"
-
-        cMo.Connection = Konn
-        cMo.CommandType = CommandType.Text
-        cMo.CommandText = "SELECT * FROM " & laTabla
-        da.SelectCommand = cMo
-        Await da.FillAsync(ds, "esa") '
-
-        cMo.Dispose()
-        da.Dispose()
-        Konn.Dispose()
-
-        'Dim elRes As String = ""
-        'elRes = Await HazPutEnFireBase(elModulo, "gb0002", ds)
-
-
-    End Sub
-
-    Public Async Function MakeConnection() As Task(Of MySqlConnection)
-
-        Dim con As New MySqlConnection()
-        Dim laCadena As String
-        Dim suServidor As String = "localhost" '"cmdb010" 'My.Settings.SerVnEim
-        Dim elUsuario As String = "sapuser" '"expenses" 'My.Settings.IuSernEim
-        Dim elPassword As String = "Mortredsap7*" '"Conti62743" 'My.Settings.passNeim
-
-        Dim laDataBase As String = "sapmd" '"expenses" 'My.Settings.DatBnEim
-
-        'suServidor = "localhost" '"cmdb010" 'Cambiar por el del cliente!
-        'elUsuario = "mro" 'Cambiar por el usuario del Cliente
-        'elPassword = "Conti62743" 'El password del Cliente!
-        'laDataBase = "mro" 'Cambiar por la DB del cliente!!
-
-        'Aqui esta lo bueno, como poner los strings basados en los servers
-        laCadena = "server=" & suServidor & ";user id=" & elUsuario & ";password=" & elPassword & ";database=" & laDataBase 'Se ponen los datos del Server, UserId, Password, Database!
-        con.ConnectionString = laCadena
-
-        Try
-            Await con.OpenAsync()
-
-            Return con
-
-        Catch ex As Exception
-            Return Nothing
-        End Try
 
     End Function
 

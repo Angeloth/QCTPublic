@@ -348,16 +348,17 @@ Module Module4
 
     End Function
 
-    Public Function ContainsInvalidChars(ByVal elTexto As String, ByVal losInvalids As String, ByRef elError As String) As Boolean
+    Public Function ContainsInvalidChars(ByVal elTexto As String, ByVal losInvalids As String) As Boolean
 
         Dim conTiene As Boolean = False
         Dim unCh As String = ""
-        elError = ""
+        'elError = ""
         For i = 0 To losInvalids.Length - 1
-            unCh = Mid(losInvalids, i, 1)
+            unCh = losInvalids.Substring(i, 1)
+            'unCh = Mid(losInvalids, i, 1)
 
             If elTexto.Contains(unCh) = True Then
-                elError = "This field is not allowed to contain any of the following characters: " & losInvalids & " , please review!"
+                'elError = "This field is not allowed to contain any of the following characters: " & losInvalids & " , please review!"
                 conTiene = True
                 Exit For
             End If

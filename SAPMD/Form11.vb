@@ -207,12 +207,18 @@
         Dim cuantosUno As Integer = 0
         Dim FieldCheck As String = ""
         Dim enCuentra As DataRow
+
+        Dim xCam(2) As String
+
         For i = 0 To DataGridView1.Rows.Count - 1
 
             If DataGridView1.Rows(i).Cells(1).Value = True Then
                 cuantosUno = cuantosUno + 1
-                If FieldCheck <> "" Then FieldCheck = FieldCheck & "="
+                If FieldCheck <> "" Then FieldCheck = FieldCheck & ">"
                 FieldCheck = FieldCheck & CStr(DataGridView1.Rows(i).Tag)
+
+                xCam(cuantosUno) = DataGridView1.Rows(i).Cells(0).Value
+
             End If
 
             If IsNothing(DataGridView1.Rows(i).Cells(2).Value) = False Then
@@ -260,9 +266,10 @@
             '4. Regla extra de regla de construccion vs objeto externo
             '5. Regla extra de validacion de dependant field vs condicionales internas, matching fields!!!!
             '6. 
-
+            Form12.camPo1 = xCam(1)
+            Form12.camPo2 = xCam(2)
+            Form12.elSimbolo = ">"
             Form12.ShowDialog()
-
 
         End If
 

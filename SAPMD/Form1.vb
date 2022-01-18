@@ -3962,6 +3962,11 @@ Public Class Form1
 
             If borroRecords = True Then DataGridView1.Rows.Clear()
 
+            estoyAgregandoRows = True
+
+            DataGridView1.AllowUserToAddRows = False
+            DataGridView1.AllowUserToDeleteRows = False
+
             Dim bS As New BindingSource
 
             bS.DataSource = elDt
@@ -3969,6 +3974,18 @@ Public Class Form1
             DataGridView1.AutoGenerateColumns = False
 
             DataGridView1.DataSource = bS
+
+
+            For i = 0 To DataGridView1.Rows.Count - 1
+                DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
+            Next
+
+            estoyAgregandoRows = False
+
+            DataGridView1.AllowUserToAddRows = True
+            DataGridView1.AllowUserToDeleteRows = True
+
+
 
         End If
 
@@ -4673,7 +4690,6 @@ Public Class Form1
 
             Case Is = 3
                 'records!
-                DataGridView1.Rows(e.RowIndex).HeaderCell.Value = CStr(e.RowIndex + 1)
 
             Case Is = 4
                 'templates
@@ -6754,6 +6770,15 @@ Public Class Form1
                         End Select
 
 
+                        If CStr(ValidaDt.Rows(z).Item(18)) <> "" Then
+                            'if non allowed charss, tiene algo, debe validar que la cadena que se puso NO contenga caracteres inválidos!
+                            If ContainsInvalidChars(valEvaluar, CStr(ValidaDt.Rows(z).Item(18))) = True Then
+                                PintaCeldaDeError(i, j, "This field is not allowed to contain any of the following characters: " & CStr(ValidaDt.Rows(z).Item(18)) & " , please review!")
+                                Continue For
+                            End If
+                        End If
+
+
                         Select Case CStr(ValidaDt.Rows(z).Item(12))
                             Case Is = "None", ""
                                 'nada!
@@ -6811,6 +6836,7 @@ Public Class Form1
                             End If
                         End Try
                     Else
+
                         DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Value = "Ok. No repeteability is configured for this template"
                         DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Style.ForeColor = Color.Black
                         DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Style.Font = New System.Drawing.Font("Calibri", 10, FontStyle.Bold)

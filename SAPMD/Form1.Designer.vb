@@ -56,6 +56,8 @@ Partial Class Form1
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripButton10 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton11 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripSeparator13 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripButton17 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripButton12 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator10 = New System.Windows.Forms.ToolStripSeparator()
@@ -67,8 +69,6 @@ Partial Class Form1
         Me.ToolStripSeparator12 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripButton16 = New System.Windows.Forms.ToolStripButton()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
-        Me.ToolStripButton17 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripSeparator13 = New System.Windows.Forms.ToolStripSeparator()
         Me.TableLayoutPanel1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -84,11 +84,11 @@ Partial Class Form1
         '
         Me.TableLayoutPanel1.ColumnCount = 6
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 22.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 412.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 440.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.SplitContainer1, 1, 2)
         Me.TableLayoutPanel1.Controls.Add(Me.ToolStrip1, 1, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.ToolStrip3, 1, 1)
@@ -125,8 +125,8 @@ Partial Class Form1
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.DataGridView1)
         Me.TableLayoutPanel1.SetRowSpan(Me.SplitContainer1, 3)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1334, 566)
-        Me.SplitContainer1.SplitterDistance = 364
+        Me.SplitContainer1.Size = New System.Drawing.Size(1333, 566)
+        Me.SplitContainer1.SplitterDistance = 363
         Me.SplitContainer1.SplitterWidth = 6
         Me.SplitContainer1.TabIndex = 4
         '
@@ -136,7 +136,7 @@ Partial Class Form1
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TreeView1.Name = "TreeView1"
-        Me.TreeView1.Size = New System.Drawing.Size(364, 566)
+        Me.TreeView1.Size = New System.Drawing.Size(363, 566)
         Me.TreeView1.TabIndex = 0
         '
         'DataGridView1
@@ -160,7 +160,7 @@ Partial Class Form1
         Me.ToolStrip1.Location = New System.Drawing.Point(22, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(412, 46)
+        Me.ToolStrip1.Size = New System.Drawing.Size(440, 46)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -222,7 +222,7 @@ Partial Class Form1
         Me.ToolStrip3.Location = New System.Drawing.Point(22, 46)
         Me.ToolStrip3.Name = "ToolStrip3"
         Me.ToolStrip3.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
-        Me.ToolStrip3.Size = New System.Drawing.Size(412, 46)
+        Me.ToolStrip3.Size = New System.Drawing.Size(440, 46)
         Me.ToolStrip3.TabIndex = 6
         Me.ToolStrip3.Text = "ToolStrip3"
         '
@@ -291,10 +291,10 @@ Partial Class Form1
         Me.Label1.AutoSize = True
         Me.TableLayoutPanel1.SetColumnSpan(Me.Label1, 3)
         Me.Label1.Font = New System.Drawing.Font("Calibri", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(438, 3)
+        Me.Label1.Location = New System.Drawing.Point(466, 3)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(922, 39)
+        Me.Label1.Size = New System.Drawing.Size(893, 39)
         Me.Label1.TabIndex = 5
         Me.Label1.Text = "Label1"
         '
@@ -304,10 +304,10 @@ Partial Class Form1
         Me.Label2.AutoSize = True
         Me.TableLayoutPanel1.SetColumnSpan(Me.Label2, 2)
         Me.Label2.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(438, 54)
+        Me.Label2.Location = New System.Drawing.Point(466, 54)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(270, 29)
+        Me.Label2.Size = New System.Drawing.Size(262, 29)
         Me.Label2.TabIndex = 7
         Me.Label2.Text = "Label2"
         '
@@ -317,12 +317,12 @@ Partial Class Form1
         Me.ToolStrip2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ToolStrip2.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip2.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton8, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.ToolStripSeparator6, Me.ToolStripButton1, Me.ToolStripButton9, Me.ToolStripSeparator7, Me.ToolStripButton10, Me.ToolStripButton11, Me.ToolStripSeparator13, Me.ToolStripButton17, Me.ToolStripSeparator8, Me.ToolStripButton12, Me.ToolStripSeparator10, Me.ToolStripButton14, Me.ToolStripSeparator9, Me.ToolStripButton13, Me.ToolStripSeparator11, Me.ToolStripButton15, Me.ToolStripSeparator12, Me.ToolStripButton16})
-        Me.ToolStrip2.Location = New System.Drawing.Point(712, 46)
+        Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton8, Me.ToolStripSeparator4, Me.ToolStripLabel1, Me.ToolStripSeparator6, Me.ToolStripButton1, Me.ToolStripButton9, Me.ToolStripSeparator7, Me.ToolStripButton10, Me.ToolStripButton13, Me.ToolStripButton11, Me.ToolStripButton12, Me.ToolStripSeparator10, Me.ToolStripButton17, Me.ToolStripSeparator13, Me.ToolStripButton14, Me.ToolStripSeparator9, Me.ToolStripSeparator11, Me.ToolStripButton15, Me.ToolStripSeparator12, Me.ToolStripButton16, Me.ToolStripSeparator8})
+        Me.ToolStrip2.Location = New System.Drawing.Point(732, 46)
         Me.ToolStrip2.Name = "ToolStrip2"
         Me.ToolStrip2.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.ToolStrip2.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.ToolStrip2.Size = New System.Drawing.Size(652, 46)
+        Me.ToolStrip2.Size = New System.Drawing.Size(631, 46)
         Me.ToolStrip2.TabIndex = 3
         Me.ToolStrip2.Text = "ToolStrip2"
         '
@@ -399,6 +399,21 @@ Partial Class Form1
         Me.ToolStripButton11.Size = New System.Drawing.Size(34, 41)
         Me.ToolStripButton11.Text = "ToolStripButton11"
         Me.ToolStripButton11.ToolTipText = "Import records"
+        '
+        'ToolStripSeparator13
+        '
+        Me.ToolStripSeparator13.Name = "ToolStripSeparator13"
+        Me.ToolStripSeparator13.Size = New System.Drawing.Size(6, 46)
+        '
+        'ToolStripButton17
+        '
+        Me.ToolStripButton17.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton17.Image = CType(resources.GetObject("ToolStripButton17.Image"), System.Drawing.Image)
+        Me.ToolStripButton17.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton17.Name = "ToolStripButton17"
+        Me.ToolStripButton17.Size = New System.Drawing.Size(34, 41)
+        Me.ToolStripButton17.Text = "ToolStripButton17"
+        Me.ToolStripButton17.ToolTipText = "Refresh data"
         '
         'ToolStripSeparator8
         '
@@ -489,20 +504,6 @@ Partial Class Form1
         Me.ImageList1.Images.SetKeyName(6, "right-arrow.png")
         Me.ImageList1.Images.SetKeyName(7, "box.png")
         Me.ImageList1.Images.SetKeyName(8, "table.png")
-        '
-        'ToolStripButton17
-        '
-        Me.ToolStripButton17.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton17.Image = CType(resources.GetObject("ToolStripButton17.Image"), System.Drawing.Image)
-        Me.ToolStripButton17.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton17.Name = "ToolStripButton17"
-        Me.ToolStripButton17.Size = New System.Drawing.Size(34, 41)
-        Me.ToolStripButton17.Text = "ToolStripButton17"
-        '
-        'ToolStripSeparator13
-        '
-        Me.ToolStripSeparator13.Name = "ToolStripSeparator13"
-        Me.ToolStripSeparator13.Size = New System.Drawing.Size(6, 46)
         '
         'Form1
         '
