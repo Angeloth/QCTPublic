@@ -54,10 +54,10 @@ Public Class Form1
             ToolStripButton6.Enabled = False
 
             ToolStripButton8.Enabled = False
-            ToolStripButton9.Enabled = False
+            'ToolStripButton9.Enabled = False
             ToolStripButton10.Enabled = False
             ToolStripButton11.Enabled = False
-            ToolStripButton1.Enabled = False
+            'ToolStripButton1.Enabled = False
 
             ToolStripButton15.Enabled = False
 
@@ -67,10 +67,10 @@ Public Class Form1
             ToolStripButton6.Enabled = True
 
             ToolStripButton8.Enabled = True
-            ToolStripButton9.Enabled = True
+            'ToolStripButton9.Enabled = True
             ToolStripButton10.Enabled = True
             ToolStripButton11.Enabled = True
-            ToolStripButton1.Enabled = True
+            'ToolStripButton1.Enabled = True
 
             ToolStripButton15.Enabled = True
         End If
@@ -410,11 +410,11 @@ Public Class Form1
 
                 'Cursor.Current = Cursors.WaitCursor
 
-                ToolStripProgressBar2.Value = 0
-                ToolStripProgressBar2.Maximum = catDs.Tables.Count
-                ToolStripLabel2.Text = "Building..."
-                ToolStripProgressBar2.Visible = True
-                ToolStripLabel2.Visible = True
+                'ToolStripProgressBar2.Value = 0
+                'ToolStripProgressBar2.Maximum = catDs.Tables.Count
+                'ToolStripLabel2.Text = "Building..."
+                'ToolStripProgressBar2.Visible = True
+                'ToolStripLabel2.Visible = True
 
                 Label1.Text = "No object selected"
                 Label2.Text = ""
@@ -422,7 +422,7 @@ Public Class Form1
                 'improve update
 
                 For i = 0 To catDs.Tables.Count - 1
-                    ToolStripProgressBar2.Value = i + 1
+                    'ToolStripProgressBar2.Value = i + 1
                     xObj = Nothing
                     xObj = Split(catDs.Tables(i).TableName, "#")
 
@@ -476,10 +476,10 @@ Public Class Form1
 
                 'Next
 
-                ToolStripLabel2.Text = "Ready"
-                ToolStripProgressBar2.Value = 0
-                ToolStripProgressBar2.Visible = False
-                ToolStripLabel2.Visible = False
+                'ToolStripLabel2.Text = "Ready"
+                'ToolStripProgressBar2.Value = 0
+                'ToolStripProgressBar2.Visible = False
+                'ToolStripLabel2.Visible = False
 
                 'Cursor.Current = Cursors.Default
 
@@ -2075,53 +2075,6 @@ Public Class Form1
 
     Private Sub TreeView1_NodeMouseClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseClick
 
-    End Sub
-
-    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
-
-        If ToolStripTextBox1.Text = "" Then
-            MsgBox("Please type some info to search", vbCritical, "SAP Master Data")
-            Exit Sub
-        End If
-
-        elQbusca = ToolStripTextBox1.Text
-        buscaEnlower = ToolStripTextBox1.Text.ToLower()
-
-        Select Case ToolStripComboBox1.SelectedIndex
-            Case Is = 0
-                'Dim NodoMadre As TreeNode
-                'NodoMadre = TreeView1.Nodes(0)
-
-                'euReka = False
-                'oNode = Nothing
-                'Call buSkaXNodo(NodoMadre)
-
-            Case Is = 1, 2
-                For i = 0 To TreeView1.Nodes.Count - 1
-                    euReka = False
-                    oNode = Nothing
-                    Call buSkaXNodo(TreeView1.Nodes(i))
-                    If euReka = True Then Exit For
-                Next
-
-        End Select
-
-
-        If euReka = False Then
-            MsgBox("Node not found!!", vbCritical, "SAP Master Data")
-            Exit Sub
-        End If
-
-        oNode.BackColor = Color.Khaki
-        oNode.EnsureVisible()
-        oNode.Expand()
-
-    End Sub
-
-    Private Sub ToolStripTextBox1_KeyDown(sender As Object, e As KeyEventArgs) Handles ToolStripTextBox1.KeyDown
-        If e.KeyCode = Keys.Return Then
-            ToolStripButton3.PerformClick()
-        End If
     End Sub
 
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
@@ -3848,10 +3801,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
-
-    End Sub
-
     Private Async Sub MuestraRecords()
 
         If CategSelected <> 3 Then Exit Sub
@@ -3928,6 +3877,15 @@ Public Class Form1
 
         Dim xObj As Object
         xObj = Split(elNode.FullPath, "\")
+
+        'Aqui se debe hacer la variante por cada nodo,
+        'Si selecciono un nodo tabla continua de forma unitaria
+        'Si selecciona un nodo objeto importa un excel con interop
+        'Solo hasta ese nivel
+        'Importar y guardar ó importar y solo ver?!?
+        'Activar view mode, solo para observar y evaluar, y al final guardo por tabla o por objeto
+        'Save y Save all
+
 
         If xObj.Length < 4 Then
             MsgBox("Please select a node at a table level!", vbCritical, "SAP MD")
@@ -4156,19 +4114,48 @@ Public Class Form1
 
     End Sub
 
-    Private Sub ToolStripButton9_Click(sender As Object, e As EventArgs) Handles ToolStripButton9.Click
-
-    End Sub
-
     Private Sub ToolStripButton12_Click(sender As Object, e As EventArgs) Handles ToolStripButton12.Click
 
 
-        'Exportar todo el 
+        'Exportar registros
+        'esperar a mañana a la presentacion!
+        'Igual, va a ser la variante dependiendo del nodo seleccionado
+        'Si selecciona un nodo tabla continua con el unitario
+        'Si selecciona el nodo objeto, exporta todo lo de ese objeto
+        'Si tiene seleccionado el nodo compañía, exporta la compañía completa con todos sus hijos
+
+
+        Select Case ToolStripComboBox1.SelectedIndex
+            Case Is = 0 'nada
+
+
+            Case Is = 1
+
+
+
+            Case Is = 2
+
+
+
+            Case Is = 3
+
+
+            Case Is = 4
+
+
+
+        End Select
+
+
 
         If DataGridView1.Rows.Count - 1 < 0 Then
             MsgBox("Deploy some information first!!", vbCritical, "Clever Costs")
             Exit Sub
         End If
+
+        Dim lCol As Integer = 1
+
+        'If ToolStripComboBox1.SelectedIndex = 3 Then lCol = 4
 
         Dim diLOg As New SaveFileDialog
         Dim oFileName As String
@@ -4178,9 +4165,7 @@ Public Class Form1
         'diLOg.Filter = "Excel File (*.xls)|*.xls|Todos los archivos (*.*)|*.*"
         If diLOg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
 
-            'Call datagridto
-            Call ExportToCsv2(DataGridView1, diLOg.FileName)
-
+            Call ExportToCsv2(DataGridView1, diLOg.FileName, lCol)
 
         End If
     End Sub
@@ -7605,5 +7590,50 @@ Public Class Form1
 
         DataGridView1.AllowUserToAddRows = True
         DataGridView1.AllowUserToDeleteRows = True
+    End Sub
+
+    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
+        If ToolStripTextBox1.Text = "" Then
+            MsgBox("Please type some info to search", vbCritical, "SAP Master Data")
+            Exit Sub
+        End If
+
+        elQbusca = ToolStripTextBox1.Text
+        buscaEnlower = ToolStripTextBox1.Text.ToLower()
+
+        Select Case ToolStripComboBox1.SelectedIndex
+            Case Is = 0
+                'Dim NodoMadre As TreeNode
+                'NodoMadre = TreeView1.Nodes(0)
+
+                'euReka = False
+                'oNode = Nothing
+                'Call buSkaXNodo(NodoMadre)
+
+            Case Is = 1, 2
+                For i = 0 To TreeView1.Nodes.Count - 1
+                    euReka = False
+                    oNode = Nothing
+                    Call buSkaXNodo(TreeView1.Nodes(i))
+                    If euReka = True Then Exit For
+                Next
+
+        End Select
+
+
+        If euReka = False Then
+            MsgBox("Node not found!!", vbCritical, "SAP Master Data")
+            Exit Sub
+        End If
+
+        oNode.BackColor = Color.Khaki
+        oNode.EnsureVisible()
+        oNode.Expand()
+    End Sub
+
+    Private Sub ToolStripTextBox1_KeyDown(sender As Object, e As KeyEventArgs) Handles ToolStripTextBox1.KeyDown
+        If e.KeyCode = Keys.Return Then
+            ToolStripButton3.PerformClick()
+        End If
     End Sub
 End Class

@@ -73,7 +73,7 @@ Module Module3
 
     End Sub
 
-    Public Sub ExportToCsv2(ByVal dt As DataGridView, ByVal xFile As String)
+    Public Sub ExportToCsv2(ByVal dt As DataGridView, ByVal xFile As String, ByVal limCols As Integer)
 
         Dim oWrite As System.IO.StreamWriter
         oWrite = IO.File.CreateText(xFile)
@@ -91,7 +91,8 @@ Module Module3
 
             i = 1
 
-            For k = 0 To dt.Columns.Count - 4 'siempre se elimina las ultimas 3 columnas!
+            '-1, ó -4
+            For k = 0 To dt.Columns.Count - limCols 'siempre se elimina las ultimas 3 columnas!
                 If j = 1 Then
                     If i = 1 Then
                         CSVHeader.Append(dt.Columns(k).Name.ToString())
@@ -109,11 +110,6 @@ Module Module3
                 i += 1
             Next
 
-            For Each c As DataGridViewColumn In dt.Columns
-
-
-            Next
-
             oWrite.WriteLine(CSVHeader.ToString())
 
         Next
@@ -127,7 +123,7 @@ Module Module3
             Dim CSVLine As StringBuilder = New StringBuilder()
             Dim s As String = ""
 
-            For k = 0 To dt.Columns.Count - 4
+            For k = 0 To dt.Columns.Count - limCols '4
 
                 If k = 0 Then
                     If IsNothing(dt.Rows(r).Cells(k).Value) = True Then
@@ -154,6 +150,12 @@ Module Module3
 
         oWrite.Close()
         oWrite = Nothing
+
+        Dim X As Integer
+        X = MsgBox("Report exported at: " & xFile & " !" & vbCrLf & "You want to open the file now?", vbQuestion + vbYesNo, "QCT")
+        If X = 6 Then
+            System.Diagnostics.Process.Start(xFile)
+        End If
 
     End Sub
 
@@ -185,7 +187,7 @@ Module Module3
 
     End Function
 
-    Public Function DescargaExcelReport(ByVal elSetDa As DataSet, ByVal elFilNam As String, ByRef elError As String) As Boolean
+    Public Function ExportaExcelReport(ByVal elSetDa As DataSet, ByVal elFilNam As String, ByRef elError As String) As Boolean
 
         Dim elRes As Boolean = False
 
@@ -283,7 +285,7 @@ Module Module3
 
     End Function
 
-    Public Sub ImportaTemplate(ByVal elArchivo As String, ByRef elSet As DataSet)
+    Public Sub ImportaExcel(ByVal elArchivo As String, ByRef elSet As DataSet)
 
         'debería venir un match del objeto a matchear junto con sus hijos!
         'o venir la tabla con sus objetos y buscar
@@ -313,7 +315,7 @@ Module Module3
                 'SI lo encuentra, entonces lo pone!
                 'como detectar el total de registros en un excel
                 'el ultimo renglon!
-                lastRow = xSh.UsedRange.Rows(xSh.UsedRange.Rows.Count).Row
+                lastRow = xSh.UsedRange.Rows(xSh.UsedRange.Rows.Count).Row 'suponiendo que este funcione!
 
                 For k = 4 To lastRow
 
