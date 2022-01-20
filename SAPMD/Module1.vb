@@ -548,32 +548,6 @@ Module Module1
                 Case Is = "catpro"
                     'nuevos catalogos
 
-                    '3 variantes de prod:
-
-                    'Se lo puedes prestar y te sobra, no hay pex, estas cubierto para prestar y para lo firme de planeacion
-
-                    'Se lo puedes prestar (puedes pedir mas material al proveedor y la fecha de entrega es inferior a la fecha en la que lo necesitan) pero ANTES debes colocar inmediatamente otra PO al proveedor, esto se hace por CADA material que se preste
-
-                    'NO se lo puedes prestar porque ya esta firme para la producción venidera
-
-                    'Si entra en la última opción, se toma el segundo criterio:
-
-                    'Se evalua automaticamente entre planeacion firme y el que lo necesita:
-
-                    'Para que finish good es, y se evalua de acuerdo a prioridad
-
-                    'De acuerdo a cliente final: VIP - comercio - tienda - minorista
-
-                    'De acuerdo a fecha de entrega del que lo necesita. Si el que lo necesita su fecha de entrega es holgada (hay tiempo), puede esperarse y esperar a que le entreguen mas
-
-                    'Se le solicita al que necesita el material:
-
-                    '1. Para la orden que es
-
-                    '2. Que materiales necesita y cuantos de cada material
-
-                    'Si al final se presta e implica algun retraso del material, entonces se pasa a autorizaciones de director de manufactura/planeación, gerente etc.
-
                     For Each dino In dinos
 
                         Dim ser As JObject = JObject.Parse(dino.Object.ToString)
@@ -1523,6 +1497,7 @@ Module Module1
 
         Dim cadeConv = JsonConvert.SerializeObject(elDato)
         'Dim ser As JObject = JObject.Parse("")
+        'client.Child("").PutAsync("").ConfigureAwait(False)
 
         Try
             'Await client.Child("global").Child("gb-aaaa").PutAsync(miDato).ConfigureAwait(False)

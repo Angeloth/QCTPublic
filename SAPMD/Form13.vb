@@ -42,7 +42,7 @@
         '19. Migrar todo a la base de de Luis Adrian
         '20. Generar tokens de autenticacion para mas seguridad
         '21. Crear 'medium installer' para realizar actualizaciones automáticas/parches
-        '22. 
+        '22. Re-Explorar PutAsync para escribir datos en batch en un nodo!
         '23. 
 
 

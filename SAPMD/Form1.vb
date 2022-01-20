@@ -214,6 +214,7 @@ Public Class Form1
         'https://firebase.google.com/docs/auth/admin/verify-id-tokens#retrieve_id_tokens_on_clients
         'https://developers.google.com/identity/protocols/oauth2
 
+        'https://firebase.google.com/docs/database/web/structure-data
 
         'Tree Slow:
         'https://forums.asp.net/t/1783420.aspx?ASP+NET+TreeView+Working+Too+Slow
