@@ -5543,7 +5543,13 @@ Public Class Form1
                                     Else
                                         'es local!
                                         'cuando es la misma tabla NO hay dependencias, solo condiciones!?
-                                        valCheck = DataGridView1.Rows(i).Cells(CStr(ValidaDt.Rows(z).Item(22))).Value
+
+                                        If CStr(ValidaDt.Rows(z).Item(22)) = "" Then
+                                            PintaCeldaDeError(i, j, "The conditional matching field(s) is not set!!, please review with the module responsible of defining condition rules!")
+                                            Continue For
+                                        Else
+                                            valCheck = DataGridView1.Rows(i).Cells(CStr(ValidaDt.Rows(z).Item(22))).Value
+                                        End If
 
                                     End If
 
@@ -7338,7 +7344,7 @@ Public Class Form1
 
                 miFil.Clear()
                 miFil = filtRelas.Clone()
-                Dim resy() As DataRow = filtRelas.Select("RuleCode='" & CStr(relaUniqRul.Rows(i).Item(0)) & "'", "Consec ASC")
+                Dim resy() As DataRow = filtRelas.Select("RuleCode='" & CStr(relaUniqRul.Rows(i).Item(0)) & "' AND ParentField<>''", "Consec ASC")
                 For Each row As DataRow In resy
                     miFil.ImportRow(row)
                     tablaPapa = row.Item(3)
