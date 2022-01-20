@@ -1384,7 +1384,8 @@ Module Module1
 
                                 If siHubo = False Then
                                     'agregamos un renglon!
-                                    xSet.Tables(xSet.Tables.Count - 1).Rows.Add({item.Name, moduX, rulKey, LevKey, "", "", "", "", 0, 0})
+                                    'OJO, esto aqui abajo SI estaba!
+                                    'xSet.Tables(xSet.Tables.Count - 1).Rows.Add({item.Name, moduX, rulKey, LevKey, "", "", "", "", 0, 0})
                                 End If
 
                             Next

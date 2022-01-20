@@ -49,30 +49,31 @@ Public Class Form1
 
         If RoleUsuario = "Viewer" Or RoleUsuario = "Admin" Then
 
+            ToolStripButton1.Enabled = False
             ToolStripButton4.Enabled = False
             ToolStripButton5.Enabled = False
             ToolStripButton6.Enabled = False
-
+            ToolStripButton7.Enabled = False
             ToolStripButton8.Enabled = False
-            'ToolStripButton9.Enabled = False
             ToolStripButton10.Enabled = False
             ToolStripButton11.Enabled = False
-            'ToolStripButton1.Enabled = False
-
+            ToolStripButton14.Enabled = False
             ToolStripButton15.Enabled = False
+            ToolStripButton16.Enabled = False
 
         Else
+            ToolStripButton1.Enabled = True
             ToolStripButton4.Enabled = True
             ToolStripButton5.Enabled = True
             ToolStripButton6.Enabled = True
-
+            ToolStripButton7.Enabled = True
             ToolStripButton8.Enabled = True
-            'ToolStripButton9.Enabled = True
             ToolStripButton10.Enabled = True
             ToolStripButton11.Enabled = True
-            'ToolStripButton1.Enabled = True
-
+            ToolStripButton14.Enabled = True
             ToolStripButton15.Enabled = True
+            ToolStripButton16.Enabled = True
+
         End If
 
 
@@ -87,8 +88,8 @@ Public Class Form1
         arbolDs.Tables.Clear()
         arbolDs.Tables.Add("Tree")
 
-        ToolStripButton10.Enabled = False
-        ToolStripButton11.Enabled = False
+        'ToolStripButton10.Enabled = False
+        'ToolStripButton11.Enabled = False
 
         Dim iAveprim(1) As DataColumn
         Dim kEys As New DataColumn()
@@ -247,8 +248,8 @@ Public Class Form1
                 'se eliminar el tree, se deshabilita todo
 
                 If RoleUsuario = "Editor" Then
-                    ToolStripButton10.Enabled = False
-                    ToolStripButton11.Enabled = False
+                    'ToolStripButton10.Enabled = False
+                    'ToolStripButton11.Enabled = False
                 End If
 
                 CategSelected = 0
@@ -259,8 +260,8 @@ Public Class Form1
             Case Is = 1 'catalogos
 
                 If RoleUsuario = "Editor" Then
-                    ToolStripButton10.Enabled = False
-                    ToolStripButton11.Enabled = False
+                    'ToolStripButton10.Enabled = False
+                    'ToolStripButton11.Enabled = False
                 End If
 
                 CategSelected = 1
@@ -269,8 +270,8 @@ Public Class Form1
             Case Is = 2 'dependencias
 
                 If RoleUsuario = "Editor" Then
-                    ToolStripButton10.Enabled = False
-                    ToolStripButton11.Enabled = False
+                    'ToolStripButton10.Enabled = False
+                    'ToolStripButton11.Enabled = False
                 End If
 
                 CategSelected = 2
@@ -278,8 +279,8 @@ Public Class Form1
 
             Case Is = 3 'records
                 If RoleUsuario = "Editor" Then
-                    ToolStripButton10.Enabled = True
-                    ToolStripButton11.Enabled = True
+                    'ToolStripButton10.Enabled = True
+                    'ToolStripButton11.Enabled = True
                 End If
 
                 CategSelected = 3
@@ -287,8 +288,8 @@ Public Class Form1
 
             Case Is = 4 'Templates
                 If RoleUsuario = "Editor" Then
-                    ToolStripButton10.Enabled = False
-                    ToolStripButton11.Enabled = False
+                    'ToolStripButton10.Enabled = False
+                    'ToolStripButton11.Enabled = False
                 End If
 
                 CategSelected = 4
@@ -296,8 +297,8 @@ Public Class Form1
 
             Case Is = 5
                 If RoleUsuario = "Editor" Then
-                    ToolStripButton10.Enabled = False
-                    ToolStripButton11.Enabled = False
+                    'ToolStripButton10.Enabled = False
+                    'ToolStripButton11.Enabled = False
                 End If
                 CategSelected = 5
                 If depeDs.Tables.Count = 0 Then seCarga = True
@@ -1307,6 +1308,7 @@ Public Class Form1
                 'Posi = TreeView1.Nodes.IndexOf(e.Node)
                 xObj = Split(e.Node.FullPath, "\")
                 If xObj.Length = 1 Then
+                    DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
                     NodoNameActual = ""
                     puSSyCat = -1
@@ -1337,8 +1339,10 @@ Public Class Form1
 
                     If Posi >= 0 Then
 
+                        Dim bS As New BindingSource
                         cataNombre = catDs.Tables(Posi).TableName
                         puSSyCat = Posi
+                        DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
                         DataGridView1.Columns.Clear()
 
@@ -1349,26 +1353,33 @@ Public Class Form1
                             DataGridView1.Columns(i).AutoSizeMode = DataGridViewAutoSizeColumnMode.None
                         Next
 
+                        estoyAgregandoRows = True
+
                         'ahora primero agregamos las columnas!
                         For j = 2 To catDs.Tables(Posi).Columns.Count - 1
                             DataGridView1.Columns.Add(catDs.Tables(Posi).Columns(j).ColumnName, catDs.Tables(Posi).Columns(j).ExtendedProperties.Item("FieldName"))
+                            DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = catDs.Tables(Posi).Columns(j).ColumnName
                         Next
 
-                        For i = 0 To catDs.Tables(Posi).Rows.Count - 1
-                            DataGridView1.Rows.Add()
-                            DataGridView1.Rows(DataGridView1.Rows.Count - 1).HeaderCell.Value = CStr(i + 1)
+                        bS.DataSource = catDs.Tables(Posi)
+                        DataGridView1.AutoGenerateColumns = False
+                        DataGridView1.DataSource = bS
 
-                            For j = 0 To DataGridView1.Columns.Count - 1
-                                DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(j).Value = catDs.Tables(Posi).Rows(i).Item(DataGridView1.Columns(j).Name)
-                            Next
-
-                            'For j = 0 To catDs.Tables(Posi).Columns.Count - 1
-                            'DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(j).Value = catDs.Tables(Posi).Rows(i).Item(j)
-                            'Next
-
-                            'DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(0).Value = catDs.Tables(Posi).Rows(j).Item(0)
-                            'DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(1).Value = catDs.Tables(Posi).Rows(j).Item(1)
+                        For i = 0 To DataGridView1.Rows.Count - 1
+                            DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
                         Next
+
+                        estoyAgregandoRows = False
+
+                        'For i = 0 To catDs.Tables(Posi).Rows.Count - 1
+                        '    DataGridView1.Rows.Add()
+                        '    DataGridView1.Rows(DataGridView1.Rows.Count - 1).HeaderCell.Value = CStr(i + 1)
+
+                        '    For j = 0 To DataGridView1.Columns.Count - 1
+                        '        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(j).Value = catDs.Tables(Posi).Rows(i).Item(DataGridView1.Columns(j).Name)
+                        '    Next
+
+                        'Next
 
                         DataGridView1.RowHeadersWidth = 70
 
@@ -1381,6 +1392,7 @@ Public Class Form1
                     Else
                         'es un nodo nuevo!
                         'simplemente se limpia el grid y se deja libre para que ponga la info!
+                        DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
                         DataGridView1.AllowUserToAddRows = True
                         DataGridView1.AllowUserToDeleteRows = True
@@ -1397,6 +1409,7 @@ Public Class Form1
                 If xObj.Length = 1 Or xObj.Length = 2 Then
                     'error!
                     NodoNameActual = ""
+                    DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
                 Else
                     Select Case xObj.Length
@@ -1444,6 +1457,7 @@ Public Class Form1
                     Next
 
                     If Posi >= 0 Then
+                        DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
 
                         DataGridView1.AllowUserToAddRows = False
@@ -1483,6 +1497,7 @@ Public Class Form1
                         DataGridView1.AllowUserToAddRows = True
                         DataGridView1.AllowUserToDeleteRows = True
                     Else
+                        DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
                         DataGridView1.AllowUserToAddRows = True
                         DataGridView1.AllowUserToDeleteRows = True
@@ -1497,6 +1512,7 @@ Public Class Form1
                 xObj = Split(e.Node.FullPath, "\")
                 If xObj.Length < 4 Then
                     NodoNameActual = ""
+                    DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
                     DataGridView1.Columns.Clear()
                     Exit Sub
@@ -1590,6 +1606,7 @@ Public Class Form1
                     'o nada?!
                     tablaNombre = ""
                     NodoNameActual = ""
+                    DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
 
                 Else
@@ -1702,6 +1719,7 @@ Public Class Form1
 
                         estoyAgregandoRows = True
 
+                        DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
 
                         DataGridView1.AllowUserToAddRows = False
@@ -2056,6 +2074,7 @@ Public Class Form1
                         DataGridView1.Columns(1).Frozen = True
 
                     Else
+                        DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
                         DataGridView1.AllowUserToAddRows = True
                         DataGridView1.AllowUserToDeleteRows = True
@@ -2257,6 +2276,11 @@ Public Class Form1
                         catDs.Tables(catDs.Tables.Count - 1).Columns.Add(kEys)
                         'catDs.Tables(catDs.Tables.Count - 1).Columns.Add("Value", GetType(String))'este si estaba, en la versión anterior!
                         catDs.Tables(catDs.Tables.Count - 1).PrimaryKey = iAveprim
+                        catDs.Tables(catDs.Tables.Count - 1).ExtendedProperties.Add("ModuleCode", moduCode)
+                        catDs.Tables(catDs.Tables.Count - 1).ExtendedProperties.Add("CatalogCode", nodyav)
+                        catDs.Tables(catDs.Tables.Count - 1).ExtendedProperties.Add("CatalogName", Form2.tabValue)
+                        catDs.Tables(catDs.Tables.Count - 1).ExtendedProperties.Add("ColumnCount", 0)
+                        catDs.Tables(catDs.Tables.Count - 1).ExtendedProperties.Add("ModuleName", "Undefined")
 
                     Else
                         MsgBox(unRetorno, vbCritical, "SAP MD")
@@ -2275,176 +2299,175 @@ Public Class Form1
             Case Is = 2 'dependencias
                 'aqui tmb se puede
                 'OJO, primero se deben cargar los templates en caso de que no se haya hecho antes!
-                If tempDs.Tables.Count = 0 Then
-                    'las cargamos
-                    usaDataset.Tables(0).Rows.Clear()
-                    usaDataset.Tables(0).Rows.Add({"templates"})
-                    tempDs.Tables.Clear()
-                    tempDs = Await PullUrlWs(usaDataset, "templates")
-                End If
+                'If tempDs.Tables.Count = 0 Then
+                '    'las cargamos
+                '    usaDataset.Tables(0).Rows.Clear()
+                '    usaDataset.Tables(0).Rows.Add({"templates"})
+                '    tempDs.Tables.Clear()
+                '    tempDs = Await PullUrlWs(usaDataset, "templates")
+                'End If
+
+                'writeDs.Tables(0).Rows.Add({"dependencies"})
+
+                ''nomas ahii!!!
+                'xObj = Split(elNode.FullPath, "\")
+
+                'Select Case xObj.Length
+                '    Case Is = 1
+                '        'esta hasta arriba, agrega un template!
+                '        'add template
+                '        Form2.xtraDs = tempDs
+                '        Form2.yTraDs = depeDs
+                '        Form2.queOpcion = 2
+                '        Form2.huboExito = False
+
+                '        Form2.ShowDialog()
+
+                '        If Form2.huboExito = False Then Exit Sub
+
+                '        pathBuild = RaizFire & "/" & "dependencies"
+                '        pathBuild = pathBuild & "/" & Form2.pathValue
+
+                '        xDs.Tables(0).Rows.Add({"ObjectName", Form2.keyValue})
+
+                '        Await HazPutEnFireBase(pathBuild, xDs)
+
+                '        'hago rebuild!
+                '        Await CargaOpcion(CategSelected)
+
+                '        elNode.Nodes.Add(Form2.pathValue, Form2.pathValue & " / " & Form2.keyValue, 2, 2)
+                '        elNode.Nodes(elNode.Nodes.Count - 1).Tag = Form2.keyValue
+                '        'se agrega el nodo a FB
 
 
-                writeDs.Tables(0).Rows.Add({"dependencies"})
+                '    Case Is = 2
+                '        'esta en un template, agrega una tabla/hoja!!
+                '        'yObj = Split(elNode.Tag, "#")
+                '        zObj = CStr("")
+                '        For i = 0 To tempDs.Tables.Count - 1
+                '            yObj = Split(tempDs.Tables(i).TableName, "#")
+                '            If CStr(yObj(0)) = elNode.Name Then
+                '                zObj = CStr(yObj(2))
+                '                Exit For
+                '            End If
+                '        Next
 
-                'nomas ahii!!!
-                xObj = Split(elNode.FullPath, "\")
-
-                Select Case xObj.Length
-                    Case Is = 1
-                        'esta hasta arriba, agrega un template!
-                        'add template
-                        Form2.xtraDs = tempDs
-                        Form2.yTraDs = depeDs
-                        Form2.queOpcion = 2
-                        Form2.huboExito = False
-
-                        Form2.ShowDialog()
-
-                        If Form2.huboExito = False Then Exit Sub
-
-                        pathBuild = RaizFire & "/" & "dependencies"
-                        pathBuild = pathBuild & "/" & Form2.pathValue
-
-                        xDs.Tables(0).Rows.Add({"ObjectName", Form2.keyValue})
-
-                        Await HazPutEnFireBase(pathBuild, xDs)
-
-                        'hago rebuild!
-                        Await CargaOpcion(CategSelected)
-
-                        elNode.Nodes.Add(Form2.pathValue, Form2.pathValue & " / " & Form2.keyValue, 2, 2)
-                        elNode.Nodes(elNode.Nodes.Count - 1).Tag = Form2.keyValue
-                        'se agrega el nodo a FB
+                '        Dim enCuentra As DataRow
+                '        enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(zObj).ToUpper())
+                '        If IsNothing(enCuentra) = True Then
+                '            MsgBox("Sorry you are not allowed to make changes on the selected module", vbCritical, "SAP MD")
+                '            Exit Sub
+                '        End If
 
 
-                    Case Is = 2
-                        'esta en un template, agrega una tabla/hoja!!
-                        'yObj = Split(elNode.Tag, "#")
-                        zObj = CStr("")
-                        For i = 0 To tempDs.Tables.Count - 1
-                            yObj = Split(tempDs.Tables(i).TableName, "#")
-                            If CStr(yObj(0)) = elNode.Name Then
-                                zObj = CStr(yObj(2))
-                                Exit For
-                            End If
-                        Next
+                '        Form2.xtraDs = tempDs
+                '        Form2.yTraDs = depeDs
+                '        Form2.queOpcion = 3
+                '        Form2.huboExito = False
+                '        Form2.pathValue = elNode.Name
 
-                        Dim enCuentra As DataRow
-                        enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(zObj).ToUpper())
-                        If IsNothing(enCuentra) = True Then
-                            MsgBox("Sorry you are not allowed to make changes on the selected module", vbCritical, "SAP MD")
-                            Exit Sub
-                        End If
+                '        Form2.ShowDialog()
 
+                '        If Form2.huboExito = False Then Exit Sub
 
-                        Form2.xtraDs = tempDs
-                        Form2.yTraDs = depeDs
-                        Form2.queOpcion = 3
-                        Form2.huboExito = False
-                        Form2.pathValue = elNode.Name
+                '        pathBuild = RaizFire & "/" & "dependencies"
+                '        pathBuild = pathBuild & "/" & Form2.pathValue & "/" & Form2.keyValue
 
-                        Form2.ShowDialog()
+                '        xDs.Tables(0).Rows.Add({"TableName", Form2.tabValue})
 
-                        If Form2.huboExito = False Then Exit Sub
+                '        Await HazPutEnFireBase(pathBuild, xDs)
 
-                        pathBuild = RaizFire & "/" & "dependencies"
-                        pathBuild = pathBuild & "/" & Form2.pathValue & "/" & Form2.keyValue
+                '        'hago rebuild!
+                '        Await CargaOpcion(CategSelected)
 
-                        xDs.Tables(0).Rows.Add({"TableName", Form2.tabValue})
-
-                        Await HazPutEnFireBase(pathBuild, xDs)
-
-                        'hago rebuild!
-                        Await CargaOpcion(CategSelected)
-
-                        elNode.Nodes.Add(Form2.keyValue, Form2.keyValue & " / " & Form2.tabValue, 8, 8)
-                        elNode.Nodes(elNode.Nodes.Count - 1).Tag = Form2.tabValue
+                '        elNode.Nodes.Add(Form2.keyValue, Form2.keyValue & " / " & Form2.tabValue, 8, 8)
+                '        elNode.Nodes(elNode.Nodes.Count - 1).Tag = Form2.tabValue
 
 
-                    Case Is = 3
-                        'esta en una tabla, agrega un campo!
-                        'aqui ya viene la interfaz!
+                '    Case Is = 3
+                '        'esta en una tabla, agrega un campo!
+                '        'aqui ya viene la interfaz!
 
-                        zObj = CStr("")
-                        For i = 0 To tempDs.Tables.Count - 1
-                            yObj = Split(tempDs.Tables(i).TableName, "#")
-                            If CStr(yObj(0)) = elNode.Parent.Name Then
-                                zObj = CStr(yObj(2))
-                                Exit For
-                            End If
-                        Next
+                '        zObj = CStr("")
+                '        For i = 0 To tempDs.Tables.Count - 1
+                '            yObj = Split(tempDs.Tables(i).TableName, "#")
+                '            If CStr(yObj(0)) = elNode.Parent.Name Then
+                '                zObj = CStr(yObj(2))
+                '                Exit For
+                '            End If
+                '        Next
 
-                        Dim enCuentra As DataRow
-                        enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(zObj).ToUpper())
-                        If IsNothing(enCuentra) = True Then
-                            MsgBox("Sorry you are not allowed to make changes on the selected module", vbCritical, "SAP MD")
-                            Exit Sub
-                        End If
-
-
-                        Form3.xtraDs = tempDs
-                        Form3.yTraDs = depeDs
-                        Form3.depeTemplate = elNode.Parent.Name
-                        Form3.depeTabla = elNode.Name
-
-                        Form3.resDepFieldCode = ""
-                        Form3.resDepFieldName = ""
-                        Form3.resConTempCode = ""
-                        Form3.resConTempName = ""
-                        Form3.resConTempModule = ""
-                        Form3.resConTableCode = ""
-                        Form3.resConTableName = ""
-                        Form3.resConFieldCode = ""
-                        Form3.resConFieldName = ""
-
-                        Form3.resConType = ""
-                        Form3.resConRule = ""
-                        Form3.resConVal = ""
-                        Form3.resMachFields = ""
-
-                        Form3.depeCampo = ""
-
-                        Form3.elPath = "dependencies/" & elNode.Parent.Name & "/" & elNode.Name
-
-                        Form3.huboExito = False
-
-                        Form3.ShowDialog()
-
-                        If Form3.huboExito = False Then Exit Sub
-
-                        'se escribe en firebase!
-                        pathBuild = RaizFire & "/" & "dependencies"
-                        pathBuild = pathBuild & "/" & Form3.depeTemplate
-                        pathBuild = pathBuild & "/" & Form3.depeTabla
-                        pathBuild = pathBuild & "/" & Form3.resDepFieldCode
-
-                        xDs.Tables(0).Rows.Add({"MyName", Form3.resDepFieldName}) '0
-                        xDs.Tables(0).Rows.Add({"Object", Form3.resConTempCode}) '1
-                        xDs.Tables(0).Rows.Add({"Module", Form3.resConTempModule}) '2
-                        xDs.Tables(0).Rows.Add({"TableCode", Form3.resConTableCode}) '3
-                        xDs.Tables(0).Rows.Add({"TableName", Form3.resConTableName}) '4
-                        xDs.Tables(0).Rows.Add({"FieldCode", Form3.resConFieldCode}) '5
-                        xDs.Tables(0).Rows.Add({"FieldName", Form3.resConFieldName}) '6
-
-                        xDs.Tables(0).Rows.Add({"ConditionalType", Form3.resConType}) '7
-                        xDs.Tables(0).Rows.Add({"ConditionalRule", Form3.resConRule}) '8
-                        xDs.Tables(0).Rows.Add({"ConditionalValue", Form3.resConVal}) '9
-
-                        Await HazPutEnFireBase(pathBuild, xDs)
-
-                        'hago rebuild!
-                        Await CargaOpcion(CategSelected)
-
-                        elNode.Nodes.Add(Form3.resDepFieldCode, Form3.resDepFieldCode & " / " & Form3.resDepFieldName, 4, 4)
-                        Posi = elNode.Nodes.Count - 1
-
-                        elNode.Nodes(Posi).Nodes.Add(Form3.resConTempCode, "Object: " & Form3.resConTempCode, 4, 4)
-                        elNode.Nodes(Posi).Nodes.Add(Form3.resConTempModule, "Module: " & Form3.resConTempModule, 4, 4)
-                        elNode.Nodes(Posi).Nodes.Add(Form3.resConTableCode, "Table: " & Form3.resConTableCode & " / " & Form3.resConTableName, 4, 4)
-                        elNode.Nodes(Posi).Nodes.Add(Form3.resConFieldCode, "Field: " & Form3.resConFieldCode & " / " & Form3.resConFieldName, 4, 4)
+                '        Dim enCuentra As DataRow
+                '        enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(zObj).ToUpper())
+                '        If IsNothing(enCuentra) = True Then
+                '            MsgBox("Sorry you are not allowed to make changes on the selected module", vbCritical, "SAP MD")
+                '            Exit Sub
+                '        End If
 
 
-                End Select
+                '        Form3.xtraDs = tempDs
+                '        Form3.yTraDs = depeDs
+                '        Form3.depeTemplate = elNode.Parent.Name
+                '        Form3.depeTabla = elNode.Name
+
+                '        Form3.resDepFieldCode = ""
+                '        Form3.resDepFieldName = ""
+                '        Form3.resConTempCode = ""
+                '        Form3.resConTempName = ""
+                '        Form3.resConTempModule = ""
+                '        Form3.resConTableCode = ""
+                '        Form3.resConTableName = ""
+                '        Form3.resConFieldCode = ""
+                '        Form3.resConFieldName = ""
+
+                '        Form3.resConType = ""
+                '        Form3.resConRule = ""
+                '        Form3.resConVal = ""
+                '        Form3.resMachFields = ""
+
+                '        Form3.depeCampo = ""
+
+                '        Form3.elPath = "dependencies/" & elNode.Parent.Name & "/" & elNode.Name
+
+                '        Form3.huboExito = False
+
+                '        Form3.ShowDialog()
+
+                '        If Form3.huboExito = False Then Exit Sub
+
+                '        'se escribe en firebase!
+                '        pathBuild = RaizFire & "/" & "dependencies"
+                '        pathBuild = pathBuild & "/" & Form3.depeTemplate
+                '        pathBuild = pathBuild & "/" & Form3.depeTabla
+                '        pathBuild = pathBuild & "/" & Form3.resDepFieldCode
+
+                '        xDs.Tables(0).Rows.Add({"MyName", Form3.resDepFieldName}) '0
+                '        xDs.Tables(0).Rows.Add({"Object", Form3.resConTempCode}) '1
+                '        xDs.Tables(0).Rows.Add({"Module", Form3.resConTempModule}) '2
+                '        xDs.Tables(0).Rows.Add({"TableCode", Form3.resConTableCode}) '3
+                '        xDs.Tables(0).Rows.Add({"TableName", Form3.resConTableName}) '4
+                '        xDs.Tables(0).Rows.Add({"FieldCode", Form3.resConFieldCode}) '5
+                '        xDs.Tables(0).Rows.Add({"FieldName", Form3.resConFieldName}) '6
+
+                '        xDs.Tables(0).Rows.Add({"ConditionalType", Form3.resConType}) '7
+                '        xDs.Tables(0).Rows.Add({"ConditionalRule", Form3.resConRule}) '8
+                '        xDs.Tables(0).Rows.Add({"ConditionalValue", Form3.resConVal}) '9
+
+                '        Await HazPutEnFireBase(pathBuild, xDs)
+
+                '        'hago rebuild!
+                '        Await CargaOpcion(CategSelected)
+
+                '        elNode.Nodes.Add(Form3.resDepFieldCode, Form3.resDepFieldCode & " / " & Form3.resDepFieldName, 4, 4)
+                '        Posi = elNode.Nodes.Count - 1
+
+                '        elNode.Nodes(Posi).Nodes.Add(Form3.resConTempCode, "Object: " & Form3.resConTempCode, 4, 4)
+                '        elNode.Nodes(Posi).Nodes.Add(Form3.resConTempModule, "Module: " & Form3.resConTempModule, 4, 4)
+                '        elNode.Nodes(Posi).Nodes.Add(Form3.resConTableCode, "Table: " & Form3.resConTableCode & " / " & Form3.resConTableName, 4, 4)
+                '        elNode.Nodes(Posi).Nodes.Add(Form3.resConFieldCode, "Field: " & Form3.resConFieldCode & " / " & Form3.resConFieldName, 4, 4)
+
+
+                'End Select
 
 
 
@@ -3014,6 +3037,7 @@ Public Class Form1
                     elNode.Remove()
                     elNode = Nothing
                     NodoNameActual = ""
+                    DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
                     DataGridView1.Columns.Clear()
 
@@ -3837,7 +3861,7 @@ Public Class Form1
         Dim xDs As New DataSet
         xDs = Await PullUrlWs(usaDataset, "records")
 
-
+        DataGridView1.DataSource = Nothing
         DataGridView1.Rows.Clear()
 
         DataGridView1.AllowUserToAddRows = False
@@ -3845,16 +3869,26 @@ Public Class Form1
 
         If xDs.Tables.Count > 0 Then
             Dim k As Integer = 0
-            For i = 0 To xDs.Tables(0).Rows.Count - 1
 
-                DataGridView1.Rows.Add()
-                DataGridView1.Rows(DataGridView1.Rows.Count - 1).HeaderCell.Value = CStr(i + 1)
-                For j = 0 To xDs.Tables(0).Columns.Count - 1
-                    DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(xDs.Tables(0).Columns(j).ColumnName).Value = xDs.Tables(0).Rows(i).Item(j)
-                Next
+            Dim bS As New BindingSource
 
-            Next
-            'MsgBox("All records downloaded!", vbInformation, "SAP MD")
+            bS.DataSource = xDs.Tables(0)
+
+            DataGridView1.AutoGenerateColumns = False
+
+            DataGridView1.DataSource = bS
+
+            'Esto era antes!
+            'For i = 0 To xDs.Tables(0).Rows.Count - 1
+
+            '    DataGridView1.Rows.Add()
+            '    DataGridView1.Rows(DataGridView1.Rows.Count - 1).HeaderCell.Value = CStr(i + 1)
+            '    For j = 0 To xDs.Tables(0).Columns.Count - 1
+            '        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(xDs.Tables(0).Columns(j).ColumnName).Value = xDs.Tables(0).Rows(i).Item(j)
+            '    Next
+
+            'Next
+
         Else
             MsgBox("No records found for this object!!", vbInformation, "SAP MD")
         End If
@@ -3869,7 +3903,8 @@ Public Class Form1
     Private Sub ToolStripButton11_Click(sender As Object, e As EventArgs) Handles ToolStripButton11.Click
 
         'este boton va ser para importar registros de un excel
-        If CategSelected <> 3 Then Exit Sub
+        If CategSelected <> 3 And CategSelected <> 1 Then Exit Sub
+
         If IsNothing(elNode) = True Then
             MsgBox("Please select a valid node!", vbCritical, "SAP MD")
             Exit Sub
@@ -3877,6 +3912,43 @@ Public Class Form1
 
         Dim xObj As Object
         xObj = Split(elNode.FullPath, "\")
+        Dim enCuentra As DataRow
+
+        Select Case ToolStripComboBox1.SelectedIndex
+            Case Is = 1
+                'catalogos
+                If xObj.Length < 2 Then
+                    MsgBox("Please select a node at a catalog level!", vbCritical, "SAP MD")
+                    Exit Sub
+                End If
+
+                enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(catDs.Tables(cataNombre).ExtendedProperties.Item("ModuleCode")).ToUpper())
+                If IsNothing(enCuentra) = True Then
+                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "SAP MD")
+                    Exit Sub
+                End If
+
+            Case Is = 2
+
+
+            Case Is = 3
+                'records
+
+                'moduloSelek
+
+                If xObj.Length < 4 Then
+                    MsgBox("Please select a node at a table level!", vbCritical, "QCT")
+                    Exit Sub
+                End If
+
+                enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+                If IsNothing(enCuentra) = True Then
+                    MsgBox("Sorry you are not allowed to import record to the selected module!!", vbCritical, "QCT")
+                    Exit Sub
+                End If
+
+
+        End Select
 
         'Aqui se debe hacer la variante por cada nodo,
         'Si selecciono un nodo tabla continua de forma unitaria
@@ -3887,10 +3959,6 @@ Public Class Form1
         'Save y Save all
 
 
-        If xObj.Length < 4 Then
-            MsgBox("Please select a node at a table level!", vbCritical, "SAP MD")
-            Exit Sub
-        End If
 
         Dim diLOg As New OpenFileDialog
         Dim oFileName As String
@@ -3905,7 +3973,6 @@ Public Class Form1
         '4. Exportar una hoja simple
         '5. Exportar todo el template!
 
-
         Dim borroRecords As Boolean = False
 
         If diLOg.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -3918,7 +3985,10 @@ Public Class Form1
 
             If elDt.Rows.Count = 0 Then Exit Sub
 
-            If borroRecords = True Then DataGridView1.Rows.Clear()
+            DataGridView1.DataSource = Nothing
+            If borroRecords = True Then
+                DataGridView1.Rows.Clear()
+            End If
 
             estoyAgregandoRows = True
 
@@ -3932,7 +4002,6 @@ Public Class Form1
             DataGridView1.AutoGenerateColumns = False
 
             DataGridView1.DataSource = bS
-
 
             For i = 0 To DataGridView1.Rows.Count - 1
                 DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
@@ -3950,6 +4019,7 @@ Public Class Form1
     End Sub
 
     Private Async Sub ToolStripButton10_Click(sender As Object, e As EventArgs) Handles ToolStripButton10.Click
+
         If CategSelected <> 3 Then Exit Sub
         'subir info a firebase!
 
@@ -7092,6 +7162,13 @@ Public Class Form1
                 'templates!
                 'primero, debe estar seleccionado el combo de conditional!
 
+                Dim enCuentra As DataRow
+                enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+                If IsNothing(enCuentra) = True Then
+                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "SAP MD")
+                    Exit Sub
+                End If
+
                 If DataGridView1.CurrentCell.RowIndex < 0 Then Exit Sub
 
                 If IsNothing(DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value) = True Then
@@ -7162,11 +7239,16 @@ Public Class Form1
     Private Async Sub ToolStripButton15_Click(sender As Object, e As EventArgs) Handles ToolStripButton15.Click
 
         If ToolStripComboBox1.SelectedIndex <> 4 Then Exit Sub
-
         'debe tener seleccionado templates!!
-
         If objetoSelek = "" Then
             MsgBox("Please select a object first!! ", vbCritical, "SAP MD")
+            Exit Sub
+        End If
+
+        Dim enCuentra As DataRow
+        enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+        If IsNothing(enCuentra) = True Then
+            MsgBox("Sorry you are not allowed to add/change table relations to the selected module", vbCritical, "SAP MD")
             Exit Sub
         End If
 
@@ -7439,6 +7521,12 @@ Public Class Form1
 
                 'moduCode = elNode.Parent.Name
                 'mitablaCode = elNode.Name
+                Dim enCuentra As DataRow
+                enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(catDs.Tables(cataNombre).ExtendedProperties.Item("ModuleCode")).ToUpper())
+                If IsNothing(enCuentra) = True Then
+                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "SAP MD")
+                    Exit Sub
+                End If
 
                 'copiamos la ESTRUCTURA de información!
                 TabColumnas.Rows.Clear()
@@ -7492,6 +7580,7 @@ Public Class Form1
 
         If cataNombre = "" Then Exit Sub
 
+        DataGridView1.DataSource = Nothing
         DataGridView1.Rows.Clear()
         DataGridView1.Columns.Clear()
 
@@ -7505,6 +7594,7 @@ Public Class Form1
         'ahora primero agregamos las columnas!
         For j = 2 To catDs.Tables(cataNombre).Columns.Count - 1
             DataGridView1.Columns.Add(catDs.Tables(cataNombre).Columns(j).ColumnName, catDs.Tables(cataNombre).Columns(j).ExtendedProperties.Item("FieldName"))
+            DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = catDs.Tables(cataNombre).Columns(j).ColumnName
         Next
 
         For i = 0 To catDs.Tables(cataNombre).Rows.Count - 1
@@ -7567,6 +7657,7 @@ Public Class Form1
         Dim xDs As New DataSet
         xDs = Await PullUrlWs(usaDataset, "records")
 
+        DataGridView1.DataSource = Nothing
         DataGridView1.Rows.Clear()
 
         DataGridView1.AllowUserToAddRows = False
@@ -7635,5 +7726,10 @@ Public Class Form1
         If e.KeyCode = Keys.Return Then
             ToolStripButton3.PerformClick()
         End If
+    End Sub
+
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        'save all
+
     End Sub
 End Class
