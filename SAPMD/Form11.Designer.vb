@@ -60,7 +60,7 @@ Partial Class Form11
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 34.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 29.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.Label1, 1, 1)
         Me.TableLayoutPanel1.Controls.Add(Me.ToolStrip1, 1, 2)
         Me.TableLayoutPanel1.Controls.Add(Me.ToolStrip2, 4, 2)
@@ -90,7 +90,7 @@ Partial Class Form11
         Me.Label1.Location = New System.Drawing.Point(26, 23)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(1248, 77)
+        Me.Label1.Size = New System.Drawing.Size(1246, 77)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Bind catalog"
         Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -100,7 +100,6 @@ Partial Class Form11
         Me.ToolStrip1.BackColor = System.Drawing.Color.White
         Me.TableLayoutPanel1.SetColumnSpan(Me.ToolStrip1, 3)
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripLabel1, Me.ToolStripTextBox1, Me.ToolStripSeparator1, Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator3, Me.ToolStripButton3})
         Me.ToolStrip1.Location = New System.Drawing.Point(22, 100)
         Me.ToolStrip1.Name = "ToolStrip1"
@@ -171,7 +170,7 @@ Partial Class Form11
         Me.ToolStrip2.Location = New System.Drawing.Point(697, 100)
         Me.ToolStrip2.Name = "ToolStrip2"
         Me.ToolStrip2.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
-        Me.ToolStrip2.Size = New System.Drawing.Size(581, 46)
+        Me.ToolStrip2.Size = New System.Drawing.Size(579, 46)
         Me.ToolStrip2.TabIndex = 4
         Me.ToolStrip2.Text = "ToolStrip2"
         '
@@ -201,8 +200,8 @@ Partial Class Form11
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.DataGridView2)
         Me.TableLayoutPanel1.SetRowSpan(Me.SplitContainer1, 4)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1250, 615)
-        Me.SplitContainer1.SplitterDistance = 458
+        Me.SplitContainer1.Size = New System.Drawing.Size(1248, 615)
+        Me.SplitContainer1.SplitterDistance = 457
         Me.SplitContainer1.TabIndex = 5
         '
         'DataGridView1
@@ -214,7 +213,7 @@ Partial Class Form11
         Me.DataGridView1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.RowHeadersWidth = 62
-        Me.DataGridView1.Size = New System.Drawing.Size(458, 615)
+        Me.DataGridView1.Size = New System.Drawing.Size(457, 615)
         Me.DataGridView1.TabIndex = 2
         '
         'DataGridView2
@@ -226,7 +225,7 @@ Partial Class Form11
         Me.DataGridView2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.DataGridView2.Name = "DataGridView2"
         Me.DataGridView2.RowHeadersWidth = 62
-        Me.DataGridView2.Size = New System.Drawing.Size(788, 615)
+        Me.DataGridView2.Size = New System.Drawing.Size(787, 615)
         Me.DataGridView2.TabIndex = 3
         '
         'Form11

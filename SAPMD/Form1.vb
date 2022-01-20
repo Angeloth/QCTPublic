@@ -3878,6 +3878,10 @@ Public Class Form1
 
             DataGridView1.DataSource = bS
 
+            For i = 0 To DataGridView1.Rows.Count - 1
+                DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
+            Next
+
             'Esto era antes!
             'For i = 0 To xDs.Tables(0).Rows.Count - 1
 
@@ -5389,7 +5393,15 @@ Public Class Form1
                         LimpiaCeldaDeError(i, j)
                         esYave = False
 
-                        If IsNothing(DataGridView1.Rows(i).Cells(j).Value) = True Then valEvaluar = "" Else valEvaluar = DataGridView1.Rows(i).Cells(j).Value
+                        If IsNothing(DataGridView1.Rows(i).Cells(j).Value) = True Then
+                            valEvaluar = ""
+                        Else
+                            If IsDBNull(DataGridView1.Rows(i).Cells(j).Value) = True Then
+                                valEvaluar = ""
+                            Else
+                                valEvaluar = DataGridView1.Rows(i).Cells(j).Value
+                            End If
+                        End If
 
                         'valEvaluar = DataGridView1.Rows(i).Cells(j).Value
                         esMandatorio = False
