@@ -398,6 +398,7 @@ Module Module2
         elDs.Tables(laTabInd).Rows.Clear()
 
         'For i = 0 To elGrid.Rows.Count - 1
+        posDg = elRenglon + 1
 
         xYave = elGrid.Rows(elRenglon).Cells(ColYave).Value
         elDs.Tables(laTabInd).Rows.Add({xYave, "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""})
@@ -408,8 +409,9 @@ Module Module2
         Else
             elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(2) = ""
             End If
-        elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(3) = elGrid.Rows(elRenglon).HeaderCell.Value 'posicion!
-        posDg = CInt(elGrid.Rows(elRenglon).HeaderCell.Value)
+        elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(3) = posDg ' elGrid.Rows(elRenglon).HeaderCell.Value 'posicion!
+        'posDg = CInt(elGrid.Rows(elRenglon).HeaderCell.Value)
+
         elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(4) = LetraNumero.Tables(0).Rows(posDg - 1).Item(1)
 
             For j = fromCol To toCol 'elGrid.Columns.Count - 1

@@ -923,7 +923,6 @@ Public Class Form1
 
                 TreeView1.EndUpdate()
 
-
         End Select
 
 
@@ -5020,9 +5019,10 @@ Public Class Form1
 
                             'DataGridView1.Rows(e.rowindex).Cells(e.columnindex).tag
                             'gb:gb0001:FIELDMATCH:MATNR#A-BUKRS#B
+
                             Dim miTag As Object = DataGridView1.Rows(e.RowIndex).Cells(10).Tag
 
-                            If miTag = "None" Then
+                            If miTag = "None" Or IsNothing(miTag) = True Then
                                 'va directo a load
 
                                 Form11.toyLeyendo = False
