@@ -820,6 +820,9 @@ Module Module1
                                         Case Is = "MatchingFields"
                                             xSet.Tables(xSet.Tables.Count - 1).Rows(xSet.Tables(xSet.Tables.Count - 1).Rows.Count - 1).Item(13) = prap.Value
 
+                                        Case Is = "ConditionalScope"
+                                            xSet.Tables(xSet.Tables.Count - 1).Rows(xSet.Tables(xSet.Tables.Count - 1).Rows.Count - 1).Item(14) = prap.Value
+
                                     End Select
 
                                 Next

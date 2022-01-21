@@ -5551,7 +5551,14 @@ Public Class Form1
                                             miTabF.ImportRow(row)
                                         Next
 
-                                        valCheck = miTabF.Rows(0).Item(CStr(ValidaDt.Rows(z).Item(22))) 'valor ultimo a comparar!
+                                        If miTabF.Rows.Count = 1 Then
+                                            valCheck = miTabF.Rows(0).Item(CStr(ValidaDt.Rows(z).Item(22)))
+                                        Else
+                                            valCheck = "Multiple"
+                                            'valCheck = miTabF.Rows(0).Item(CStr(ValidaDt.Rows(z).Item(22)))
+                                        End If
+
+                                        'valor ultimo a comparar!
 
                                     Else
                                         'es local!
@@ -5611,90 +5618,140 @@ Public Class Form1
 
 
                                         Case Is = "MATCHS" 'va ser mandatorio si el campo matchea con el valor condicional!
-                                            If valCheck = valPrufz Then
-                                                'si macheo!
-                                                If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
-                                                    esMandatorio = True
-                                                Else
-                                                    'se evalua!!
-                                                    'la regla esta OK!
-                                                    'continuo!
-                                                    anchoTru(j) = True
-                                                    Continue For
-                                                End If
-                                            Else
-                                                If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
-                                                    'NO es mandatorio, se queda vacío!
-                                                    esMandatorio = False
-                                                    esOpcional = True
-                                                Else
-                                                    PintaCeldaDeError(i, j, "The conditional final matching field > " & mixPobl & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " : " & busCad & " > " & valCheck & " , does not match to the required value: " & valPrufz & " , review conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & ">" & ValidaDt.Rows(z).Item(22) & " ")
+
+                                            If valCheck = "Multiple" Then
+
+                                                'Aqui falta!!
+                                                buskEst = buskEst & " AND " & CStr(ValidaDt.Rows(z).Item(22)) & "='" & valPrufz & "'"
+                                                Dim xtraRows() As DataRow = multiDepe.Tables(mixNombreTab).Select(buskEst)
+                                                If xtraRows.Length = 0 Then
+                                                    PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " , please review!")
                                                     Continue For
                                                 End If
 
+                                            Else
+                                                If valCheck = valPrufz Then
+                                                    'si macheo!
+                                                    If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
+                                                        esMandatorio = True
+                                                    Else
+                                                        'se evalua!!
+                                                        'la regla esta OK!
+                                                        'continuo!
+                                                        anchoTru(j) = True
+                                                        Continue For
+                                                    End If
+                                                Else
+                                                    If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
+                                                        'NO es mandatorio, se queda vacío!
+                                                        esMandatorio = False
+                                                        esOpcional = True
+                                                    Else
+                                                        PintaCeldaDeError(i, j, "The conditional final matching field > " & mixPobl & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " : " & busCad & " > " & valCheck & " , does not match to the required value: " & valPrufz & " , review conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & ">" & ValidaDt.Rows(z).Item(22) & " ")
+                                                        Continue For
+                                                    End If
+
+                                                End If
                                             End If
+
+
 
                                         Case Is = "STARTWITH"
 
-                                            If valCheck.StartsWith(valPrufz) = True Then
-                                                'cumple la condición, 
-                                                If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
-                                                    esMandatorio = True
-                                                Else
-                                                    anchoTru(j) = True
+                                            If valCheck = "Multiple" Then
+                                                buskEst = buskEst & " AND " & CStr(ValidaDt.Rows(z).Item(22)) & " LIKE '" & valPrufz & "%'"
+                                                Dim xtraRows() As DataRow = multiDepe.Tables(mixNombreTab).Select(buskEst)
+                                                If xtraRows.Length = 0 Then
+                                                    PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " , please review!")
                                                     Continue For
                                                 End If
-
                                             Else
-                                                If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
-                                                    esMandatorio = False
-                                                    esOpcional = True
-                                                Else
-                                                    PintaCeldaDeError(i, j, "The conditional final matching field > " & mixPobl & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " : " & busCad & " > " & valCheck & " , does not starts with the required value: " & valPrufz & " , review conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & ">" & ValidaDt.Rows(z).Item(22) & " ")
-                                                    Continue For
-                                                End If
+                                                If valCheck.StartsWith(valPrufz) = True Then
+                                                    'cumple la condición, 
+                                                    If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
+                                                        esMandatorio = True
+                                                    Else
+                                                        anchoTru(j) = True
+                                                        Continue For
+                                                    End If
 
+                                                Else
+                                                    If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
+                                                        esMandatorio = False
+                                                        esOpcional = True
+                                                    Else
+                                                        PintaCeldaDeError(i, j, "The conditional final matching field > " & mixPobl & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " : " & busCad & " > " & valCheck & " , does not starts with the required value: " & valPrufz & " , review conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & ">" & ValidaDt.Rows(z).Item(22) & " ")
+                                                        Continue For
+                                                    End If
+
+                                                End If
                                             End If
+
+
 
                                         Case Is = "ENDWITH"
-                                            If valCheck.EndsWith(valPrufz) = True Then
 
-                                                If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
-                                                    esMandatorio = True
-                                                Else
-                                                    anchoTru(j) = True
+                                            If valCheck = "Multiple" Then
+                                                buskEst = buskEst & " AND " & CStr(ValidaDt.Rows(z).Item(22)) & " LIKE '%" & valPrufz & "'"
+                                                Dim xtraRows() As DataRow = multiDepe.Tables(mixNombreTab).Select(buskEst)
+                                                If xtraRows.Length = 0 Then
+                                                    PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " , please review!")
                                                     Continue For
                                                 End If
-
                                             Else
-                                                If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
-                                                    esMandatorio = False
-                                                    esOpcional = True
-                                                Else
-                                                    PintaCeldaDeError(i, j, "The conditional final matching field > " & mixPobl & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " : " & busCad & " > " & valCheck & " , does not ends with the required value: " & valPrufz & " , review conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & ">" & ValidaDt.Rows(z).Item(22) & " ")
-                                                    Continue For
-                                                End If
+                                                If valCheck.EndsWith(valPrufz) = True Then
 
+                                                    If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
+                                                        esMandatorio = True
+                                                    Else
+                                                        anchoTru(j) = True
+                                                        Continue For
+                                                    End If
+
+                                                Else
+                                                    If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
+                                                        esMandatorio = False
+                                                        esOpcional = True
+                                                    Else
+                                                        PintaCeldaDeError(i, j, "The conditional final matching field > " & mixPobl & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " : " & busCad & " > " & valCheck & " , does not ends with the required value: " & valPrufz & " , review conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & ">" & ValidaDt.Rows(z).Item(22) & " ")
+                                                        Continue For
+                                                    End If
+
+                                                End If
                                             End If
+
+
 
 
                                         Case Is = "CONTAINS"
-                                            If valCheck.Contains(valPrufz) = True Then
-                                                If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
-                                                    esMandatorio = True
-                                                Else
-                                                    anchoTru(j) = True
+
+                                            If valCheck = "Multiple" Then
+                                                buskEst = buskEst & " AND " & CStr(ValidaDt.Rows(z).Item(22)) & " LIKE '%" & valPrufz & "%'"
+                                                Dim xtraRows() As DataRow = multiDepe.Tables(mixNombreTab).Select(buskEst)
+                                                If xtraRows.Length = 0 Then
+                                                    PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " , please review!")
                                                     Continue For
                                                 End If
                                             Else
-                                                If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
-                                                    esMandatorio = False
-                                                    esOpcional = True
+                                                If valCheck.Contains(valPrufz) = True Then
+                                                    If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
+                                                        esMandatorio = True
+                                                    Else
+                                                        anchoTru(j) = True
+                                                        Continue For
+                                                    End If
                                                 Else
-                                                    PintaCeldaDeError(i, j, "The conditional final matching field > " & mixPobl & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " : " & busCad & " > " & valCheck & " , does not CONTAINS the required value: " & valPrufz & " , review conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & ">" & ValidaDt.Rows(z).Item(22) & " ")
-                                                    Continue For
+                                                    If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
+                                                        esMandatorio = False
+                                                        esOpcional = True
+                                                    Else
+                                                        PintaCeldaDeError(i, j, "The conditional final matching field > " & mixPobl & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " : " & busCad & " > " & valCheck & " , does not CONTAINS the required value: " & valPrufz & " , review conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & ">" & ValidaDt.Rows(z).Item(22) & " ")
+                                                        Continue For
+                                                    End If
                                                 End If
                                             End If
+
+
 
                                     End Select
 
