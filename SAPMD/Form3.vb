@@ -202,7 +202,7 @@
 
 
         Else
-            MsgBox("Tables not found!!", vbCritical, "SAP MD")
+            MsgBox("Tables not found!!", vbCritical, TitBox)
             Me.Close()
             Exit Sub
         End If
@@ -237,7 +237,7 @@
             Me.Close()
 
         Else
-            MsgBox("Please complete all fields!", vbCritical, "SAP MD")
+            MsgBox("Please complete all fields!", vbCritical, TitBox)
         End If
 
 
@@ -248,7 +248,7 @@
             Dim enCuentra As DataRow
             enCuentra = DatDepField.Tables(0).Rows.Find(TextBox1.Text)
             If IsNothing(enCuentra) = True Then
-                MsgBox("Please enter a valid field code!", vbCritical, "SAP MD")
+                MsgBox("Please enter a valid field code!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -272,7 +272,7 @@
             Dim enCuentra As DataRow
             enCuentra = DatConTempDs.Tables(0).Rows.Find(TextBox3.Text)
             If IsNothing(enCuentra) = True Then
-                MsgBox("Please enter a valid template code!", vbCritical, "SAP MD")
+                MsgBox("Please enter a valid template code!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -333,7 +333,7 @@
             Button3.Visible = True
             Button4.Visible = False
         Else
-            MsgBox("", vbCritical, "SAP MD")
+            MsgBox("", vbCritical, TitBox)
         End If
 
     End Sub
@@ -344,7 +344,7 @@
             Dim enCuentra As DataRow
             enCuentra = DsBox6.Tables(0).Rows.Find(TextBox6.Text)
             If IsNothing(enCuentra) = True Then
-                MsgBox("Please enter a valid template code!", vbCritical, "SAP MD")
+                MsgBox("Please enter a valid template code!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -433,7 +433,7 @@
             End If
 
         Else
-            MsgBox("No table found!", vbCritical, "SAP MD")
+            MsgBox("No table found!", vbCritical, TitBox)
 
         End If
 
@@ -445,7 +445,7 @@
             Dim enCuentra As DataRow
             enCuentra = DsBox8.Tables(0).Rows.Find(TextBox8.Text)
             If IsNothing(enCuentra) = True Then
-                MsgBox("Please enter a valid template code!", vbCritical, "SAP MD")
+                MsgBox("Please enter a valid template code!", vbCritical, TitBox)
                 Exit Sub
             End If
 

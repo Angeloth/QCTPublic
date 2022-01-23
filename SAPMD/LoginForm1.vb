@@ -14,7 +14,7 @@ Public Class LoginForm1
         'validar el login del usuario!!
 
         If UsernameTextBox.Text = "" Or PasswordTextBox.Text = "" Then
-            MsgBox("Please fill you Email and Password to continue!!", vbCritical, "SAP MD")
+            MsgBox("Please fill you Email and Password to continue!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -22,7 +22,7 @@ Public Class LoginForm1
         enCuentra = setUsuarios.Tables(0).Rows.Find(UsernameTextBox.Text)
 
         If IsNothing(enCuentra) = True Then
-            MsgBox("This user don't exists!, please verify!!", vbCritical, "SAP MD")
+            MsgBox("This user don't exists!, please verify!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -30,7 +30,7 @@ Public Class LoginForm1
         z = setUsuarios.Tables(0).Rows.IndexOf(enCuentra)
 
         If getSHA1Hash(PasswordTextBox.Text) <> setUsuarios.Tables(0).Rows(z).Item(4) Then
-            MsgBox("Invalid password!!", vbCritical, "SAP MD")
+            MsgBox("Invalid password!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -47,7 +47,7 @@ Public Class LoginForm1
         End If
 
         If Form6.huboExito = False Then
-            MsgBox("Please provide a new password for your session!!", vbCritical, "SAP MD")
+            MsgBox("Please provide a new password for your session!!", vbCritical, TitBox)
             Exit Sub
         End If
 

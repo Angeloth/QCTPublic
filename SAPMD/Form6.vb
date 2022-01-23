@@ -14,17 +14,17 @@ Public Class Form6
     Private Async Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
         If TextBox1.Text = "" Or TextBox2.Text = "" Then
-            MsgBox("Please fill the two boxes with the password!", vbCritical, "SAP MD")
+            MsgBox("Please fill the two boxes with the password!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If TextBox1.Text.Length < 8 Then
-            MsgBox("Please make sure that the new password is at least 8 characters long!", vbCritical, "SAP MD")
+            MsgBox("Please make sure that the new password is at least 8 characters long!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If TextBox1.Text <> TextBox2.Text Then
-            MsgBox("The passwords doesn't match!!", vbCritical, "SAP MD")
+            MsgBox("The passwords doesn't match!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -46,22 +46,22 @@ Public Class Form6
         Next
 
         If cumpleNum = False Then
-            MsgBox("Please make sure that your password contains the following: " & vbCrLf & "At least 8 characters long" & vbCrLf & "One Upper Case letter" & vbCrLf & "One Lower Case letter" & vbCrLf & "One number" & vbCrLf & "One special character!" & vbCrLf & "Please correct and try again!!", vbCritical, "SAP MD")
+            MsgBox("Please make sure that your password contains the following: " & vbCrLf & "At least 8 characters long" & vbCrLf & "One Upper Case letter" & vbCrLf & "One Lower Case letter" & vbCrLf & "One number" & vbCrLf & "One special character!" & vbCrLf & "Please correct and try again!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If cumpleUpper = False Then
-            MsgBox("Please make sure that your password contains the following: " & vbCrLf & "At least 8 characters long" & vbCrLf & "One Upper Case letter" & vbCrLf & "One Lower Case letter" & vbCrLf & "One number" & vbCrLf & "One special character!" & vbCrLf & "Please correct and try again!!", vbCritical, "SAP MD")
+            MsgBox("Please make sure that your password contains the following: " & vbCrLf & "At least 8 characters long" & vbCrLf & "One Upper Case letter" & vbCrLf & "One Lower Case letter" & vbCrLf & "One number" & vbCrLf & "One special character!" & vbCrLf & "Please correct and try again!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If cumpleLower = False Then
-            MsgBox("Please make sure that your password contains the following: " & vbCrLf & "At least 8 characters long" & vbCrLf & "One Upper Case letter" & vbCrLf & "One Lower Case letter" & vbCrLf & "One number" & vbCrLf & "One special character!" & vbCrLf & "Please correct and try again!!", vbCritical, "SAP MD")
+            MsgBox("Please make sure that your password contains the following: " & vbCrLf & "At least 8 characters long" & vbCrLf & "One Upper Case letter" & vbCrLf & "One Lower Case letter" & vbCrLf & "One number" & vbCrLf & "One special character!" & vbCrLf & "Please correct and try again!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If cumpleEspec = False Then
-            MsgBox("Please make sure that your password contains the following: " & vbCrLf & "At least 8 characters long" & vbCrLf & "One Upper Case letter" & vbCrLf & "One Lower Case letter" & vbCrLf & "One number" & vbCrLf & "One special character!" & vbCrLf & "Please correct and try again!!", vbCritical, "SAP MD")
+            MsgBox("Please make sure that your password contains the following: " & vbCrLf & "At least 8 characters long" & vbCrLf & "One Upper Case letter" & vbCrLf & "One Lower Case letter" & vbCrLf & "One number" & vbCrLf & "One special character!" & vbCrLf & "Please correct and try again!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -77,7 +77,7 @@ Public Class Form6
         'HazPutEnFireBaseConPath()
 
         If elRet <> "Ok" Then
-            MsgBox(elRet, vbCritical, "SAP MD")
+            MsgBox(elRet, vbCritical, TitBox)
             Exit Sub
         End If
 

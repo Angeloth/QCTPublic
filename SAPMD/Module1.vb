@@ -8,6 +8,7 @@ Imports System.Text
 Imports System.Security.Cryptography
 Module Module1
     'Modulo para realizar las escrituras y lecturas de FireBase!
+    Public Const TitBox As String = "DQCT"
     Public Const RaizFire As String = "https://gates-47856-default-rtdb.firebaseio.com" 'sustituir por el de la empresa
     Public RoleUsuario As String
     Public ModuPermit As New DataSet

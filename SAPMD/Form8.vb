@@ -121,7 +121,7 @@
 
         If tablaLocal.Rows.Count = 0 Then
 
-            MsgBox("No table objects found!!", vbInformation, "SAP MD")
+            MsgBox("No table objects found!!", vbInformation, TitBox)
 
             Me.Close()
 

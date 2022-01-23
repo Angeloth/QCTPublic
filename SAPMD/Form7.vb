@@ -314,19 +314,15 @@
     Private Async Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
 
         If reglaSelected = "" Then
-            MsgBox("Please select a rule first!!", vbCritical, "SAP MD")
+            MsgBox("Please select a rule first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If DataGridView1.Rows.Count = 0 Then
-            MsgBox("Please add some rules first!", vbCritical, "SAP MD")
+            MsgBox("Please add some rules first!", vbCritical, TitBox)
             Exit Sub
         End If
 
-        If DataGridView1.Rows.Count < 2 Then
-            MsgBox("A construction must be formed by at least 2 rules!!", vbCritical, "SAP MD")
-            Exit Sub
-        End If
 
         Dim xDs As New DataSet
         xDs.Tables.Add()
@@ -341,7 +337,7 @@
         Dim unEntero2 As Integer = 0
         Dim laIzq As String = ""
         Dim laDer As String = ""
-        Dim enCuentra As DataRow
+        'Dim enCuentra As DataRow
         Dim miLimit As Integer = 0
         Dim valorColumna As String = ""
         Dim posiColumna As Integer = 0
@@ -351,7 +347,7 @@
             valorColumna = ""
 
             If DataGridView1.Rows(i).Cells(1).Value = "No selection" Then
-                MsgBox("A rule is missing on the row '" & CStr(i + 1) & "', please select an option from the Rule column", vbCritical, "SAP MD")
+                MsgBox("A rule is missing on the row '" & CStr(i + 1) & "', please select an option from the Rule column", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -393,7 +389,7 @@
                 Case Is = "D - Fixed Value"
                     'que tenga algo!!
                     If DataGridView1.Rows(i).Cells(2).Value = "" Then
-                        MsgBox("Please type a Value for this fixed value on row: " & CStr(i + 1), vbCritical, "SAP MD")
+                        MsgBox("Please type a Value for this fixed value on row: " & CStr(i + 1), vbCritical, TitBox)
                         Exit Sub
                     End If
 
@@ -402,7 +398,7 @@
 
                 Case Is = "E - External object"
                     If DataGridView1.Rows(i).Cells(2).Value = "" Or DataGridView1.Rows(i).Cells(2).Value = "None" Then
-                        MsgBox("Please make sure to set a external object traceability for row " & CStr(i), vbCritical, "QDT")
+                        MsgBox("Please make sure to set a external object traceability for row " & CStr(i), vbCritical, TitBox)
                         Exit Sub
                     End If
                     valorColumna = DataGridView1.Rows(i).Cells(2).Value
@@ -411,12 +407,12 @@
 
 
             If DataGridView1.Rows(i).Cells(3).Value = "" Then
-                MsgBox("Please type a max char length for the row '" & CStr(i + 1), vbCritical, "SAP MD")
+                MsgBox("Please type a max char length for the row '" & CStr(i + 1), vbCritical, TitBox)
                 Exit Sub
             End If
 
             If CStr(DataGridView1.Rows(i).Cells(3).Value).Length > 5 Then
-                MsgBox("The max char length should be at most 5 digits long'" & CStr(i + 1), vbCritical, "SAP MD")
+                MsgBox("The max char length should be at most 5 digits long'" & CStr(i + 1), vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -446,7 +442,7 @@
                     'ok!
                     miLimit = miLimit + unEntero1
                 Else
-                    MsgBox("The max char length must be an integer number, please check row '" & CStr(i + 1), vbCritical, "SAP MD")
+                    MsgBox("The max char length must be an integer number, please check row '" & CStr(i + 1), vbCritical, TitBox)
                     Exit Sub
                 End If
             End If
@@ -463,7 +459,7 @@
         Next
 
         If miLimit > maxCharLimit Then
-            MsgBox("The max char limit you defined for this entire field is " & maxCharLimit & ", and currently this rule has currently " & miLimit, vbCritical, "SAP MD")
+            MsgBox("The max char limit you defined for this entire field is " & maxCharLimit & ", and currently this rule has currently " & miLimit, vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -484,7 +480,7 @@
         If resp = "Ok" Then
             resp = Await HazPostEnFireBaseConPathYColumnas(elCamino, xDs.Tables(0), reglaSelected, -1)
 
-            MsgBox("Rule updated!", vbInformation, "SAP MD")
+            MsgBox("Rule updated!", vbInformation, TitBox)
 
             Await ReCargaConstruction()
 
@@ -528,13 +524,13 @@
 
     Private Async Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
         If reglaSelected = "" Then
-            MsgBox("Please select first one rule to delete!", vbCritical, "SAP MD")
+            MsgBox("Please select first one rule to delete!", vbCritical, TitBox)
             Exit Sub
         End If
 
         Dim x As Integer = 0
 
-        x = MsgBox("ATTENTION!!" & vbCrLf & "Are you sure you want to delete this rule?, this action can not be undone!", vbQuestion + vbYesNo, "SAP MD")
+        x = MsgBox("ATTENTION!!" & vbCrLf & "Are you sure you want to delete this rule?, this action can not be undone!", vbQuestion + vbYesNo, TitBox)
 
         If x <> 6 Then Exit Sub
 

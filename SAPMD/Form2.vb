@@ -167,7 +167,7 @@
                     Next
 
                 Else
-                    MsgBox("No table founds!", vbCritical, "SAP MD")
+                    MsgBox("No table founds!", vbCritical, TitBox)
                     Me.Close()
                 End If
 
@@ -240,38 +240,38 @@
 
             Case Is = 1, 4
                 If TextBox3.Text = "" Then
-                    MsgBox("Please provide a name for this new node!", vbCritical, "SAP MD")
+                    MsgBox("Please provide a name for this new node!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
                 If TextBox3.Text.Length <= 2 Then
-                    MsgBox("Please provide name longer than 2 characters!!", vbCritical, "SAP MD")
+                    MsgBox("Please provide name longer than 2 characters!!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
             Case Is = 5
 
                 If TextBox1.Text = "" Or TextBox2.Text = "" Or TextBox3.Text = "" Then
-                    MsgBox("All fields are required!!", vbCritical, "SAP MD")
+                    MsgBox("All fields are required!!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
                 Dim enCuentra As DataRow
                 enCuentra = ModuDs.Tables(0).Rows.Find(TextBox1.Text.ToLower())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("This is not a valid SAP module!!, please review!!", vbCritical, "SAP MD")
+                    MsgBox("This is not a valid SAP module!!, please review!!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
                 enCuentra = ModuPermit.Tables(0).Rows.Find(TextBox1.Text.ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to add templates on the selected module", vbCritical, "SAP MD")
+                    MsgBox("Sorry you are not allowed to add templates on the selected module", vbCritical, TitBox)
                     Exit Sub
                 End If
 
             Case Is = 2
                 If TextBox1.Text = "" Then
-                    MsgBox("Please type a valid template code!", vbCritical, "SAP MD")
+                    MsgBox("Please type a valid template code!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -279,13 +279,13 @@
 
                 enCuentra = filtroDs.Tables(0).Rows.Find(TextBox1.Text)
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Please enter a valid template code!", vbCritical, "SAP MD")
+                    MsgBox("Please enter a valid template code!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
                 enCuentra = ModuPermit.Tables(0).Rows.Find(TextBox3.Text.ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to add templates on the selected module", vbCritical, "SAP MD")
+                    MsgBox("Sorry you are not allowed to add templates on the selected module", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -293,14 +293,14 @@
             Case Is = 3
 
                 If TextBox1.Text = "" Or TextBox2.Text = "" Or TextBox3.Text = "" Then
-                    MsgBox("All fields are required!!", vbCritical, "SAP MD")
+                    MsgBox("All fields are required!!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
 
             Case Is = 6
                 If TextBox1.Text = "" Or TextBox2.Text = "" Or TextBox3.Text = "" Then
-                    MsgBox("All fields are required!!", vbCritical, "SAP MD")
+                    MsgBox("All fields are required!!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -336,7 +336,7 @@
 
                     enCuentra = filtroDs.Tables(0).Rows.Find(TextBox1.Text)
                     If IsNothing(enCuentra) = True Then
-                        MsgBox("Please enter a valid template code!", vbCritical, "SAP MD")
+                        MsgBox("Please enter a valid template code!", vbCritical, TitBox)
                         Exit Sub
                     End If
 
@@ -362,7 +362,7 @@
 
                     enCuentra = filtroDs.Tables(0).Rows.Find(TextBox2.Text)
                     If IsNothing(enCuentra) = True Then
-                        MsgBox("Please enter a valid table code!", vbCritical, "SAP MD")
+                        MsgBox("Please enter a valid table code!", vbCritical, TitBox)
                         Exit Sub
                     End If
 

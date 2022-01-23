@@ -203,7 +203,7 @@ Public Class Form4
         'save1
 
         If TextBox1.Text = "" Then
-            MsgBox("Please enter a valid Email address!", vbCritical, "SAP MD")
+            MsgBox("Please enter a valid Email address!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -211,22 +211,22 @@ Public Class Form4
         Try
             Dim xMail As New MailAddress(TextBox1.Text)
         Catch ex As Exception
-            MsgBox("Please enter a valid Email address!", vbCritical, "SAP MD")
+            MsgBox("Please enter a valid Email address!", vbCritical, TitBox)
             Exit Sub
         End Try
 
         If TextBox2.Text = "" Then
-            MsgBox("Please enter a Name for this user", vbCritical, "SAP MD")
+            MsgBox("Please enter a Name for this user", vbCritical, TitBox)
             Exit Sub
         End If
 
         If TextBox3.Text = "" Then
-            MsgBox("Please enter a Last name for this user", vbCritical, "SAP MD")
+            MsgBox("Please enter a Last name for this user", vbCritical, TitBox)
             Exit Sub
         End If
 
         If ComboBox1.SelectedIndex < 0 Then
-            MsgBox("Please select a role for this user!!", vbCritical, "SAP MD")
+            MsgBox("Please select a role for this user!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -243,7 +243,7 @@ Public Class Form4
             Next
 
             If cadModulos = "" Then
-                MsgBox("Please check some modules for this Editor role!", vbCritical, "SAP MD")
+                MsgBox("Please check some modules for this Editor role!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -285,14 +285,14 @@ Public Class Form4
             enCuentra = setUsers.Tables(0).Rows.Find(TextBox1.Text)
             If IsNothing(enCuentra) = False Then
                 'ya estaba!!
-                MsgBox("This user already exists!!, if you want to edit it, please click on Edit User and check it from the list on the left!", vbCritical, "SAP MD")
+                MsgBox("This user already exists!!, if you want to edit it, please click on Edit User and check it from the list on the left!", vbCritical, TitBox)
                 Exit Sub
             End If
 
             xSet.Rows.Add({TextBox1.Text, TextBox2.Text, TextBox3.Text, cadChek, suPass, elRol, cadModulos, ""})
 
             elRet = Await HazPostEnFireBaseConPathYColumnas(elCamino, xSet, "list", 7)
-            MsgBox(elRet, vbInformation, "SAP MD")
+            MsgBox(elRet, vbInformation, TitBox)
 
             Call ReloadUserList()
 
@@ -301,7 +301,7 @@ Public Class Form4
             'un poco diferente!, se debe actualizar!
             enCuentra = setUsers.Tables(0).Rows.Find(TextBox1.Text)
             If IsNothing(enCuentra) = True Then
-                MsgBox("User not found!!", vbCritical, "SAP MD")
+                MsgBox("User not found!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -319,7 +319,7 @@ Public Class Form4
 
             elRet = Await HazPutEnFireBasePathYColumnas(elCamino, xSet, 7)
 
-            MsgBox(elRet, vbInformation, "SAP MD")
+            MsgBox(elRet, vbInformation, TitBox)
             Call ReloadUserList()
 
         End If
@@ -338,7 +338,7 @@ Public Class Form4
         Next
 
         If elUsr = "" Then
-            MsgBox("Please check a user to delete first!!", vbCritical, "SAP MP")
+            MsgBox("Please check a user to delete first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -348,7 +348,7 @@ Public Class Form4
 
         If IsNothing(enCuentra) = True Then
             'no se encuentra el usuario!
-            MsgBox("User not found!!", vbCritical, "SAP MD")
+            MsgBox("User not found!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -367,7 +367,7 @@ Public Class Form4
             Next
 
             If filterDT.Rows.Count <= 2 Then
-                MsgBox("You can't delete this Admin, there must be at least 2 admins in the user list!!", vbCritical, "SAP MD")
+                MsgBox("You can't delete this Admin, there must be at least 2 admins in the user list!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -382,10 +382,10 @@ Public Class Form4
         elRet = Await HazDeleteEnFbSimple(pathDel, CStr(setUsers.Tables(0).Rows(z).Item(7)))
 
         If elRet = "Ok" Then
-            MsgBox("User gone!", vbInformation, "SAP MD")
+            MsgBox("User gone!", vbInformation, TitBox)
             Call ReloadUserList()
         Else
-            MsgBox(elRet, vbInformation, "SAP MD")
+            MsgBox(elRet, vbInformation, TitBox)
         End If
 
     End Sub
