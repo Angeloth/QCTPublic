@@ -39,12 +39,10 @@
         '16. Modulo para administrar nuevos 'releases', Que se marquen las compañias y modulos y por ende los templates aplicables y fechas límite para subir la info!
         '17. Lógica para liberación de templates de acuerdo a dependencias
         '18. Visualizar la estructura de llenado completa al 'arbol' maestro de construcción!
-        '19. Migrar todo a la base de de Luis Adrian
+        '19. Migrar todo a la base de Firebase de Luis Adrian
         '20. Generar tokens de autenticacion para mas seguridad
         '21. Crear 'medium installer' para realizar actualizaciones automáticas/parches
-        '22. Re-Explorar PutAsync para escribir datos en batch en un nodo!
-        '23. 
-
+        '22. Re-Explorar método para escribir datos en batch en un nodo de forma masiva más rápidamente
 
         'Evaluación 
 

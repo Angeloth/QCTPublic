@@ -40,6 +40,7 @@ Public Class Form1
     Private ValidaDt As New DataTable
 
     Private multiDepe As New DataSet
+    Private RecDt As New DataTable
 
     Private xDepeDs As New DataSet 'este se usa momentaneamente para validar!
     Private rowEstaba As Long
@@ -1576,12 +1577,25 @@ Public Class Form1
                             DataGridView1.Columns.Add(filterDT.Rows(j).Item(3), filterDT.Rows(j).Item(4))
                             DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = filterDT.Rows(j).Item(3)
                             DataGridView1.Columns(DataGridView1.Columns.Count - 1).Tag = filterDT.Rows(j).Item(5) 'si es campo Yave o no!
+                            'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell = New DataGridViewAutoFilter.DataGridViewAutoFilterColumnHeaderCell
+                            DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderText = filterDT.Rows(j).Item(4)
                         Next
 
                         'agregar 3 columnas extras para validar!
                         DataGridView1.Columns.Add("ROWOK", "¿Row Ok?")
+                        'DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = "ROWOK"
+                        'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell = New DataGridViewAutoFilter.DataGridViewAutoFilterColumnHeaderCell
+                        'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderText = "¿Row Ok?"
+
                         DataGridView1.Columns.Add("ROWREP", "Repeteability?")
+                        'DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = "ROWREP"
+                        'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell = New DataGridViewAutoFilter.DataGridViewAutoFilterColumnHeaderCell
+                        'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderText = "Repeteability?"
+
                         DataGridView1.Columns.Add("ROWCOMMS", "Internal-Relations Ok?")
+                        'DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = "ROWCOMMS"
+                        'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell = New DataGridViewAutoFilter.DataGridViewAutoFilterColumnHeaderCell
+                        'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderText = "Internal-Relations Ok?"
 
                         DataGridView1.AllowUserToAddRows = True
                         DataGridView1.AllowUserToDeleteRows = True
@@ -3906,7 +3920,16 @@ Public Class Form1
 
             Dim bS As New BindingSource
 
-            bS.DataSource = xDs.Tables(0)
+            RecDt.Rows.Clear()
+            RecDt.Columns.Clear()
+            RecDt = xDs.Tables(0)
+            'agregar las columnas extras!!
+
+            'RecDt.Columns.Add("ROWOK")
+            'RecDt.Columns.Add("ROWREP")
+            'RecDt.Columns.Add("ROWCOMMS")
+
+            bS.DataSource = RecDt ' xDs.Tables(0)
 
             DataGridView1.AutoGenerateColumns = False
 
@@ -3914,7 +3937,9 @@ Public Class Form1
 
             For i = 0 To DataGridView1.Rows.Count - 1
                 DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
+                DataGridView1.Rows(i).Tag = "NO OK" 'empezamos suponiendo que estan mal!
             Next
+
 
             'Esto era antes!
             'For i = 0 To xDs.Tables(0).Rows.Count - 1
@@ -6972,6 +6997,7 @@ Public Class Form1
                     Next
 
                     If elRowOk = True Then
+                        DataGridView1.Rows(i).Tag = "Ok!"
                         DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 1 - 2).Value = "Ok!"
                         DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 1 - 2).Style.ForeColor = Color.DarkGreen
                         DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 1 - 2).Style.Font = New System.Drawing.Font("Calibri", 10, FontStyle.Bold)
@@ -7092,6 +7118,9 @@ Public Class Form1
                     End If
 
                 Next
+
+
+
 
             Case Is = 4
 
@@ -7840,6 +7869,41 @@ Public Class Form1
 
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         'save all
+
+    End Sub
+
+    Private Sub ToolStripButton9_CheckedChanged(sender As Object, e As EventArgs) Handles ToolStripButton9.CheckedChanged
+
+        If ToolStripComboBox1.SelectedIndex <> 3 Then Exit Sub
+
+        Dim currencyManager1 As CurrencyManager = CType(BindingContext(DataGridView1.DataSource), CurrencyManager)
+        currencyManager1.SuspendBinding()
+        'DataGridView1.Rows(5).Visible = False
+
+
+        If ToolStripButton9.Checked = True Then
+
+            For i = 0 To DataGridView1.Rows.Count - 2
+                If IsNothing(DataGridView1.Rows(i).Tag) = True Then Continue For
+                If DataGridView1.Rows(i).Tag = "" Then Continue For
+                If DataGridView1.Rows(i).Tag = "NO OK" Then
+                    DataGridView1.Rows(i).Visible = True
+                Else
+                    DataGridView1.Rows(i).Visible = False
+                End If
+            Next
+
+        Else
+            If ToolStripButton9.Checked = False Then
+                For i = 0 To DataGridView1.Rows.Count - 2
+                    If IsNothing(DataGridView1.Rows(i).Tag) = True Then Continue For
+                    If DataGridView1.Rows(i).Tag = "" Then Continue For
+                    DataGridView1.Rows(i).Visible = True
+                Next
+            End If
+        End If
+
+        currencyManager1.ResumeBinding()
 
     End Sub
 End Class

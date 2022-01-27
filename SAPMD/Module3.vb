@@ -123,6 +123,8 @@ Module Module3
             Dim CSVLine As StringBuilder = New StringBuilder()
             Dim s As String = ""
 
+            If dt.Rows(r).Visible = False Then Continue For 'lo invisible no lo descarga!
+
             For k = 0 To dt.Columns.Count - limCols '4
 
                 If k = 0 Then
