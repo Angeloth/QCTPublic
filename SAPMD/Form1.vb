@@ -232,7 +232,7 @@ Public Class Form1
         '3- Templates- como se llenan
         '4- Dependencias, como se agregan
         '5- Registros, como se suben con la App, como se descargan con el template
-        '
+
         rowEstaba = -1
         puSSyCat = -1
         cataNombre = ""
@@ -4282,7 +4282,7 @@ Public Class Form1
 
 
         If DataGridView1.Rows.Count - 1 < 0 Then
-            MsgBox("Deploy some information first!!", vbCritical, "Clever Costs")
+            MsgBox("Deploy some information first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -7906,4 +7906,8 @@ Public Class Form1
         currencyManager1.ResumeBinding()
 
     End Sub
+
+
+
+
 End Class

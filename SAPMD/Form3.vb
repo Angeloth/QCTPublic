@@ -169,16 +169,17 @@
 
             MySourceDepField.Clear()
             For i = 0 To filtroDt.Rows.Count - 1
-                yaTaba = False
-                For j = 0 To filtroDep.Rows.Count - 1
-                    If filtroDt.Rows(i).Item(3) = filtroDep.Rows(j).Item(2) Then
-                        yaTaba = True
-                        Exit For
-                    End If
-                Next
+                'yaTaba = False
+                'For j = 0 To filtroDep.Rows.Count - 1
+                '    If filtroDt.Rows(i).Item(3) = filtroDep.Rows(j).Item(2) Then
+                '        yaTaba = True
+                '        Exit For
+                '    End If
+                'Next
 
-                If yaTaba = True Then Continue For
+                'If yaTaba = True Then Continue For
                 MySourceDepField.Add(CStr(filtroDt.Rows(i).Item(3)))
+
                 DatDepField.Tables(0).Rows.Add({filtroDt.Rows(i).Item(3), filtroDt.Rows(i).Item(4)})
             Next
 
