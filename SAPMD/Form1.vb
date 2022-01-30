@@ -7276,6 +7276,9 @@ Public Class Form1
                     Exit Sub
                 End If
 
+                If IsNothing(DataGridView1.Rows(rowEstaba).Cells(0).Value) = True Then Exit Sub
+                If DataGridView1.Rows(rowEstaba).Cells(0).Value = "" Then Exit Sub
+
                 Call TomaInfoPara1RowTemplate(DataGridView1, writeDs, 3, 0, 3, 13, rowEstaba)
 
                 'tomamos la info!!, 
