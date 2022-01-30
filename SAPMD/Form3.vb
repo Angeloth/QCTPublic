@@ -214,6 +214,18 @@
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
+        If ComboBox2.SelectedIndex = 0 Then
+
+            If ComboBox1.SelectedIndex <> 1 And ComboBox1.SelectedIndex <> 2 Then
+                If TextBox10.Text = "" Then
+                    MsgBox("Please define a Conditional Value to Match a condition rule!!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+            End If
+
+        End If
+
+
         If depFieldOk = True And conFieldOk = True Then
             'tenemos todo para meterlo de una vez a FB!
             resDepFieldCode = TextBox1.Text
@@ -500,6 +512,9 @@
                     ComboBox1.Items.Add("STARTWITH")
                     ComboBox1.Items.Add("ENDWITH")
                     ComboBox1.Items.Add("CONTAINS")
+
+                    'Si el valor en VALUE es VACIO, entonces va a aplicar la regla vs la columna condicional
+
                 End If
 
                 'que termine o inicia con el valor de la columna condicional!
@@ -554,8 +569,10 @@
             ComboBox1.SelectedIndex = 0
             ComboBox1.Enabled = False 'La regla SIEMPRE va a ser MATCHS! para construccion!
         Else
+
             ComboBox1.Enabled = True
             ComboBox1.SelectedIndex = 0
+
         End If
 
 
@@ -601,6 +618,8 @@
             TextBox10.Text = ""
             TextBox10.Enabled = False
         Else
+            'Si se aplica la regla entonces debe tener al menos 1 renglon al encontrarlo
+            'Si condiciona
             Select Case CStr(ComboBox1.Items(ComboBox1.SelectedIndex))
                 Case Is = "NULL", "NOTNULL"
                     TextBox10.Text = ""
@@ -609,7 +628,15 @@
                 Case Else
 
                     TextBox10.Text = ""
-                    TextBox10.Enabled = True
+                    If ComboBox2.SelectedIndex = 1 Then
+                        'Es de aplicación, se deshabilita el text10
+                        TextBox10.Enabled = False
+                    Else
+                        TextBox10.Enabled = True
+                    End If
+
+                    'TextBox10.Enabled = True
+
             End Select
 
         End If

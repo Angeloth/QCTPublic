@@ -5528,11 +5528,8 @@ Public Class Form1
                                     'Si cumple la condicion, entonces valida con la regla que se haya puesto
                                     'Si cumple la condicion, debe existir la informacion en la otra hoja
 
-
-                                    'Dim elRows() As DataRow
-                                    'Dim elMio As DataRow
-
                                     xObj = Nothing
+                                    Dim valPrufz As String = ""
                                     Dim misRows() As DataRow
                                     Dim mixPobl As String = ""
                                     Dim busCad As String = ""
@@ -5540,104 +5537,121 @@ Public Class Form1
                                     'Nombre de la tabla condicional a buscar:
                                     mixNombreTab = ValidaDt.Rows(z).Item(20) & "#" & ValidaDt.Rows(z).Item(21) & "#" & ValidaDt.Rows(z).Item(22)
 
-                                    'si es local, de la misma tabla, entonces se evalúa vs el datagrid!!
-
-                                    If ValidaDt.Rows(z).Item(27) <> "None" Then
-                                        'es Interno ó externo!!
-                                        'tiene matching fields!
-
-                                        If multiDepe.Tables.IndexOf(mixNombreTab) < 0 Then
-                                            PintaCeldaDeWarning(i, j, "Warning!!, There is no data to validate either if this field is right o wrong")
-                                            Continue For
-                                        End If
-
-                                        buskEst = ""
-
-                                        xObj = Split(CStr(ValidaDt.Rows(z).Item(27)), "-")
-
-                                        buskEst = ""
-                                        mixPobl = ""
-                                        busCad = ""
-
-                                        For w = 0 To UBound(xObj)
-
-                                            'hacer split de los campos
-                                            'Primero el hijo, luego el condicional
-                                            'el primero es de la tabla actual, el segundo de la tabla condicional
-                                            If w <> 0 Then buskEst = buskEst & " AND "
-
-                                            If w <> 0 Then mixPobl = mixPobl & " > "
-
-                                            If w <> 0 Then busCad = busCad & " > "
-
-                                            yObj = Nothing
-                                            yObj = Split(CStr(xObj(w)), "#")
-
-                                            mixPobl = mixPobl & CStr(yObj(1))
-
-                                            valBus = DataGridView1.Rows(i).Cells(CStr(yObj(0))).Value
-
-                                            busCad = busCad & valBus
-
-                                            buskEst = buskEst & CStr(yObj(1)) 'siempre la primera posición
-                                            buskEst = buskEst & "='" & valBus & "'"
-
-                                        Next
-
-                                        misRows = multiDepe.Tables(mixNombreTab).Select(buskEst)
-
-                                        If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
-                                            'solo para condicionar la evaluación del valor!
-                                            If misRows.Count = 0 Then
-                                                'como NO existe la condición NO se evalua!, todo OK!
-                                                anchoTru(j) = True
-                                                Continue For
-                                            End If
-
-                                        Else
-                                            'para aplicar la regla!
-                                            If misRows.Count = 0 Then
-                                                'NO existe la dependencia!!
-                                                PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " , please review!")
-                                                Continue For
-                                            End If
-
-                                        End If
-
-                                        Dim miTabF As DataTable
-                                        miTabF = multiDepe.Tables(mixNombreTab).Clone()
-                                        For Each row In misRows
-                                            miTabF.ImportRow(row)
-                                        Next
-
-                                        If miTabF.Rows.Count = 1 Then
-                                            valCheck = miTabF.Rows(0).Item(CStr(ValidaDt.Rows(z).Item(22)))
-                                        Else
-                                            valCheck = "Multiple"
-                                            'valCheck = miTabF.Rows(0).Item(CStr(ValidaDt.Rows(z).Item(22)))
-                                        End If
-
-                                        'valor ultimo a comparar!
-
-                                    Else
-                                        'es local!
-                                        'cuando es la misma tabla NO hay dependencias, solo condiciones!?
-
-                                        If CStr(ValidaDt.Rows(z).Item(22)) = "" Then
-                                            PintaCeldaDeError(i, j, "The conditional matching field(s) is not set!!, please review with the module responsible of defining condition rules!")
-                                            Continue For
-                                        Else
-                                            valCheck = DataGridView1.Rows(i).Cells(CStr(ValidaDt.Rows(z).Item(22))).Value
-                                        End If
-
-                                    End If
-
-                                    Dim valPrufz As String = ""
+                                    'Esto es independiente de la opcion de arriba!
                                     If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
                                         valPrufz = CStr(ValidaDt.Rows(z).Item(25))
                                     Else
                                         valPrufz = valEvaluar
                                     End If
+
+                                    'si es local, de la misma tabla, entonces se evalúa vs el datagrid!!
+                                    'DEBE tener un matching field cuando es vs una validación de objeto externo!?
+                                    buskEst = ""
+
+                                    Select Case CStr(ValidaDt.Rows(z).Item(23))
+                                        Case Is = "Local"
+                                            'Solo si es local debería validar SIEMPRE vs su mismo renglon y ya!
+                                            If CStr(ValidaDt.Rows(z).Item(22)) = "" Then
+                                                PintaCeldaDeError(i, j, "The conditional matching field(s) is not set!!, please review with the module responsible of defining condition rules!")
+                                                Continue For
+                                            Else
+                                                valCheck = DataGridView1.Rows(i).Cells(CStr(ValidaDt.Rows(z).Item(22))).Value
+                                            End If
+
+                                            'SIEMPRE va a tener NONE en matching fields!
+
+
+                                        Case Else 'Internal o External
+
+                                            If multiDepe.Tables.IndexOf(mixNombreTab) < 0 Then
+                                                PintaCeldaDeWarning(i, j, "Warning!!, There is no data to validate either if this field is right o wrong")
+                                                Continue For
+                                            End If
+
+                                            'es como si fuera vs un ToBeValue de una columna externa de otro template!
+                                            If ValidaDt.Rows(z).Item(27) <> "None" Then
+                                                'es Interno ó externo!!
+                                                'tiene matching fields!
+
+                                                xObj = Split(CStr(ValidaDt.Rows(z).Item(27)), "-")
+
+                                                'buskEst = ""
+                                                mixPobl = ""
+                                                busCad = ""
+
+                                                For w = 0 To UBound(xObj)
+
+                                                    'hacer split de los campos
+                                                    'Primero el hijo, luego el condicional
+                                                    'el primero es de la tabla actual, el segundo de la tabla condicional
+                                                    If w <> 0 Then buskEst = buskEst & " AND "
+
+                                                    If w <> 0 Then mixPobl = mixPobl & " > "
+
+                                                    If w <> 0 Then busCad = busCad & " > "
+
+                                                    yObj = Nothing
+                                                    yObj = Split(CStr(xObj(w)), "#")
+
+                                                    mixPobl = mixPobl & CStr(yObj(1))
+
+                                                    valBus = DataGridView1.Rows(i).Cells(CStr(yObj(0))).Value
+
+                                                    busCad = busCad & valBus
+
+                                                    buskEst = buskEst & CStr(yObj(1)) 'siempre la primera posición
+                                                    buskEst = buskEst & "='" & valBus & "'"
+
+                                                Next
+
+                                                misRows = multiDepe.Tables(mixNombreTab).Select(buskEst)
+
+                                                If CStr(ValidaDt.Rows(z).Item(28)) = "To Condition" Then
+                                                    'solo para condicionar la evaluación del valor!
+                                                    If misRows.Count = 0 Then
+                                                        'como NO existe la condición NO se evalua!, todo OK!
+                                                        anchoTru(j) = True
+                                                        Continue For
+                                                    End If
+
+                                                Else
+                                                    'para aplicar la regla!
+                                                    If misRows.Count = 0 Then
+                                                        'NO existe la dependencia!!
+                                                        PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " , please review!")
+                                                        Continue For
+                                                    End If
+
+                                                End If
+
+                                                Dim miTabF As DataTable
+                                                miTabF = multiDepe.Tables(mixNombreTab).Clone()
+                                                For Each row In misRows
+                                                    miTabF.ImportRow(row)
+                                                Next
+
+                                                If miTabF.Rows.Count = 1 Then
+                                                    valCheck = miTabF.Rows(0).Item(CStr(ValidaDt.Rows(z).Item(22)))
+                                                Else
+                                                    valCheck = "Multiple"
+                                                End If
+
+                                            Else
+                                                'Directo vs ToBeValue
+                                                valCheck = "Multiple"
+                                                'Conditional>OR>Value
+                                                'Hay de 2, Tobe Value, para condicionar o para aplicar
+
+                                                'Si es para condicionar estamos diciendo que con que 1 valor de las opciones seleccionadas
+                                                'cumpla la regla se aplica la regla exterior, se debe usar valprufz
+
+                                                'Si es para aplicar estamos diciendo que valevaluar debe hacer match con la regla seleccionada
+                                                'dentro de la columna de valores
+
+                                            End If
+
+
+                                    End Select
 
                                     'Cuando sea vs evaluación NO se puede seleccionar OR, NULL y NOT NULL
 
@@ -5681,7 +5695,10 @@ Public Class Form1
                                             If valCheck = "Multiple" Then
 
                                                 'Aqui falta!!
-                                                buskEst = buskEst & " AND " & CStr(ValidaDt.Rows(z).Item(22)) & "='" & valPrufz & "'"
+                                                If buskEst <> "" Then buskEst = buskEst & " AND "
+
+                                                buskEst = buskEst & CStr(ValidaDt.Rows(z).Item(22)) & "='" & valPrufz & "'"
+
                                                 Dim xtraRows() As DataRow = multiDepe.Tables(mixNombreTab).Select(buskEst)
                                                 If xtraRows.Length = 0 Then
                                                     PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " , please review!")
@@ -5718,7 +5735,8 @@ Public Class Form1
                                         Case Is = "STARTWITH"
 
                                             If valCheck = "Multiple" Then
-                                                buskEst = buskEst & " AND " & CStr(ValidaDt.Rows(z).Item(22)) & " LIKE '" & valPrufz & "%'"
+                                                If buskEst <> "" Then buskEst = buskEst & " AND "
+                                                buskEst = buskEst & CStr(ValidaDt.Rows(z).Item(22)) & " LIKE '" & valPrufz & "%'"
                                                 Dim xtraRows() As DataRow = multiDepe.Tables(mixNombreTab).Select(buskEst)
                                                 If xtraRows.Length = 0 Then
                                                     PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " , please review!")
@@ -5751,7 +5769,8 @@ Public Class Form1
                                         Case Is = "ENDWITH"
 
                                             If valCheck = "Multiple" Then
-                                                buskEst = buskEst & " AND " & CStr(ValidaDt.Rows(z).Item(22)) & " LIKE '%" & valPrufz & "'"
+                                                If buskEst <> "" Then buskEst = buskEst & " AND "
+                                                buskEst = buskEst & CStr(ValidaDt.Rows(z).Item(22)) & " LIKE '%" & valPrufz & "'"
                                                 Dim xtraRows() As DataRow = multiDepe.Tables(mixNombreTab).Select(buskEst)
                                                 If xtraRows.Length = 0 Then
                                                     PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " , please review!")
@@ -5785,7 +5804,8 @@ Public Class Form1
                                         Case Is = "CONTAINS"
 
                                             If valCheck = "Multiple" Then
-                                                buskEst = buskEst & " AND " & CStr(ValidaDt.Rows(z).Item(22)) & " LIKE '%" & valPrufz & "%'"
+                                                If buskEst <> "" Then buskEst = buskEst & " AND "
+                                                buskEst = buskEst & CStr(ValidaDt.Rows(z).Item(22)) & " LIKE '%" & valPrufz & "%'"
                                                 Dim xtraRows() As DataRow = multiDepe.Tables(mixNombreTab).Select(buskEst)
                                                 If xtraRows.Length = 0 Then
                                                     PintaCeldaDeError(i, j, "The conditional matching field(s) > " & mixPobl & " : " & busCad & " , were not found on the conditional object path: " & ValidaDt.Rows(z).Item(20) & ">" & ValidaDt.Rows(z).Item(21) & " > " & CStr(ValidaDt.Rows(z).Item(22)) & " , please review!")
@@ -5813,6 +5833,8 @@ Public Class Form1
 
 
                                     End Select
+
+
 
                                     'multidepe va a contener las tablas para validar los datos de todos 
                                     'los objetos dependientes, dependiendo de lo que se valide es la consulta que se
