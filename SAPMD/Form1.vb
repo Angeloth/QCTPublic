@@ -2097,6 +2097,7 @@ Public Class Form1
 
                         Next
 
+                        DataGridView1.Columns(9).ReadOnly = True 'CatalogCode
                         DataGridView1.Columns(10).ReadOnly = True 'CatalogCode
                         DataGridView1.Columns(14).ReadOnly = True 'ConditionalPath
                         DataGridView1.Columns(15).ReadOnly = True 'ConditionalObject
@@ -3744,7 +3745,7 @@ Public Class Form1
                 DataGridView1.AllowUserToDeleteRows = False
 
                 'OJO, este metodo de abajo va a cambiar por uno más robusto, que tome toodos los campos necesarios!!
-                'Call TomaInfoDeGridConCampoLlave(DataGridView1, writeDs, 3, "0", 1, tabCode)
+                'nuevos y deleted
 
                 Call TomaInfoParaTemplates(DataGridView1, writeDs, 3, 0, 3, 13)
 
@@ -3756,7 +3757,7 @@ Public Class Form1
 
                 'se debe re-escribir!!
 
-                Await HazDeleteEnFbSimple(unPaths, "")
+                'Await HazDeleteEnFbSimple(unPaths, "")'Esto se quito!!, porque borraba los vinculos con los catálogos!
 
                 Await HazPutEnFbSimple(unPaths, "TableName", tabNombre)
 
@@ -4591,7 +4592,6 @@ Public Class Form1
 
                             Case Is = "A - From Catalog"
                                 'se habilita catalogs
-                                DataGridView1.Rows(e.RowIndex).Cells(9).ReadOnly = False
 
                                 DataGridView1.Rows(e.RowIndex).Cells(11).Value = ""
                                 DataGridView1.Rows(e.RowIndex).Cells(11).ReadOnly = True
@@ -7932,7 +7932,32 @@ Public Class Form1
 
     End Sub
 
+    Private Sub DataGridView1_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles DataGridView1.CellBeginEdit
+
+        Select Case ToolStripComboBox1.SelectedIndex
+            Case Is = 0 'nada
+
+
+            Case Is = 1
+                'catalogos
+                If estoyAgregandoRows = True Then Exit Sub
+
+
+            Case Is = 2
+
+
+            Case Is = 3
+
+
+            Case Is = 4
+
+
+            Case Is = 5
 
 
 
+        End Select
+
+
+    End Sub
 End Class
