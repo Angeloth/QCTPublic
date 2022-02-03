@@ -295,7 +295,7 @@ Public Class Form1
                 End If
 
                 CategSelected = 4
-                If tempDs.Tables.Count = 0 Then seCarga = True
+                If tempDs.Tables.Count = 0 Or depeDs.Tables.Count = 0 Then seCarga = True
 
             Case Is = 5
                 If RoleUsuario = "Editor" Then
@@ -1770,6 +1770,7 @@ Public Class Form1
                         DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
 
+
                         DataGridView1.AllowUserToAddRows = False
                         DataGridView1.AllowUserToDeleteRows = False
 
@@ -2111,14 +2112,17 @@ Public Class Form1
                         DataGridView1.Columns(23).ReadOnly = True 'ConstructionRule
                         DataGridView1.RowHeadersWidth = 70
 
+
+
                         estoyAgregandoRows = False
 
                         For i = 0 To DataGridView1.Columns.Count - 1
                             DataGridView1.Columns(i).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+                            DataGridView1.Columns(i).SortMode = DataGridViewColumnSortMode.NotSortable
                         Next
 
                         DataGridView1.AllowUserToAddRows = True
-                        DataGridView1.AllowUserToDeleteRows = True
+                        'DataGridView1.AllowUserToDeleteRows = True
 
                         DataGridView1.Columns(1).Frozen = True
 
@@ -2126,7 +2130,7 @@ Public Class Form1
                         DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
                         DataGridView1.AllowUserToAddRows = True
-                        DataGridView1.AllowUserToDeleteRows = True
+                        'DataGridView1.AllowUserToDeleteRows = True
                     End If
 
 
@@ -7390,6 +7394,17 @@ Public Class Form1
 
     End Sub
 
+    Public Async Function BorraCampo(ByVal elObjeto As String, ByVal laTabla As String, ByVal elCampo As String) As Task(Of String)
+
+        'OJO, con las implicaciones de borrar un campo!!
+        Dim elCamino As String = ""
+        elCamino = RaizFire
+        elCamino = elCamino & "/templates/" & elObjeto & "/" & laTabla
+
+        Return Await HazDeleteEnFbSimple(elCamino, elCampo)
+
+    End Function
+
     Private Async Function BorraDepen(ByVal elObjeto As String, ByVal laTabla As String, ByVal elCampo As String) As Task(Of String)
         'im laResp As String = ""
         Dim elCamino As String = ""
@@ -7951,6 +7966,101 @@ Public Class Form1
 
             Case Is = 4
 
+
+            Case Is = 5
+
+
+
+        End Select
+
+
+    End Sub
+
+    Private Async Sub ToolStripButton18_Click(sender As Object, e As EventArgs) Handles ToolStripButton18.Click
+        'boton para eliminar el campo X
+        Select Case ToolStripComboBox1.SelectedIndex
+            Case Is = 0
+
+            Case Is = 1
+
+
+            Case Is = 2
+
+
+            Case Is = 3
+
+
+            Case Is = 4
+                'templates!!
+                Dim enCuentra As DataRow
+                enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+                If IsNothing(enCuentra) = True Then
+                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "DQCT")
+                    Exit Sub
+                End If
+
+                If DataGridView1.CurrentCell.RowIndex < 0 Then Exit Sub
+
+                If IsNothing(DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value) = True Then
+                    MsgBox("Please define a field code first!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                If DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value = "" Then
+                    MsgBox("Please define a field code first!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                Dim X As Integer = 0
+                X = MsgBox("ATTENTION!!" & vbCrLf & "Are you sure you want to delete the field: " & CStr(DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value) & vbCrLf & "This action can not be undone!!", vbQuestion + vbYesNo, TitBox)
+                If X <> 6 Then Exit Sub
+
+                ToolStripLabel1.Visible = True
+                ToolStripLabel1.Text = "Updating positions..."
+
+                DataGridView1.AllowUserToAddRows = False
+                DataGridView1.AllowUserToDeleteRows = False
+
+                Dim resp As String = Await BorraCampo(objetoSelek, tableSelek, CStr(DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value))
+                If resp = "Ok" Then
+                    'hay que re-asignar las posiciones y letras!!
+                    Dim posiBack As Integer = DataGridView1.CurrentCell.RowIndex
+                    Dim xDt As New DataTable
+                    xDt.Columns.Add("FieldCode", GetType(String))
+                    xDt.Columns.Add("Position", GetType(String))
+                    xDt.Columns.Add("Letter", GetType(String))
+
+                    DataGridView1.Rows.RemoveAt(DataGridView1.CurrentCell.RowIndex)
+                    For i = 0 To DataGridView1.Rows.Count - 1
+                        'se crea una matriz para hacer el put
+                        DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
+                    Next
+
+                    For i = 0 To DataGridView1.Rows.Count - 1
+                        xDt.Rows.Add({CStr(DataGridView1.Rows(i).Cells(0).Value), CStr(i + 1), LetraNumero.Tables(0).Rows(i).Item(1)})
+                    Next
+
+                    Dim elCamino As String
+                    elCamino = RaizFire
+                    elCamino = elCamino & "/" & "templates"
+                    elCamino = elCamino & "/" & objetoSelek
+                    elCamino = elCamino & "/" & tableSelek
+
+                    resp = Await HazPutEnFireBasePathYColumnas(elCamino, xDt, 0)
+
+                    usaDataset.Tables(0).Rows.Clear()
+                    usaDataset.Tables(0).Rows.Add({"templates"})
+                    tempDs.Tables.Clear()
+                    tempDs = Await PullUrlWs(usaDataset, "templates")
+
+                    MsgBox("Update done!", vbInformation, TitBox)
+
+                End If
+
+                ToolStripLabel1.Text = "Ready"
+                ToolStripLabel1.Visible = False
+
+                DataGridView1.AllowUserToAddRows = True
 
             Case Is = 5
 
