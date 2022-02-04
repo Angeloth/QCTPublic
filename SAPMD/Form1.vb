@@ -4170,6 +4170,9 @@ Public Class Form1
             MutaDs.Tables(0).Rows.Add()
             For j = 0 To DataGridView1.Columns.Count - 4
                 MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1) = DataGridView1.Rows(i).Cells(j).Value
+                'quitar las comillas
+                MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1) = Replace(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1), """", "")
+
                 If DataGridView1.Columns(j).Tag = "X" Then
                     k = k + 1
                     If k = 1 Then
@@ -4178,6 +4181,7 @@ Public Class Form1
                         yavEField = yavEField & "#" & DataGridView1.Rows(i).Cells(j).Value
                     End If
                 End If
+
             Next
 
             If yavEField = "" Then yavEField = Guid.NewGuid().ToString()
@@ -5443,6 +5447,7 @@ Public Class Form1
 
                 For i = 0 To DataGridView1.Rows.Count - 2
 
+                    DataGridView1.Rows(i).Tag = "NO OK"
                     'se pone en cero!
                     For j = 0 To DataGridView1.Columns.Count - 4
                         anchoTru(j) = False
@@ -7224,8 +7229,6 @@ Public Class Form1
             Case Is = 4
                 'templates!
 
-
-
                 xObj = Split(elNode.FullPath, "\")
 
                 If xObj.Length = 1 Or xObj.Length = 2 Then
@@ -7916,13 +7919,37 @@ Public Class Form1
 
         If ToolStripComboBox1.SelectedIndex <> 3 Then Exit Sub
 
-        Dim currencyManager1 As CurrencyManager = CType(BindingContext(DataGridView1.DataSource), CurrencyManager)
-        currencyManager1.SuspendBinding()
-        'DataGridView1.Rows(5).Visible = False
+        If DataGridView1.DataSource Is Nothing = False Then
+            'tiene algo en el binding
+            Dim currencyManager1 As CurrencyManager = CType(BindingContext(DataGridView1.DataSource), CurrencyManager)
+            currencyManager1.SuspendBinding()
 
+            If ToolStripButton9.Checked = True Then
 
-        If ToolStripButton9.Checked = True Then
+                For i = 0 To DataGridView1.Rows.Count - 2
+                    If IsNothing(DataGridView1.Rows(i).Tag) = True Then Continue For
+                    If DataGridView1.Rows(i).Tag = "" Then Continue For
+                    If DataGridView1.Rows(i).Tag = "NO OK" Then
+                        DataGridView1.Rows(i).Visible = True
+                    Else
+                        DataGridView1.Rows(i).Visible = False
+                    End If
+                Next
 
+            Else
+                If ToolStripButton9.Checked = False Then
+                    For i = 0 To DataGridView1.Rows.Count - 2
+                        If IsNothing(DataGridView1.Rows(i).Tag) = True Then Continue For
+                        If DataGridView1.Rows(i).Tag = "" Then Continue For
+                        DataGridView1.Rows(i).Visible = True
+                    Next
+                End If
+            End If
+
+            currencyManager1.ResumeBinding()
+
+        Else
+            'NO tiene nada!
             For i = 0 To DataGridView1.Rows.Count - 2
                 If IsNothing(DataGridView1.Rows(i).Tag) = True Then Continue For
                 If DataGridView1.Rows(i).Tag = "" Then Continue For
@@ -7933,17 +7960,9 @@ Public Class Form1
                 End If
             Next
 
-        Else
-            If ToolStripButton9.Checked = False Then
-                For i = 0 To DataGridView1.Rows.Count - 2
-                    If IsNothing(DataGridView1.Rows(i).Tag) = True Then Continue For
-                    If DataGridView1.Rows(i).Tag = "" Then Continue For
-                    DataGridView1.Rows(i).Visible = True
-                Next
-            End If
         End If
 
-        currencyManager1.ResumeBinding()
+
 
     End Sub
 
@@ -7956,6 +7975,11 @@ Public Class Form1
             Case Is = 1
                 'catalogos
                 If estoyAgregandoRows = True Then Exit Sub
+
+                If ToolStripComboBox1.SelectedIndex <> 1 Then Exit Sub 'si no son catalogos no hago nada
+
+                'https://stackoverflow.com/questions/20439217/add-a-row-after-setting-datasource-to-datagridview
+
 
 
             Case Is = 2
@@ -8070,4 +8094,6 @@ Public Class Form1
 
 
     End Sub
+
+
 End Class
