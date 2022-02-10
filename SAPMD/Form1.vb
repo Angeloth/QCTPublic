@@ -5927,6 +5927,8 @@ Public Class Form1
                                     PintaCeldaDeError(i, j, unError)
                                     Continue For
                                 End If
+                                DataGridView1.Rows(i).Cells(j).Value = valEvaluar
+
 
                             Case Is = "Date"
                                 Select Case anchoAValidar

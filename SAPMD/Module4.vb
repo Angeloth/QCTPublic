@@ -17,11 +17,15 @@ Module Module4
 
     End Function
 
-    Public Function isIntegerNumberOk(ByVal elValor As String, ByRef elError As String) As Boolean
+    Public Function isIntegerNumberOk(ByRef elValor As String, ByRef elError As String) As Boolean
 
         elError = ""
         Dim estaOk As Boolean = False
         Dim unEntero1 As Long ' = False
+
+        If elValor.EndsWith("%") = True Then
+            elValor = Replace(elValor, "%", "")
+        End If
 
         If IsNumeric(elValor) = False Then
             elError = "Please enter a valid integer number!"
@@ -274,9 +278,9 @@ Module Module4
         Dim partSec As String = ""
         Dim estaOk As Boolean = False
         'Dim miCad As String
-        elValor = Format(elValor, "HH:mm:ss")
+        'elValor = Format(elValor, "HH:mm:ss")
 
-        If Len(elValor) = 6 Or Len(elValor) = 8 Then
+        If elValor.Length = 6 Or elValor.Length = 8 Then
             Select Case elAnchoChar
                 Case Is = 6
                     partHr = Left(elValor, 2)
