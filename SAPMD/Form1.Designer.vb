@@ -67,6 +67,7 @@ Partial Class Form1
         Me.ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripButton18 = New System.Windows.Forms.ToolStripButton()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
+        Me.ToolStripLabel2 = New System.Windows.Forms.ToolStripLabel()
         Me.TableLayoutPanel1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -86,7 +87,7 @@ Partial Class Form1
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 37.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 38.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.SplitContainer1, 1, 2)
         Me.TableLayoutPanel1.Controls.Add(Me.ToolStrip1, 1, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.ToolStrip3, 1, 1)
@@ -123,8 +124,8 @@ Partial Class Form1
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.DataGridView1)
         Me.TableLayoutPanel1.SetRowSpan(Me.SplitContainer1, 3)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1173, 453)
-        Me.SplitContainer1.SplitterDistance = 236
+        Me.SplitContainer1.Size = New System.Drawing.Size(1172, 453)
+        Me.SplitContainer1.SplitterDistance = 235
         Me.SplitContainer1.SplitterWidth = 5
         Me.SplitContainer1.TabIndex = 4
         '
@@ -134,7 +135,7 @@ Partial Class Form1
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Margin = New System.Windows.Forms.Padding(4)
         Me.TreeView1.Name = "TreeView1"
-        Me.TreeView1.Size = New System.Drawing.Size(236, 453)
+        Me.TreeView1.Size = New System.Drawing.Size(235, 453)
         Me.TreeView1.TabIndex = 0
         '
         'DataGridView1
@@ -154,7 +155,7 @@ Partial Class Form1
         Me.ToolStrip1.BackColor = System.Drawing.Color.White
         Me.ToolStrip1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripComboBox1, Me.ToolStripSeparator1, Me.ToolStripButton2, Me.ToolStripSeparator2})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripComboBox1, Me.ToolStripSeparator1, Me.ToolStripButton2, Me.ToolStripSeparator2, Me.ToolStripLabel2})
         Me.ToolStrip1.Location = New System.Drawing.Point(20, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
@@ -281,7 +282,7 @@ Partial Class Form1
         Me.Label1.Location = New System.Drawing.Point(451, 2)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(746, 33)
+        Me.Label1.Size = New System.Drawing.Size(745, 33)
         Me.Label1.TabIndex = 5
         Me.Label1.Text = "Label1"
         '
@@ -309,7 +310,7 @@ Partial Class Form1
         Me.ToolStrip2.Name = "ToolStrip2"
         Me.ToolStrip2.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.ToolStrip2.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.ToolStrip2.Size = New System.Drawing.Size(528, 37)
+        Me.ToolStrip2.Size = New System.Drawing.Size(527, 37)
         Me.ToolStrip2.TabIndex = 3
         Me.ToolStrip2.Text = "ToolStrip2"
         '
@@ -498,6 +499,13 @@ Partial Class Form1
         Me.ImageList1.Images.SetKeyName(7, "box.png")
         Me.ImageList1.Images.SetKeyName(8, "table.png")
         '
+        'ToolStripLabel2
+        '
+        Me.ToolStripLabel2.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ToolStripLabel2.Name = "ToolStripLabel2"
+        Me.ToolStripLabel2.Size = New System.Drawing.Size(114, 34)
+        Me.ToolStripLabel2.Text = "ToolStripLabel2"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
@@ -570,4 +578,5 @@ Partial Class Form1
     Friend WithEvents ToolStripButton9 As ToolStripButton
     Friend WithEvents ToolStripSeparator6 As ToolStripSeparator
     Friend WithEvents ToolStripButton18 As ToolStripButton
+    Friend WithEvents ToolStripLabel2 As ToolStripLabel
 End Class

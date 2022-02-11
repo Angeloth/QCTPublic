@@ -51,6 +51,12 @@ Public Class LoginForm1
             Exit Sub
         End If
 
+        UsuarioCorreo = setUsuarios.Tables(0).Rows(z).Item(0)
+        UsuarioNombre = setUsuarios.Tables(0).Rows(z).Item(1)
+        UsuarioApellido = setUsuarios.Tables(0).Rows(z).Item(2)
+        UsuarioRole = setUsuarios.Tables(0).Rows(z).Item(5)
+        UsuarioModulos = setUsuarios.Tables(0).Rows(z).Item(6) 'modulos
+
         RoleUsuario = setUsuarios.Tables(0).Rows(z).Item(5)
 
         Dim iAveprim(1) As DataColumn
@@ -88,6 +94,12 @@ Public Class LoginForm1
 
         Me.CenterToScreen()
 
+        UsuarioCorreo = ""
+        UsuarioNombre = ""
+        UsuarioApellido = ""
+        UsuarioRole = ""
+        UsuarioModulos = "" 'modulos
+
         setUsuarios.Tables.Clear()
 
         setMix.Tables.Clear()
@@ -99,6 +111,20 @@ Public Class LoginForm1
         setMix.Tables(0).Rows.Add({"list"}) '1
 
         setUsuarios = Await PullUrlWs(setMix, "users")
+
+    End Sub
+
+    Private Async Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
+
+        'Dim laCade As String
+        'laCade = RaizFire
+        'laCade = laCade & "/" & "inuse"
+        'laCade = laCade & "/" & "catalogs"
+        'laCade = laCade & "/" & "md12"
+        'laCade = laCade & "/" & "md12-0001"
+
+        'Dim miDt As New DataSet
+        'miDt = Await PullDtFb(laCade, "inuse") 'que regresa!?
 
     End Sub
 End Class

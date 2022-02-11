@@ -48,9 +48,10 @@ Partial Class LoginForm1
         Me.TableLayoutPanel1.SetColumnSpan(Me.UsernameLabel, 2)
         Me.UsernameLabel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.UsernameLabel.ForeColor = System.Drawing.Color.Black
-        Me.UsernameLabel.Location = New System.Drawing.Point(23, 100)
+        Me.UsernameLabel.Location = New System.Drawing.Point(31, 123)
+        Me.UsernameLabel.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.UsernameLabel.Name = "UsernameLabel"
-        Me.UsernameLabel.Size = New System.Drawing.Size(204, 30)
+        Me.UsernameLabel.Size = New System.Drawing.Size(272, 37)
         Me.UsernameLabel.TabIndex = 0
         Me.UsernameLabel.Text = "&User name"
         Me.UsernameLabel.TextAlign = System.Drawing.ContentAlignment.BottomLeft
@@ -61,9 +62,10 @@ Partial Class LoginForm1
         Me.TableLayoutPanel1.SetColumnSpan(Me.PasswordLabel, 2)
         Me.PasswordLabel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PasswordLabel.ForeColor = System.Drawing.Color.Black
-        Me.PasswordLabel.Location = New System.Drawing.Point(23, 160)
+        Me.PasswordLabel.Location = New System.Drawing.Point(31, 197)
+        Me.PasswordLabel.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.PasswordLabel.Name = "PasswordLabel"
-        Me.PasswordLabel.Size = New System.Drawing.Size(204, 30)
+        Me.PasswordLabel.Size = New System.Drawing.Size(272, 37)
         Me.PasswordLabel.TabIndex = 2
         Me.PasswordLabel.Text = "&Password"
         Me.PasswordLabel.TextAlign = System.Drawing.ContentAlignment.BottomLeft
@@ -72,19 +74,21 @@ Partial Class LoginForm1
         '
         Me.UsernameTextBox.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TableLayoutPanel1.SetColumnSpan(Me.UsernameTextBox, 2)
-        Me.UsernameTextBox.Location = New System.Drawing.Point(23, 135)
+        Me.UsernameTextBox.Location = New System.Drawing.Point(31, 167)
+        Me.UsernameTextBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.UsernameTextBox.Name = "UsernameTextBox"
-        Me.UsernameTextBox.Size = New System.Drawing.Size(204, 20)
+        Me.UsernameTextBox.Size = New System.Drawing.Size(272, 22)
         Me.UsernameTextBox.TabIndex = 1
         '
         'PasswordTextBox
         '
         Me.PasswordTextBox.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TableLayoutPanel1.SetColumnSpan(Me.PasswordTextBox, 2)
-        Me.PasswordTextBox.Location = New System.Drawing.Point(23, 195)
+        Me.PasswordTextBox.Location = New System.Drawing.Point(31, 241)
+        Me.PasswordTextBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.PasswordTextBox.Name = "PasswordTextBox"
         Me.PasswordTextBox.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.PasswordTextBox.Size = New System.Drawing.Size(204, 20)
+        Me.PasswordTextBox.Size = New System.Drawing.Size(272, 22)
         Me.PasswordTextBox.TabIndex = 3
         Me.PasswordTextBox.UseSystemPasswordChar = True
         '
@@ -93,9 +97,10 @@ Partial Class LoginForm1
         Me.OK.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.OK.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.OK.Location = New System.Drawing.Point(23, 243)
+        Me.OK.Location = New System.Drawing.Point(31, 300)
+        Me.OK.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.OK.Name = "OK"
-        Me.OK.Size = New System.Drawing.Size(99, 23)
+        Me.OK.Size = New System.Drawing.Size(132, 28)
         Me.OK.TabIndex = 4
         Me.OK.Text = "&OK"
         '
@@ -105,9 +110,10 @@ Partial Class LoginForm1
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Cancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Cancel.Location = New System.Drawing.Point(128, 243)
+        Me.Cancel.Location = New System.Drawing.Point(171, 300)
+        Me.Cancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Cancel.Name = "Cancel"
-        Me.Cancel.Size = New System.Drawing.Size(99, 23)
+        Me.Cancel.Size = New System.Drawing.Size(132, 28)
         Me.Cancel.TabIndex = 5
         Me.Cancel.Text = "&Cancel"
         '
@@ -118,10 +124,11 @@ Partial Class LoginForm1
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TableLayoutPanel1.SetColumnSpan(Me.PictureBox1, 2)
         Me.PictureBox1.Image = CType(resources.GetObject("PictureBox1.Image"), System.Drawing.Image)
-        Me.PictureBox1.Location = New System.Drawing.Point(23, 3)
+        Me.PictureBox1.Location = New System.Drawing.Point(31, 4)
+        Me.PictureBox1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Padding = New System.Windows.Forms.Padding(10)
-        Me.PictureBox1.Size = New System.Drawing.Size(204, 94)
+        Me.PictureBox1.Padding = New System.Windows.Forms.Padding(13, 12, 13, 12)
+        Me.PictureBox1.Size = New System.Drawing.Size(272, 115)
         Me.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.PictureBox1.TabIndex = 6
         Me.PictureBox1.TabStop = False
@@ -129,10 +136,10 @@ Partial Class LoginForm1
         'TableLayoutPanel1
         '
         Me.TableLayoutPanel1.ColumnCount = 4
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.UsernameLabel, 1, 1)
         Me.TableLayoutPanel1.Controls.Add(Me.UsernameTextBox, 1, 2)
         Me.TableLayoutPanel1.Controls.Add(Me.PasswordTextBox, 1, 4)
@@ -142,29 +149,31 @@ Partial Class LoginForm1
         Me.TableLayoutPanel1.Controls.Add(Me.PictureBox1, 1, 0)
         Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 0)
+        Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 7
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 100.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 123.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(251, 287)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(335, 353)
         Me.TableLayoutPanel1.TabIndex = 7
         '
         'LoginForm1
         '
         Me.AcceptButton = Me.OK
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.CancelButton = Me.Cancel
-        Me.ClientSize = New System.Drawing.Size(251, 287)
+        Me.ClientSize = New System.Drawing.Size(335, 353)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "LoginForm1"

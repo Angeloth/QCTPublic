@@ -15,6 +15,13 @@ Module Module1
     Public ModuPermit As New DataSet
     Public LetraNumero As New DataSet
     Public matAlpha(27) As String
+
+    Public UsuarioNombre As String
+    Public UsuarioCorreo As String
+    Public UsuarioRole As String
+    Public UsuarioApellido As String
+    Public UsuarioModulos As String
+
     Public Async Function HazPutEnFbSimple(ByVal elPath As String, ByVal laYave As String, ByVal elDato As String) As Task(Of String)
 
         Dim elRegreso As String = ""
@@ -1684,5 +1691,188 @@ Module Module1
 
     End Function
 
+
+    Public Async Function PullDtFb(ByVal DtPath As String, ByVal elConcepto As String) As Task(Of DataSet)
+
+        Dim xDt As New DataSet
+        Dim client = New FirebaseClient(DtPath)
+
+        Try
+
+            Dim dinos = Await client.Child("").OnceAsync(Of Object)
+
+            Select Case elConcepto
+
+                Case Is = "inuse"
+
+                    xDt.Tables.Add()
+                    xDt.Tables(0).Columns.Add("LastUsed", GetType(String)) '0
+                    xDt.Tables(0).Columns.Add("TableName", GetType(String)) '1
+                    xDt.Tables(0).Columns.Add("User", GetType(String)) '2
+                    xDt.Tables(0).Columns.Add("UserName", GetType(String)) '3
+                    xDt.Tables(0).Columns.Add("inUse", GetType(String)) '4
+                    xDt.Tables(0).ExtendedProperties.Add("inEdit", False)
+
+                    xDt.Tables(0).Rows.Add({"", "", "", "", "X"}) 'iniciamos con la idea de que NO se puede editar!
+
+                    If dinos.Count = 0 Then
+                        'NO existía!, le ponemos false!
+                        xDt.Tables(0).Rows(0).Item(4) = ""
+                        Return xDt
+                    End If
+
+                    For Each dino In dinos
+
+                        Dim ser As JObject = JObject.Parse(dino.Object.ToString)
+                        Dim datos As List(Of JToken) = ser.Children().ToList
+
+                        For Each item As JProperty In datos
+                            Select Case item.Name
+
+                                Case Is = "LastUsed"
+                                    xDt.Tables(0).Rows(xDt.Tables(0).Rows.Count - 1).Item(0) = item.Value.ToString()
+
+                                Case Is = "TableName"
+                                    xDt.Tables(0).Rows(xDt.Tables(0).Rows.Count - 1).Item(1) = item.Value.ToString()
+
+                                Case Is = "User"
+                                    xDt.Tables(0).Rows(xDt.Tables(0).Rows.Count - 1).Item(2) = item.Value.ToString()
+
+                                Case Is = "UserName"
+                                    xDt.Tables(0).Rows(xDt.Tables(0).Rows.Count - 1).Item(3) = item.Value.ToString()
+
+                                Case Is = "inUse"
+                                    xDt.Tables(0).Rows(xDt.Tables(0).Rows.Count - 1).Item(4) = item.Value.ToString()
+
+                            End Select
+
+                        Next
+
+                    Next
+
+                    'caso extraordinario!, soy yo mismo!, puedo seguir editando
+                    If xDt.Tables(0).Rows(0).Item(2) = UsuarioCorreo Then
+                        xDt.Tables(0).Rows(0).Item(4) = "" 'puede re-editar
+                    End If
+
+
+                Case Is = "otro"
+
+
+
+            End Select
+
+        Catch ex As Exception
+
+
+
+        End Try
+
+        'si no tiene tablas o renglones entonces NO existia!!, no hay bronca!!
+
+        Return xDt
+
+    End Function
+
+    Public Async Function HazPutConPathRowsyCols(ByVal elPath As String, ByVal elSet As DataTable, ByVal colYave As Integer) As Task(Of String)
+        If elSet.Rows.Count = 0 Then Return "No records to write!"
+
+        Dim client = New FirebaseClient(elPath)
+        Dim laYave As String = ""
+        Dim miDato As String = ""
+        Dim elHijo As String = ""
+
+        Dim elRegreso As String = ""
+        Dim cuentaErrores As Long = 0
+        Dim cuentaOk As Long = 0
+        Dim errLog As String = ""
+        For i = 0 To elSet.Rows.Count - 1
+
+            If colYave >= 0 Then
+                elHijo = elSet.Rows(i).Item(colYave)
+            Else
+                elHijo = ""
+            End If
+
+            For j = 0 To elSet.Columns.Count - 1
+
+                If j = colYave Then Continue For
+
+                laYave = elSet.Columns(j).ColumnName '0,1
+                miDato = """" & elSet.Rows(i).Item(j) & """"
+
+                Try
+
+                    Await client.Child(elHijo).Child(laYave).PutAsync(miDato).ConfigureAwait(False)
+                    cuentaOk = cuentaOk + 1
+                Catch ex As Exception
+
+                    cuentaErrores = cuentaErrores + 1
+                    errLog = errLog & "Error writting on node: " & elPath & " > " & laYave & " > " & miDato & " : " & ex.Message & vbCrLf
+
+                End Try
+
+            Next
+
+        Next
+
+
+        If cuentaOk > 0 Then
+            elRegreso = elRegreso & cuentaOk & " records added!" & vbCrLf & vbCrLf
+        End If
+
+        If cuentaErrores > 0 Then
+            elRegreso = elRegreso & cuentaErrores & " Errors on writting..." & vbCrLf
+            elRegreso = elRegreso & errLog
+        End If
+
+        Return elRegreso
+
+    End Function
+
+    Public Async Function HazPost1Set(ByVal elPath As String, ByVal elSet As DataTable, ByVal colYave As Integer) As Task(Of String)
+        If elSet.Rows.Count = 0 Then Return "No records to write!"
+
+        Dim client = New FirebaseClient(elPath)
+        Dim laYave As String = ""
+        Dim miDato As String = ""
+        Dim elHijo As String = ""
+
+        Dim elRegreso As String = ""
+        Dim cuentaErrores As Long = 0
+        Dim cuentaOk As Long = 0
+        Dim errLog As String = ""
+
+        Dim elJuntos As String = ""
+
+        For i = 0 To elSet.Rows.Count - 1
+
+            elJuntos = "{" & vbCrLf
+            For j = 0 To elSet.Columns.Count - 1
+
+                If j <> 0 Then elJuntos = elJuntos & "," & vbCrLf
+
+                laYave = elSet.Columns(j).ColumnName
+                miDato = elSet.Rows(i).Item(j)
+
+                elJuntos = elJuntos & """" & laYave & """"
+                elJuntos = elJuntos & ":" & """" & miDato & """"
+
+            Next
+            elJuntos = elJuntos & vbCrLf & "}"
+
+            Try
+                Await client.Child("").PostAsync(elJuntos, False)
+                cuentaOk = cuentaOk + 1
+            Catch ex As Exception
+                cuentaErrores = cuentaErrores + 1
+                errLog = errLog & "Error writting on node: " & elPath & " > " & laYave & " > " & miDato & " : " & ex.Message & vbCrLf
+            End Try
+
+        Next
+
+        Return elRegreso
+
+    End Function
 
 End Module

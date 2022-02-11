@@ -46,7 +46,31 @@ Public Class Form1
     Private rowEstaba As Long
     Private puSSyCat As Integer
     Private cataNombre As String
+
+    Private pathFinduse As String
+    Private editDs As New DataSet 'set para ver los datos si se puede editar o no!
+    Private puedoEditar As Boolean
+    Private lastNodeEdit As String
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'Para el status de objeto en uso
+        'Que se postee el objeto, su nombre, la hoja, su nombre, y el nodo de inuse:X ó vacío
+        'Y que se postee la hora, timestamp de utc
+        'que pasa si cambio de nodo ó me salgo?
+        'debo trazar que nodo estaba viendo, 
+        'Poner un timer que luego de cierto tiempo de inactividad se cierre solo!!
+        'Esto aplica para nodos de catalogos, de templates y de records!!!
+        'Aun asi, poner una regla que luego de cierto tiempo de inactividad pueda entrar!!
+        'Y verificar que el que lo este usando no sea YO MISMO!!
+        'Al seleccionar un nodo debe hacer 2 cosas,
+        'OJO, si es Viewer o Admin NO aplica nada!!
+        'PRIMERO checar que NO se este usando por alguien mas
+        'SEGUNDO, si NO se esta usando por nadie mas, se postea que se esta usando por X usuario
+        'TERCERO, si SI se esta usando por alguien mas, se debe bloquear la edición,
+        pathFinduse = ""
+        puedoEditar = False
+        lastNodeEdit = ""
+        ToolStripLabel2.Text = ""
+        editDs.Clear()
 
         If RoleUsuario = "Viewer" Or RoleUsuario = "Admin" Then
 
@@ -1277,7 +1301,7 @@ Public Class Form1
 
     End Sub
 
-    Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
+    Private Async Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
 
         'e.Node.Text
         'TreeView1.Nodes.IndexOfKey("")
@@ -1298,6 +1322,8 @@ Public Class Form1
         Dim k As Integer = 0
 
         elNode = e.Node
+        puedoEditar = False
+        ToolStripLabel2.Text = ""
 
         Select Case ToolStripComboBox1.SelectedIndex
             Case Is = 0
@@ -1307,21 +1333,34 @@ Public Class Form1
             Case Is = 1
                 'marca el nodo, busca
                 'Posi = TreeView1.Nodes.IndexOf(e.Node)
+
                 xObj = Split(e.Node.FullPath, "\")
                 If xObj.Length = 1 Then
                     DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
                     NodoNameActual = ""
                     puSSyCat = -1
+                    moduloSelek = e.Node.Name 'segun yo!
+                    pathFinduse = "" 'nada que buscar!
+
                 Else
                     Label1.Text = "Catalogs"
+                    pathFinduse = RaizFire
+                    pathFinduse = pathFinduse & "/" & "inuse"
+                    pathFinduse = pathFinduse & "/" & "catalogs"
 
                     If xObj.Length = 2 Then
                         cadFind = e.Node.Parent.Name & "#" & e.Node.Name
                         Label2.Text = CStr(xObj(0)) & "/" & e.Node.Text
+                        moduloSelek = e.Node.Parent.Name
+                        pathFinduse = pathFinduse & "/" & e.Node.Parent.Name
+                        pathFinduse = pathFinduse & "/" & e.Node.Name
                     Else
                         cadFind = e.Node.Parent.Parent.Name & "#" & e.Node.Parent.Name
                         Label2.Text = CStr(xObj(0)) & "/" & e.Node.Parent.Text
+                        moduloSelek = e.Node.Parent.Parent.Name
+                        pathFinduse = pathFinduse & "/" & e.Node.Parent.Parent.Name
+                        pathFinduse = pathFinduse & "/" & e.Node.Parent.Name
                     End If
 
                     If NodoNameActual = "" Then
@@ -1339,6 +1378,80 @@ Public Class Form1
                     Next
 
                     If Posi >= 0 Then
+
+
+                        If RoleUsuario = "Editor" Then
+
+                            If editDs.Tables.Count = 1 Then
+                                If editDs.Tables(0).Rows.Count = 1 Then
+                                    'pasamos a desuso el template anterior!
+                                    'crear un sitio mas, y que se carguen sus consolidados
+                                    'codigo de planta a un codigo de compañia!
+                                    If editDs.Tables(0).ExtendedProperties.Item("inEdit") = True Then
+                                        'DesUso el template que estaba usando!
+                                        editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                                        editDs.Tables(0).Rows(0).Item(1) = ""
+                                        editDs.Tables(0).Rows(0).Item(2) = ""
+                                        editDs.Tables(0).Rows(0).Item(3) = ""
+                                        editDs.Tables(0).Rows(0).Item(4) = ""
+                                        'seria borrarlo y ya!
+                                        If editDs.Tables(0).ExtendedProperties.Item("lastPath") <> "" Then
+                                            Await HazDeleteEnFbSimple(editDs.Tables(0).ExtendedProperties.Item("lastPath"), "")
+                                        End If
+
+                                    End If
+                                End If
+                            End If
+
+                            Dim enCuentra As DataRow
+                            enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+                            If IsNothing(enCuentra) = False Then
+                                editDs.Clear()
+                                'significa que SI puede editar este modulo, verificar que NO haya nadie
+                                editDs = Await PullDtFb(pathFinduse, "inuse")
+
+                                If editDs.Tables.Count = 0 Then
+                                    puedoEditar = False 'ocurrió un error!
+                                Else
+                                    If editDs.Tables(0).Rows.Count = 0 Then
+                                        puedoEditar = False
+                                    Else
+                                        If editDs.Tables(0).Rows(0).Item(4) = "X" Then puedoEditar = False Else puedoEditar = True
+                                    End If
+
+                                End If
+
+                            End If
+
+                            If puedoEditar = True Then
+                                'escribo ANTES de mostrar que lo estoy usando/editando!
+                                're-escribo SOLO si el usuario no era YO!
+                                If editDs.Tables(0).Rows(0).Item(2) <> UsuarioCorreo Then
+
+                                    editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                                    editDs.Tables(0).Rows(0).Item(1) = ""
+                                    editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
+                                    editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
+                                    editDs.Tables(0).Rows(0).Item(4) = "X"
+                                    'Debo ponerlo SOLO si lo estaba editando!!
+                                    Await HazPost1Set(pathFinduse, editDs.Tables(0), -1)
+
+                                Else
+                                    editDs.Tables(0).Rows(0).Item(4) = "X"
+                                End If
+
+                                ToolStripLabel2.ForeColor = Color.DarkGreen
+                                ToolStripLabel2.Text = "Available for edit"
+                                editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
+                                editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
+                            Else
+                                'poner que NO puede editar en el label y en rojo!
+                                ToolStripLabel2.ForeColor = Color.Crimson
+                                ToolStripLabel2.Text = editDs.Tables(0).Rows(0).Item(3) & " is editing this object"
+                            End If
+
+                        End If
+
 
                         Dim bS As New BindingSource
                         cataNombre = catDs.Tables(Posi).TableName
@@ -1372,15 +1485,6 @@ Public Class Form1
 
                         estoyAgregandoRows = False
 
-                        'For i = 0 To catDs.Tables(Posi).Rows.Count - 1
-                        '    DataGridView1.Rows.Add()
-                        '    DataGridView1.Rows(DataGridView1.Rows.Count - 1).HeaderCell.Value = CStr(i + 1)
-
-                        '    For j = 0 To DataGridView1.Columns.Count - 1
-                        '        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(j).Value = catDs.Tables(Posi).Rows(i).Item(DataGridView1.Columns(j).Name)
-                        '    Next
-
-                        'Next
 
                         DataGridView1.RowHeadersWidth = 70
 
@@ -1388,8 +1492,9 @@ Public Class Form1
                             DataGridView1.Columns(i).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
                         Next
 
-                        DataGridView1.AllowUserToAddRows = True
-                        DataGridView1.AllowUserToDeleteRows = True
+                        DataGridView1.AllowUserToAddRows = puedoEditar ' True
+                        DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
+
                     Else
                         'es un nodo nuevo!
                         'simplemente se limpia el grid y se deja libre para que ponga la info!
@@ -7602,88 +7707,6 @@ Public Class Form1
 
     Private Async Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
 
-        'proceso para re-write a New Catalogs!!
-        'OJOO, quitar despues!!
-        'Dim enCuentra As DataRow
-        'usaDataset.Tables(0).Rows.Clear()
-        'usaDataset.Tables(0).Rows.Add({"catalogs"})
-        'catDs.Tables.Clear()
-        'catDs = Await PullUrlWs(usaDataset, "catalogs")
-
-        'Dim camIno As String
-        'Dim moduNombre As String = ""
-        'Dim cataNombre As String = ""
-        'Dim i As Integer
-        'Dim z As Integer = 0
-        'Dim j As Long
-        'Dim xObj As Object = Nothing
-        'Dim xDt As New DataTable
-        'Dim reDt As New DataTable
-        'xDt.Columns.Add("FieldCode", GetType(String)) '0
-        'xDt.Columns.Add("FieldName", GetType(String)) '1
-        'xDt.Columns.Add("Description", GetType(String)) '2
-        'xDt.Columns.Add("Position", GetType(Integer)) '3
-        'xDt.Columns.Add("isText", GetType(String)) '4
-
-        'reDt.Columns.Add("A", GetType(String)) '0
-        'reDt.Columns.Add("ZZ", GetType(String)) 'campo de descripción!,
-
-        'For i = 0 To catDs.Tables.Count - 1
-
-        '    xObj = Split(catDs.Tables(i).TableName, "#")
-        '    moduNombre = "Undefined"
-        '    cataNombre = "Undefined"
-        '    enCuentra = ModuloDs.Tables(0).Rows.Find(CStr(xObj(0)))
-        '    If IsNothing(enCuentra) = False Then
-        '        z = ModuloDs.Tables(0).Rows.IndexOf(enCuentra)
-        '        moduNombre = CStr(ModuloDs.Tables(0).Rows(z).Item(1))
-        '    End If
-
-        '    cataNombre = catDs.Tables(i).Columns(0).ColumnName
-
-        '    camIno = RaizFire
-        '    camIno = camIno & "/" & "catpro"
-        '    camIno = camIno & "/" & CStr(xObj(0))
-        '    Await HazPutEnFbSimple(camIno, "ModuleName", moduNombre)
-
-        '    camIno = RaizFire
-        '    camIno = camIno & "/" & "catpro"
-        '    camIno = camIno & "/" & CStr(xObj(0))
-        '    camIno = camIno & "/" & CStr(xObj(1))
-
-        '    Await HazPutEnFbSimple(camIno, "CatalogName", cataNombre)
-
-        '    'se agrega los campos generales
-
-        '    xDt.Rows.Clear()
-        '    xDt.Rows.Add({"A", cataNombre, "", 1, "Text"})
-        '    xDt.Rows.Add({"ZZ", "Combined description", "", 2, "Text"})
-
-        '    camIno = RaizFire
-        '    camIno = camIno & "/" & "catpro"
-        '    camIno = camIno & "/" & CStr(xObj(0))
-        '    camIno = camIno & "/" & CStr(xObj(1))
-
-        '    'primero borramos es vdd
-        '    Await HazDeleteEnFbSimple(camIno, "data") 'pero este nel, al proximo si!
-
-        '    Await HazPostEnFireBaseConPathYColumnas(camIno, xDt, "data", -1)
-
-        '    'se agrega la data
-
-        '    Await HazDeleteEnFbSimple(camIno, "records") 'pero este nel, al proximo si!
-        '    reDt.Rows.Clear()
-        '    For j = 0 To catDs.Tables(i).Rows.Count - 1
-
-        '        'If catDs.Tables(i).Rows(j).Item(0) = "CatalogName" Then Continue For
-        '        reDt.Rows.Add({catDs.Tables(i).Rows(j).Item(0), catDs.Tables(i).Rows(j).Item(1)})
-
-        '    Next
-
-        '    Await HazPostEnFireBaseConPathYColumnas(camIno, reDt, "records", -1)
-
-        'Next
-
 
     End Sub
 
@@ -8097,5 +8120,22 @@ Public Class Form1
 
     End Sub
 
+    Private Async Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
 
+        If editDs.Tables.Count = 1 Then
+            If editDs.Tables(0).Rows.Count = 1 Then
+                If editDs.Tables(0).ExtendedProperties.Item("inEdit") = True Then
+
+                    If editDs.Tables(0).ExtendedProperties.Item("lastPath") <> "" Then
+
+                        Await HazDeleteEnFbSimple(editDs.Tables(0).ExtendedProperties.Item("lastPath"), "")
+                        'OJO, tmb cuando cambie de nodo o se salga del catalogo!
+
+                    End If
+
+                End If
+            End If
+        End If
+
+    End Sub
 End Class
