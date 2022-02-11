@@ -253,6 +253,7 @@
     <Compile Include="Module2.vb" />
     <Compile Include="Module3.vb" />
     <Compile Include="Module4.vb" />
+    <Compile Include="Module5.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

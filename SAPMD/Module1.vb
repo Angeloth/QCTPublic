@@ -1712,6 +1712,7 @@ Module Module1
                     xDt.Tables(0).Columns.Add("UserName", GetType(String)) '3
                     xDt.Tables(0).Columns.Add("inUse", GetType(String)) '4
                     xDt.Tables(0).ExtendedProperties.Add("inEdit", False)
+                    xDt.Tables(0).ExtendedProperties.Add("Key", "")
 
                     xDt.Tables(0).Rows.Add({"", "", "", "", "X"}) 'iniciamos con la idea de que NO se puede editar!
 
@@ -1725,6 +1726,8 @@ Module Module1
 
                         Dim ser As JObject = JObject.Parse(dino.Object.ToString)
                         Dim datos As List(Of JToken) = ser.Children().ToList
+
+                        xDt.Tables(0).ExtendedProperties.Item("Key") = dino.Key
 
                         For Each item As JProperty In datos
                             Select Case item.Name
@@ -1751,9 +1754,9 @@ Module Module1
                     Next
 
                     'caso extraordinario!, soy yo mismo!, puedo seguir editando
-                    If xDt.Tables(0).Rows(0).Item(2) = UsuarioCorreo Then
-                        xDt.Tables(0).Rows(0).Item(4) = "" 'puede re-editar
-                    End If
+                    'If xDt.Tables(0).Rows(0).Item(2) = UsuarioCorreo Then
+                    '    xDt.Tables(0).Rows(0).Item(4) = "" 'puede re-editar
+                    'End If
 
 
                 Case Is = "otro"
@@ -1838,7 +1841,7 @@ Module Module1
         Dim miDato As String = ""
         Dim elHijo As String = ""
 
-        Dim elRegreso As String = ""
+        Dim elRegreso As String = "fail"
         Dim cuentaErrores As Long = 0
         Dim cuentaOk As Long = 0
         Dim errLog As String = ""
@@ -1862,7 +1865,8 @@ Module Module1
             elJuntos = elJuntos & vbCrLf & "}"
 
             Try
-                Await client.Child("").PostAsync(elJuntos, False)
+                Dim fbObj = Await client.Child("").PostAsync(elJuntos, False)
+                elRegreso = fbObj.Key
                 cuentaOk = cuentaOk + 1
             Catch ex As Exception
                 cuentaErrores = cuentaErrores + 1

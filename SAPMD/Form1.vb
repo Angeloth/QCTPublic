@@ -71,6 +71,7 @@ Public Class Form1
         lastNodeEdit = ""
         ToolStripLabel2.Text = ""
         editDs.Clear()
+        Label3.Text = ""
 
         If RoleUsuario = "Viewer" Or RoleUsuario = "Admin" Then
 
@@ -98,6 +99,13 @@ Public Class Form1
             ToolStripButton14.Enabled = True
             ToolStripButton15.Enabled = True
             ToolStripButton16.Enabled = True
+
+            Module5.Start(Date.Now.AddMinutes(5))
+            AddHandler Module5.Elapsed, AddressOf HandleElapsed
+            AddHandler Module5.TimerComplete, AddressOf HandleComplete
+            Label3.ForeColor = Color.Black
+            'ToolStripLabel21.Font = New System.Drawing.Font("Calibri", 10, FontStyle.Bold)
+            'ToolStripLabel21.ForeColor = Color.Black
 
         End If
 
@@ -1320,10 +1328,15 @@ Public Class Form1
         Dim tablaFind As String = ""
         Dim tabName As String = ""
         Dim k As Integer = 0
+        Dim retKey As String = ""
 
         elNode = e.Node
         puedoEditar = False
         ToolStripLabel2.Text = ""
+
+        Await DejoDeUsar()
+
+        If RoleUsuario = "Editor" Then Module5.AgregaTiempo()
 
         Select Case ToolStripComboBox1.SelectedIndex
             Case Is = 0
@@ -1342,6 +1355,7 @@ Public Class Form1
                     puSSyCat = -1
                     moduloSelek = e.Node.Name 'segun yo!
                     pathFinduse = "" 'nada que buscar!
+                    'eliminar uso en caso de que haya algo!
 
                 Else
                     Label1.Text = "Catalogs"
@@ -1377,81 +1391,53 @@ Public Class Form1
                         End If
                     Next
 
-                    If Posi >= 0 Then
 
+                    editDs.Clear()
 
-                        If RoleUsuario = "Editor" Then
+                    If RoleUsuario = "Editor" Then
+                        Dim enCuentra As DataRow
+                        enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+                        If IsNothing(enCuentra) = False Then
 
-                            If editDs.Tables.Count = 1 Then
-                                If editDs.Tables(0).Rows.Count = 1 Then
-                                    'pasamos a desuso el template anterior!
-                                    'crear un sitio mas, y que se carguen sus consolidados
-                                    'codigo de planta a un codigo de compañia!
-                                    If editDs.Tables(0).ExtendedProperties.Item("inEdit") = True Then
-                                        'DesUso el template que estaba usando!
-                                        editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-                                        editDs.Tables(0).Rows(0).Item(1) = ""
-                                        editDs.Tables(0).Rows(0).Item(2) = ""
-                                        editDs.Tables(0).Rows(0).Item(3) = ""
-                                        editDs.Tables(0).Rows(0).Item(4) = ""
-                                        'seria borrarlo y ya!
-                                        If editDs.Tables(0).ExtendedProperties.Item("lastPath") <> "" Then
-                                            Await HazDeleteEnFbSimple(editDs.Tables(0).ExtendedProperties.Item("lastPath"), "")
-                                        End If
-
-                                    End If
-                                End If
-                            End If
-
-                            Dim enCuentra As DataRow
-                            enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
-                            If IsNothing(enCuentra) = False Then
-                                editDs.Clear()
-                                'significa que SI puede editar este modulo, verificar que NO haya nadie
-                                editDs = Await PullDtFb(pathFinduse, "inuse")
-
-                                If editDs.Tables.Count = 0 Then
-                                    puedoEditar = False 'ocurrió un error!
-                                Else
-                                    If editDs.Tables(0).Rows.Count = 0 Then
-                                        puedoEditar = False
-                                    Else
-                                        If editDs.Tables(0).Rows(0).Item(4) = "X" Then puedoEditar = False Else puedoEditar = True
-                                    End If
-
-                                End If
-
-                            End If
-
-                            If puedoEditar = True Then
-                                'escribo ANTES de mostrar que lo estoy usando/editando!
-                                're-escribo SOLO si el usuario no era YO!
-                                If editDs.Tables(0).Rows(0).Item(2) <> UsuarioCorreo Then
-
-                                    editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-                                    editDs.Tables(0).Rows(0).Item(1) = ""
-                                    editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
-                                    editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
-                                    editDs.Tables(0).Rows(0).Item(4) = "X"
-                                    'Debo ponerlo SOLO si lo estaba editando!!
-                                    Await HazPost1Set(pathFinduse, editDs.Tables(0), -1)
-
-                                Else
-                                    editDs.Tables(0).Rows(0).Item(4) = "X"
-                                End If
-
-                                ToolStripLabel2.ForeColor = Color.DarkGreen
-                                ToolStripLabel2.Text = "Available for edit"
-                                editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
-                                editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
-                            Else
-                                'poner que NO puede editar en el label y en rojo!
-                                ToolStripLabel2.ForeColor = Color.Crimson
-                                ToolStripLabel2.Text = editDs.Tables(0).Rows(0).Item(3) & " is editing this object"
-                            End If
+                            'significa que SI puede editar este modulo, verificar que NO haya nadie
+                            editDs = Await PullDtFb(pathFinduse, "inuse")
+                            puedoEditar = Await siPuedoEditar(pathFinduse)
 
                         End If
 
+                    End If
+
+                    If puedoEditar = True Then
+                        'escribo ANTES de mostrar que lo estoy usando/editando!
+                        're-escribo SOLO si el usuario no era YO!
+                        editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                        editDs.Tables(0).Rows(0).Item(1) = ""
+                        editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
+                        editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
+                        editDs.Tables(0).Rows(0).Item(4) = "X"
+                        'Debo ponerlo SOLO si lo estaba editando!!
+                        retKey = Await HazPost1Set(pathFinduse, editDs.Tables(0), -1)
+
+                        If retKey = "fail" Then
+
+                            puedoEditar = False
+                        End If
+
+                        ToolStripLabel2.ForeColor = Color.DarkGreen
+                        ToolStripLabel2.Text = "Available for edit"
+                        editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
+                        editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
+                        editDs.Tables(0).ExtendedProperties.Item("Key") = retKey
+
+                    Else
+                        'poner que NO puede editar en el label y en rojo!
+
+                        NoPuedesEditar(editDs, ToolStripLabel2)
+
+                    End If
+
+
+                    If Posi >= 0 Then
 
                         Dim bS As New BindingSource
                         cataNombre = catDs.Tables(Posi).TableName
@@ -1500,8 +1486,8 @@ Public Class Form1
                         'simplemente se limpia el grid y se deja libre para que ponga la info!
                         DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
-                        DataGridView1.AllowUserToAddRows = True
-                        DataGridView1.AllowUserToDeleteRows = True
+                        DataGridView1.AllowUserToAddRows = puedoEditar ' True
+                        DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
                         puSSyCat = -1
                         cataNombre = ""
                     End If
@@ -1510,6 +1496,7 @@ Public Class Form1
 
 
             Case Is = 2
+
                 xObj = Split(e.Node.FullPath, "\")
 
                 If xObj.Length = 1 Or xObj.Length = 2 Then
@@ -1518,8 +1505,8 @@ Public Class Form1
                     DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
                 Else
-                    Select Case xObj.Length
 
+                    Select Case xObj.Length
 
                         Case Is = 3
                             tablaFind = elNode.Name
@@ -1621,6 +1608,7 @@ Public Class Form1
                     DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
                     DataGridView1.Columns.Clear()
+                    pathFinduse = ""
                     Exit Sub
                 End If
 
@@ -1641,6 +1629,13 @@ Public Class Form1
                     If NodoNameActual = tablaFind Then Exit Sub
                     NodoNameActual = tablaFind
                 End If
+
+                pathFinduse = RaizFire
+                pathFinduse = pathFinduse & "/" & "inuse"
+                pathFinduse = pathFinduse & "/" & "records"
+                pathFinduse = pathFinduse & "/" & compaSelekted
+                pathFinduse = pathFinduse & "/" & objetoSelek
+                pathFinduse = pathFinduse & "/" & tableSelek
 
                 DataGridView1.DataSource = Nothing
                 DataGridView1.Rows.Clear()
@@ -1702,19 +1697,55 @@ Public Class Form1
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell = New DataGridViewAutoFilter.DataGridViewAutoFilterColumnHeaderCell
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderText = "Internal-Relations Ok?"
 
-                        DataGridView1.AllowUserToAddRows = True
-                        DataGridView1.AllowUserToDeleteRows = True
-
-                        'For j = 0 To DataGridView1.Columns.Count - 1
-                        'DataGridView1.Columns(j).HeaderCell.Style.BackColor = Color.FromArgb(255, 64, 114, 196)
-                        'Next
+                        'Esto si estaba!!
+                        'DataGridView1.AllowUserToAddRows = True
+                        'DataGridView1.AllowUserToDeleteRows = True
 
                         Exit For
                     End If
 
                 Next
 
-                Call MuestraRecords()
+                editDs.Clear()
+                If RoleUsuario = "Editor" Then
+
+                    Dim enCuentra As DataRow
+                    enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+                    If IsNothing(enCuentra) = False Then
+                        'significa que SI puede editar este modulo, verificar que NO haya nadie
+                        editDs = Await PullDtFb(pathFinduse, "inuse")
+                        puedoEditar = Await siPuedoEditar(pathFinduse)
+
+                    End If
+
+                End If
+
+                If puedoEditar = True Then
+                    'escribo ANTES de mostrar que lo estoy usando/editando!
+                    're-escribo SOLO si el usuario no era YO!
+                    editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                    editDs.Tables(0).Rows(0).Item(1) = ""
+                    editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
+                    editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
+                    editDs.Tables(0).Rows(0).Item(4) = "X"
+                    'Debo ponerlo SOLO si lo estaba editando!!
+                    Await HazPost1Set(pathFinduse, editDs.Tables(0), -1)
+
+                    ToolStripLabel2.ForeColor = Color.DarkGreen
+                    ToolStripLabel2.Text = "Available for edit"
+                    editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
+                    editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
+                Else
+                    'poner que NO puede editar en el label y en rojo!
+
+                    NoPuedesEditar(editDs, ToolStripLabel2)
+
+                End If
+
+                DataGridView1.AllowUserToAddRows = puedoEditar 'True
+                DataGridView1.AllowUserToDeleteRows = puedoEditar 'True
+
+                MuestraRecords()
 
 
             Case Is = 4
@@ -1727,6 +1758,8 @@ Public Class Form1
                     NodoNameActual = ""
                     DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
+
+                    pathFinduse = ""
 
                 Else
 
@@ -1760,6 +1793,12 @@ Public Class Form1
                     objetoName = CStr(yObj(0))
                     objetoSelek = tabName
                     tableSelek = tablaFind
+
+                    pathFinduse = RaizFire
+                    pathFinduse = pathFinduse & "/" & "inuse"
+                    pathFinduse = pathFinduse & "/" & "templates"
+                    pathFinduse = pathFinduse & "/" & objetoSelek
+                    pathFinduse = pathFinduse & "/" & tableSelek
 
                     If NodoNameActual = "" Then
                         NodoNameActual = tablaFind
@@ -1870,11 +1909,47 @@ Public Class Form1
 
                     If Posi >= 0 Then
 
+                        'aqui bloqueamos!
+                        editDs.Clear()
+
+                        If RoleUsuario = "Editor" Then
+
+                            enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+                            If IsNothing(enCuentra) = False Then
+                                'significa que SI puede editar este modulo, verificar que NO haya nadie
+                                editDs = Await PullDtFb(pathFinduse, "inuse")
+                                puedoEditar = Await siPuedoEditar(pathFinduse)
+
+                            End If
+
+                        End If
+
+                        If puedoEditar = True Then
+                            'escribo ANTES de mostrar que lo estoy usando/editando!
+                            're-escribo SOLO si el usuario no era YO!
+                            editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                            editDs.Tables(0).Rows(0).Item(1) = ""
+                            editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
+                            editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
+                            editDs.Tables(0).Rows(0).Item(4) = "X"
+                            'Debo ponerlo SOLO si lo estaba editando!!
+                            Await HazPost1Set(pathFinduse, editDs.Tables(0), -1)
+
+                            ToolStripLabel2.ForeColor = Color.DarkGreen
+                            ToolStripLabel2.Text = "Available for edit"
+                            editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
+                            editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
+                            editDs.Tables(0).ExtendedProperties.Item("Key") = "" 'e
+                        Else
+                            'poner que NO puede editar en el label y en rojo!
+                            NoPuedesEditar(editDs, ToolStripLabel2)
+
+                        End If
+
                         estoyAgregandoRows = True
 
                         DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
-
 
                         DataGridView1.AllowUserToAddRows = False
                         DataGridView1.AllowUserToDeleteRows = False
@@ -2226,7 +2301,7 @@ Public Class Form1
                             DataGridView1.Columns(i).SortMode = DataGridViewColumnSortMode.NotSortable
                         Next
 
-                        DataGridView1.AllowUserToAddRows = True
+                        DataGridView1.AllowUserToAddRows = puedoEditar ' True
                         'DataGridView1.AllowUserToDeleteRows = True
 
                         DataGridView1.Columns(1).Frozen = True
@@ -3540,6 +3615,7 @@ Public Class Form1
 
             Case Is = 1
                 'catalogos!
+
                 xObj = Split(elNode.FullPath, "\")
 
                 If xObj.Length = 1 Then
@@ -3552,6 +3628,11 @@ Public Class Form1
                 encuentra = ModuPermit.Tables(0).Rows.Find(elNode.Parent.Name.ToUpper())
                 If IsNothing(enCuentra) = True Then
                     MsgBox("Sorry you are not allowed to make changes on the selected module", vbCritical, "DQCT")
+                    Exit Sub
+                End If
+
+                If puedoEditar = False Then
+                    MsgBox("Sorry, you are not allowed to edit this catalog at this time, please try again later or wait for it to be available to edit.", vbExclamation, TitBox)
                     Exit Sub
                 End If
 
@@ -3613,66 +3694,6 @@ Public Class Form1
                 updDt.Columns.RemoveAt(1) 'eliminamos el campo de yave local
                 TomaInfoParaCats(catDs.Tables(cataNombre), DataGridView1, niuDt, remoDt, updDt)
 
-                'Call TomaInfoDeGrid(DataGridView1, writeDs, 3)'este era el anterior!!
-
-                'comparativa local!
-                'todo lo nuevo vs lo que estaba,
-                '
-                'If niuDt.Rows.Count = 0 Then
-                '    MsgBox("Sorry, there must be at least one record per catalog, if you want to delete the whole table please select the node and click on 'Delete node' button!", vbCritical, "SAP MD")
-                '    DataGridView1.AllowUserToAddRows = True
-                '    DataGridView1.AllowUserToDeleteRows = True
-                '    Exit Sub
-                'End If
-
-                'If writeDs.Tables(3).Rows.Count = 0 Then
-                '    'no puede dejar vacía la tabla, esto equivale a eliminar el catalogo completo, 
-                '    MsgBox("Sorry, there must be at least one record per catalog, if you want to delete the whole table please select the node and click on 'Delete node' button!", vbCritical, "SAP MD")
-                '    DataGridView1.AllowUserToAddRows = True
-                '    DataGridView1.AllowUserToDeleteRows = True
-                '    Exit Sub
-                'End If
-
-                'For i = 0 To writeDs.Tables(3).Rows.Count - 1
-
-                '    encuentra = catDs.Tables(Posi).Rows.Find(CStr(writeDs.Tables(3).Rows(i).Item(0)))
-
-                '    If IsNothing(encuentra) = True Then
-                '        'nuevo registro!
-                '        'lo agregamos!
-                '        writeDs.Tables(1).Rows.Add({CStr(writeDs.Tables(3).Rows(i).Item(0)), CStr(writeDs.Tables(3).Rows(i).Item(1)), ""}) 'vacío porque se va a asignar uno!
-                '    Else
-                '        'ya estaba!, solo verificar que el texto siga diciendo igual!
-                '        z = catDs.Tables(Posi).Rows.IndexOf(encuentra)
-                '        If CStr(writeDs.Tables(3).Rows(i).Item(1)) <> catDs.Tables(Posi).Rows(z).Item(1) Then
-                '            'cambio el texto, se agrega!
-                '            writeDs.Tables(4).Rows.Add({CStr(writeDs.Tables(3).Rows(i).Item(0)), CStr(writeDs.Tables(3).Rows(i).Item(1)), catDs.Tables(Posi).Rows(z).Item(2)})
-                '            'writeDs.Tables(1).Rows.Add({CStr(writeDs.Tables(3).Rows(i).Item(0)), CStr(writeDs.Tables(3).Rows(i).Item(1)), CStr(writeDs.Tables(3).Rows(i).Item(2))})
-                '        End If
-
-                '    End If
-
-                '    encuentra = Nothing
-
-                'Next
-
-                ''al reves!
-                'For i = 0 To catDs.Tables(Posi).Rows.Count - 1
-                '    encuentra = writeDs.Tables(3).Rows.Find(CStr(catDs.Tables(Posi).Rows(i).Item(0)))
-
-                '    If IsNothing(encuentra) = True Then
-                '        'si NO lo encuentra es registro viejo
-                '        writeDs.Tables(2).Rows.Add({CStr(catDs.Tables(Posi).Rows(i).Item(0)), CStr(catDs.Tables(Posi).Rows(i).Item(1)), CStr(catDs.Tables(Posi).Rows(i).Item(2))})
-                '    Else
-                '        'si esta, nada que hacer!
-
-                '    End If
-                '    encuentra = Nothing
-                'Next
-
-                'agregar no matter what, el nombre del catalogo en el nodo!
-                'writeDs.Tables(1).Rows.Add({"CatalogName", nomCat})'doesn't make sense any more!!!
-
                 If (niuDt.Rows.Count + updDt.Rows.Count + remoDt.Rows.Count) > 0 Then
 
 
@@ -3729,43 +3750,6 @@ Public Class Form1
                 DataGridView1.AllowUserToAddRows = True
                 DataGridView1.AllowUserToDeleteRows = True
 
-                'If (writeDs.Tables(1).Rows.Count + writeDs.Tables(2).Rows.Count + writeDs.Tables(4).Rows.Count) > 0 Then
-                '    'SI hubo cambios!
-                '    'se escribe!
-                '    Cursor.Current = Cursors.WaitCursor
-                '    ToolStripLabel1.Visible = True
-                '    ToolStripLabel1.Text = "Uploading..."
-
-                '    ToolStripButton8.Enabled = False
-
-                '    xResp = Await HazCambiosAFireBase(writeDs, 1)
-
-                '    ToolStripButton8.Enabled = True
-
-                '    X = MsgBox(xResp, vbInformation, "SAP MD")
-
-                '    Cursor.Current = Cursors.Default
-                '    ToolStripLabel1.Visible = False
-                '    ToolStripLabel1.Text = "Ready"
-
-                '    If X <> 6 Or X = 6 Then
-                '        unReg = Await CargaOpcion(CategSelected)
-
-                '        If unReg = "ok" Then
-                '            Call ReloadOneNode(CategSelected)
-                '        End If
-                '        'aquii procedimiento para hacer reload del nodo!
-                '    End If
-
-                'Else
-                '    MsgBox("No changes detected!", vbInformation, "SAP MD")
-                'End If
-
-                'DataGridView1.AllowUserToAddRows = True
-                'DataGridView1.AllowUserToDeleteRows = True
-
-                'ya que está limpio, entonces tomamos la info!
-                'comparamos el ds de escritura y el 
 
 
             Case Is = 2
@@ -3840,6 +3824,12 @@ Public Class Form1
                     MsgBox("Sorry you are not allowed to make changes on the selected template", vbCritical, "DQCT")
                     Exit Sub
                 End If
+
+                If puedoEditar = False Then
+                    MsgBox("Sorry, you are not allowed to edit this template at this time, please try again later or when it becomes available.", vbExclamation, TitBox)
+                    Exit Sub
+                End If
+
 
                 For i = 0 To tempDs.Tables.Count - 1
                     If tempDs.Tables(i).TableName = cadFind Then
@@ -4068,8 +4058,12 @@ Public Class Form1
 
         DataGridView1.RowHeadersWidth = 70
 
-        DataGridView1.AllowUserToAddRows = True
-        DataGridView1.AllowUserToDeleteRows = True
+        DataGridView1.AllowUserToAddRows = puedoEditar ' True
+        DataGridView1.AllowUserToDeleteRows = puedoEditar 'True
+
+        For i = 0 To DataGridView1.Columns.Count - 1
+            DataGridView1.Columns(i).ReadOnly = Not (puedoEditar)
+        Next
 
     End Sub
 
@@ -4080,6 +4074,11 @@ Public Class Form1
 
         If IsNothing(elNode) = True Then
             MsgBox("Please select a valid node!", vbCritical, "DQCT")
+            Exit Sub
+        End If
+
+        If puedoEditar = False Then
+            MsgBox("Sorry, you are not allowed to edit this object at this time, please try again later or wait for it to be available to edit.", vbExclamation, TitBox)
             Exit Sub
         End If
 
@@ -4225,6 +4224,12 @@ Public Class Form1
                 Exit For
             End If
         Next
+
+
+        If puedoEditar = False Then
+            MsgBox("Sorry, you are not allowed to edit this template at this time, please try again later or wait for it to become available!", vbExclamation, TitBox)
+            Exit Sub
+        End If
 
         'se debe tomar la info del grid!
         'writeDs.Tables(0).Rows.Clear()
@@ -7390,6 +7395,8 @@ Public Class Form1
                     Exit Sub
                 End If
 
+                If puedoEditar = False Then Exit Sub 'NO puede editar!
+
                 If IsNothing(DataGridView1.Rows(rowEstaba).Cells(0).Value) = True Then Exit Sub
                 If DataGridView1.Rows(rowEstaba).Cells(0).Value = "" Then Exit Sub
 
@@ -7444,6 +7451,11 @@ Public Class Form1
                 enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
                 If IsNothing(enCuentra) = True Then
                     MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "DQCT")
+                    Exit Sub
+                End If
+
+                If puedoEditar = False Then
+                    MsgBox("Sorry, you are not allowed to edit this template at this time, please try again later or when it becomes available.", vbExclamation, TitBox)
                     Exit Sub
                 End If
 
@@ -7721,6 +7733,12 @@ Public Class Form1
 
             Case Is = 1
                 'catalogos!
+                If puedoEditar = False Then
+                    MsgBox("Sorry, you are not allowed to edit this catalog at this time, please try again later or wait for it to be available to edit.", vbExclamation, TitBox)
+                    Exit Sub
+                End If
+
+
                 If puSSyCat < 0 Then
                     MsgBox("Please select a catalog first!!", vbCritical, "DQCT")
                     Exit Sub
@@ -8041,10 +8059,16 @@ Public Class Form1
 
             Case Is = 4
                 'templates!!
+
                 Dim enCuentra As DataRow
                 enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "DQCT")
+                    MsgBox("Sorry you are not allowed to delete fields on the selected template", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                If puedoEditar = False Then
+                    MsgBox("Sorry, you are not allowed to edit this template at this time, please try again later or when it becomes available.", vbExclamation, TitBox)
                     Exit Sub
                 End If
 
@@ -8122,20 +8146,124 @@ Public Class Form1
 
     Private Async Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
 
+        If RoleUsuario = "Editor" Then Module5.AgregaTiempo()
+
+        Await DejoDeUsar()
+
+    End Sub
+
+    Private Async Function DejoDeUsar() As Task(Of String)
+
+        Dim elRet As String = ""
         If editDs.Tables.Count = 1 Then
             If editDs.Tables(0).Rows.Count = 1 Then
                 If editDs.Tables(0).ExtendedProperties.Item("inEdit") = True Then
 
                     If editDs.Tables(0).ExtendedProperties.Item("lastPath") <> "" Then
 
-                        Await HazDeleteEnFbSimple(editDs.Tables(0).ExtendedProperties.Item("lastPath"), "")
+                        elRet = Await HazDeleteEnFbSimple(editDs.Tables(0).ExtendedProperties.Item("lastPath"), "")
                         'OJO, tmb cuando cambie de nodo o se salga del catalogo!
-
+                        editDs.Tables(0).ExtendedProperties.Item("inEdit") = False
                     End If
 
                 End If
+            Else
+                elRet = "Ok"
+            End If
+        Else
+            elRet = "Ok"
+        End If
+
+        Return elRet
+
+    End Function
+
+    Public Async Function siPuedoEditar(ByVal unCamino As String) As Task(Of Boolean)
+
+        Dim siPuedo As Boolean = False
+
+        If editDs.Tables.Count = 0 Then
+            'puedoEditar = False 'ocurrió un error!
+        Else
+            If editDs.Tables(0).Rows.Count = 0 Then
+                'puedoEditar = False
+            Else
+                If editDs.Tables(0).Rows(0).Item(4) = "X" Then
+                    'primero verificamos el último momento!
+                    'si soy yo mismo entonces solo posteo el nuevo momento actual, caso contrario,
+                    'valido vs el tiempo
+                    If editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo Then
+                        'solo posteo el nuevo time!
+                        'igual lo borro!
+                        Await HazDeleteEnFbSimple(unCamino, "")
+                        'Await HazPutEnFbSimple(unCamino & "/" & editDs.Tables(0).ExtendedProperties.Item("Key"), "LastUsed", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                        siPuedo = True
+                    Else
+                        Dim diff As Long
+                        'fechAdd = DateAdd(DateInterval.Minute, 6, editDs.Tables(0).Rows(0).Item(0))
+                        diff = DateDiff(DateInterval.Minute, CDate(editDs.Tables(0).Rows(0).Item(0)), DateTime.Now)
+                        If diff > 6 Then
+                            'lleva mas de 5 min fuera!, se patea ó se
+                            'pero primero lo pateo!
+                            'aunque sea YO mismo, me autoborro
+
+                            Await HazDeleteEnFbSimple(unCamino, "")
+
+                            siPuedo = True
+
+                        End If
+
+                    End If
+
+                Else
+                    'NO existia este seria el caso mas comun
+                    siPuedo = True
+                End If
+            End If
+
+        End If
+
+        Return siPuedo
+
+    End Function
+
+    Private Sub NoPuedesEditar(ByVal miDs As DataSet, ByRef elLabel As ToolStripLabel)
+
+        elLabel.ForeColor = Color.Crimson
+        If miDs.Tables.Count = 0 Then
+            elLabel.Text = "You can't edit this object"
+        Else
+            If miDs.Tables(0).Rows.Count = 0 Then
+                elLabel.Text = "You can't edit this object"
+            Else
+                elLabel.Text = miDs.Tables(0).Rows(0).Item(3) & " is editing this object"
             End If
         End If
 
     End Sub
+
+    Private Sub HandleElapsed(ByVal remainingTime As TimeSpan)
+        'ToolStripLabel21.Text = "Tiempo restante: " & String.Format("{0}:{1:d2}:{2:d2}", remainingTime.Hours, remainingTime.Minutes, remainingTime.Seconds)
+        Label3.Text = String.Format("{0}:{1:d2}:{2:d2}", remainingTime.Hours, remainingTime.Minutes, remainingTime.Seconds)
+        If remainingTime.Minutes > 1 Then
+            'ToolStripLabel21.ForeColor = Color.DarkGreen
+            Label3.ForeColor = Color.DarkGreen
+        Else
+            'ToolStripLabel21.ForeColor = Color.Red
+            Label3.ForeColor = Color.Red
+        End If
+    End Sub
+
+    Private Sub HandleComplete(ByVal message As String)
+
+        'If Application.OpenForms().OfType(Of Form16).Any Then
+
+        'Form16.Close()
+
+        'End If
+
+        Me.Close()
+
+    End Sub
+
 End Class
