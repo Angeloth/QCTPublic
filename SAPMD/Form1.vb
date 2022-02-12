@@ -1261,8 +1261,6 @@ Public Class Form1
                 'http://csharp.net-informations.com/datagridview/autogridview.htm
                 'https://www.c-sharpcorner.com/UploadFile/c5c6e2/datagridview-autocomplete-textbox/
 
-                'DataGridView1.Columns.Add("TableCode", "Table Code") '0
-                'DataGridView1.Columns.Add("TableName", "Table Name") '1
                 DataGridView1.Columns.Add("FieldCode", "Field Code") '0
                 DataGridView1.Columns.Add("FieldName", "Field Name") '1
                 DataGridView1.Columns.Add(cHekKeyField) '2 '"isKey", "Key Field?"
@@ -1483,19 +1481,24 @@ Public Class Form1
                             DataGridView1.Columns(i).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
                         Next
 
-                        DataGridView1.AllowUserToAddRows = puedoEditar ' True
-                        DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
+                        'DataGridView1.AllowUserToAddRows = puedoEditar ' True
+                        'DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
+                        'DataGridView1.ReadOnly = Not puedoEditar
 
                     Else
                         'es un nodo nuevo!
                         'simplemente se limpia el grid y se deja libre para que ponga la info!
                         DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
-                        DataGridView1.AllowUserToAddRows = puedoEditar ' True
-                        DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
+
                         puSSyCat = -1
                         cataNombre = ""
                     End If
+
+                    DataGridView1.AllowUserToAddRows = puedoEditar ' True
+                    DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
+                    DataGridView1.ReadOnly = Not puedoEditar
+
 
                 End If
 
@@ -1758,6 +1761,7 @@ Public Class Form1
 
                 DataGridView1.AllowUserToAddRows = puedoEditar 'True
                 DataGridView1.AllowUserToDeleteRows = puedoEditar 'True
+                DataGridView1.ReadOnly = Not puedoEditar
 
                 MuestraRecords()
 
@@ -2301,8 +2305,23 @@ Public Class Form1
 
                         Next
 
+                        DataGridView1.Columns(0).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(1).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(2).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(3).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(4).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(5).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(6).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(7).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(8).ReadOnly = Not puedoEditar
+
                         DataGridView1.Columns(9).ReadOnly = True 'CatalogCode
                         DataGridView1.Columns(10).ReadOnly = True 'CatalogCode
+
+                        DataGridView1.Columns(11).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(12).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(13).ReadOnly = Not puedoEditar
+
                         DataGridView1.Columns(14).ReadOnly = True 'ConditionalPath
                         DataGridView1.Columns(15).ReadOnly = True 'ConditionalObject
                         DataGridView1.Columns(16).ReadOnly = True 'ConditionalTable
@@ -2314,8 +2333,6 @@ Public Class Form1
                         DataGridView1.Columns(22).ReadOnly = True 'ConstructionRule
                         DataGridView1.Columns(23).ReadOnly = True 'ConstructionRule
                         DataGridView1.RowHeadersWidth = 70
-
-
 
                         estoyAgregandoRows = False
 
@@ -5023,7 +5040,7 @@ Public Class Form1
                     Case Is = DataGridView1.Columns.Count - 1
                         'detalles
                         elDeta = DataGridView1.Rows(e.RowIndex).Cells(e.ColumnIndex).Tag
-                        MsgBox(elDeta, vbInformation, "DQCT")
+                        MsgBox(elDeta, vbInformation, TitBox)
 
                     Case Else
 
@@ -5035,6 +5052,11 @@ Public Class Form1
 
             Case Is = 4
                 'templates!
+                If puedoEditar = False Then
+                    MsgBox("Sorry you are not allowed to make any changes to this template at this time. Please make sure you have proper access to this object and no other users are editing.", vbExclamation, TitBox)
+                    Exit Sub
+                End If
+
                 If e.ColumnIndex >= 14 And e.ColumnIndex <= 21 Then
                     'condition table!
                     'hace falta un botón para eliminar la condicional anterior!!
