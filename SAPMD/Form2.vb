@@ -249,6 +249,10 @@
                     Exit Sub
                 End If
 
+                'Aqui falta ver que NO se repita!
+
+
+
             Case Is = 5
 
                 If TextBox1.Text = "" Or TextBox2.Text = "" Or TextBox3.Text = "" Then
