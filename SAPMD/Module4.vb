@@ -421,5 +421,21 @@ Module Module4
         fractionalPart = number - wholePart
     End Sub
 
+    Public Sub RemoveInvalidChars(ByRef laCad As String, ByVal cadInvalid As String)
+
+        Dim unCh As String = ""
+        'elError = ""
+        For i = 0 To cadInvalid.Length - 1
+            unCh = cadInvalid.Substring(i, 1)
+
+            If laCad.Contains(unCh) = True Then
+                'elError = "This field is not allowed to contain any of the following characters: " & losInvalids & " , please review!"
+                laCad = laCad.Replace(unCh, "")
+            End If
+
+        Next
+
+    End Sub
+
 
 End Module

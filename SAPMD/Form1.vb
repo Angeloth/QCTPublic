@@ -3926,15 +3926,13 @@ Public Class Form1
 
                 'se debe re-escribir!!
 
-                'Await HazDeleteEnFbSimple(unPaths, "")'Esto se quito!!, porque borraba los vinculos con los catálogos!
-
                 Await HazPutEnFbSimple(unPaths, "TableName", tabNombre)
 
                 xResp = Await HazPutEnFireBasePathYColumnas(unPaths, writeDs.Tables(3), 0)
 
                 toyTrabajando = False
 
-                MsgBox(xResp, vbInformation, "DQCT")
+                MsgBox(xResp, vbInformation, TitBox)
 
                 ToolStripButton8.Enabled = True
 

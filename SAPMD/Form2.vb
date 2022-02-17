@@ -226,6 +226,20 @@
                 TextBox1.Enabled = False
                 TextBox2.Enabled = False
 
+            Case Is = 7
+
+                Label1.Text = "Add template field"
+                Label2.Text = "Path:"
+                TextBox1.Text = elCamino
+                TextBox1.Enabled = False
+
+                Label4.Text = "Field code:"
+                Label3.Text = "Field name:"
+                TextBox2.Text = keyValue
+                TextBox3.Text = tabValue
+
+                TextBox2.Enabled = True
+                TextBox3.Enabled = True
 
         End Select
 
@@ -307,6 +321,36 @@
                     MsgBox("All fields are required!!", vbCritical, TitBox)
                     Exit Sub
                 End If
+
+            Case Is = 7
+                If TextBox2.Text = "" Or TextBox3.Text = "" Then
+                    MsgBox("All fields are required!!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                keyValue = TextBox2.Text
+                RemoveInvalidChars(keyValue, ".-,*/()""\{}+´´¿'?&%$#![]=")
+
+                TextBox2.Text = keyValue
+
+                If keyValue.Length < 4 Then
+                    MsgBox("Field code must be greater equal than 4 characters long!, please fix!" & vbCrLf & "Invalid characters are automatically removed!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+
+                If ContainsSpecialCharacters(TextBox2.Text) = True Then
+                    MsgBox("Please remove special characters from Field Code field!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                If TextBox3.Text.Length < 4 Then
+                    MsgBox("Field name must be greater equal than 4 characters long!, please fix!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                'aqui falta validar vs el path del template, que NO haya repetidos!!
+
 
 
         End Select
