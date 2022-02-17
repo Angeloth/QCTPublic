@@ -103,7 +103,7 @@ Public Class Form1
             ToolStripButton15.Enabled = True
             ToolStripButton16.Enabled = True
 
-            Module5.Start(Date.Now.AddMinutes(5))
+            Module5.Start(Date.Now.AddMinutes(10))
             AddHandler Module5.Elapsed, AddressOf HandleElapsed
             AddHandler Module5.TimerComplete, AddressOf HandleComplete
             Label3.ForeColor = Color.Black
@@ -4275,6 +4275,16 @@ Public Class Form1
                 'quitar las comillas
                 MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1) = Replace(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1), """", "")
 
+                If IsDBNull(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1)) = False Then
+                    If CStr(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1)).Contains("\") = True Then
+                        MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1) = Replace(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1), "\", "")
+                    End If
+
+                    If CStr(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1)).Contains(vbLf) = True Then
+                        MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1) = Replace(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1), vbLf, "")
+                    End If
+                End If
+
                 If DataGridView1.Columns(j).Tag = "X" Then
                     k = k + 1
                     If k = 1 Then
@@ -5538,6 +5548,7 @@ Public Class Form1
                 Dim mixNombreTab As String = ""
                 Dim buskEst As String = ""
                 Dim valBus As String = ""
+                Dim valAjus As String = ""
                 'Dim enCuentra As DataRow
                 'Randomize()
                 'Dim value As Integer = CInt(Int((6 * Rnd()) + 1))
@@ -5565,6 +5576,10 @@ Public Class Form1
                 'Yavez.ColumnName = "Unique"
                 'YavePrimaria(0) = Yavez
                 'uniTabla.Columns.Add(Yavez)
+
+                Await SigoVivo()
+                Module5.AgregaTiempo()
+                toyTrabajando = True
 
                 For i = 0 To DataGridView1.Rows.Count - 2
 
@@ -6080,10 +6095,12 @@ Public Class Form1
                                 End If
 
                             Case Is = "Decimal"
-                                If isDecimalOk(valEvaluar, CDec(ValidaDt.Rows(z).Item(11)), unError) = False Then
+                                valAjus = ""
+                                If isDecimalOk(valEvaluar, CDec(ValidaDt.Rows(z).Item(11)), unError, valAjus) = False Then
                                     PintaCeldaDeError(i, j, unError)
                                     Continue For
                                 End If
+                                DataGridView1.Rows(i).Cells(j).Value = valAjus
 
                             Case Is = "Indicator"
                                 If isIndicatorFieldOk(valEvaluar, unError) = False Then
@@ -7273,7 +7290,7 @@ Public Class Form1
 
                 Next
 
-
+                toyTrabajando = False
 
 
             Case Is = 4
@@ -7421,6 +7438,9 @@ Public Class Form1
                 Await HazPutEnFbSimple(unPaths, "TableName", tabNombre)
 
                 xResp = Await HazPutEnFireBasePathYColumnas(unPaths, writeDs.Tables(3), 0)
+
+                Await SigoVivo()
+                Module5.AgregaTiempo()
 
                 ToolStripLabel1.Text = "Ready"
                 ToolStripLabel1.Visible = False
@@ -8225,8 +8245,8 @@ Public Class Form1
                         Dim diff As Long
                         'fechAdd = DateAdd(DateInterval.Minute, 6, editDs.Tables(0).Rows(0).Item(0))
                         diff = DateDiff(DateInterval.Minute, CDate(editDs.Tables(0).Rows(0).Item(0)), DateTime.Now)
-                        If diff > 6 Then
-                            'lleva mas de 5 min fuera!, se patea ó se
+                        If diff > 11 Then
+                            'lleva mas de 10 min fuera!, se patea ó se
                             'pero primero lo pateo!
                             'aunque sea YO mismo, me autoborro
 

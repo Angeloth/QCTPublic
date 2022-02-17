@@ -48,37 +48,57 @@ Module Module4
 
     End Function
 
-    Public Function isDecimalOk(ByVal elValor As String, ByVal deciFormat As Decimal, ByRef elError As String) As Boolean
+    Public Function isDecimalOk(ByVal elValor As String, ByVal deciFormat As Decimal, ByRef elError As String, ByRef valFixed As String) As Boolean
 
         If IsNumeric(elValor) = False Then
             elError = "This must be a decimal field!, please review"
             Return False
         End If
 
-        If elValor.Contains(".") = False Then
-            elError = "This must be a decimal number it should have a dot '.' inside"
-            Return False
-        End If
-
-        Dim yObj As Object = Split(elValor, ".")
-
-        Dim estaOk As Boolean = False
-        Dim xDeci As Decimal = CDec(elValor)
-        Dim entePart As Decimal = 0
-        Dim fracPart As Decimal = 0
+        'Hasta aqui es un numero, pero es entero
         Dim miDeci As String = CStr(deciFormat)
         Dim xObj As Object = Split(miDeci, ".")
 
-        Call SplitDecimal(xDeci, entePart, fracPart)
+        If elValor.Contains(".") = False Then
+            'se corrige!!, no contiene dot, peero puede ajustarse al decimal, siempre y cuando cumpla la cantidad de enteros!
+            Dim ceroFix As String = ""
+            If elValor.Length <= CInt(xObj(0)) Then
+                'entra!
+                ceroFix = ""
+                For i = 1 To CInt(xObj(1))
+                    ceroFix = ceroFix & "0"
+                Next
 
-        If CStr(entePart).Length <= CInt(xObj(0)) And CStr(yObj(1)).Length <= CInt(xObj(1)) Then
-            estaOk = True
+                valFixed = elValor & "." & ceroFix
+
+                Return True
+
+            Else
+                elError = "The number of integers allowed for this field is: " & CInt(xObj(0)) & ", currently has " & elValor.Length & ", please review!!"
+                Return False
+            End If
+
         Else
-            elError = "This is a decimal field, it must have " & CStr(xObj(0)) & " maximum digits for integer part and " & CStr(xObj(1)) & " for fractional part, please review!"
-        End If
 
-        'si el numero 
-        Return estaOk
+            Dim yObj As Object = Split(elValor, ".")
+            Dim estaOk As Boolean = False
+            Dim xDeci As Decimal = CDec(elValor)
+            Dim entePart As Decimal = 0
+            Dim fracPart As Decimal = 0
+
+            Call SplitDecimal(xDeci, entePart, fracPart)
+
+            If CStr(entePart).Length <= CInt(xObj(0)) And CStr(yObj(1)).Length <= CInt(xObj(1)) Then
+                valFixed = elValor
+                estaOk = True
+            Else
+                elError = "This is a decimal field, it must have " & CStr(xObj(0)) & " maximum digits for integer part and " & CStr(xObj(1)) & " for fractional part, please review!"
+            End If
+
+            'si el numero 
+            Return estaOk
+
+        End If
 
     End Function
 

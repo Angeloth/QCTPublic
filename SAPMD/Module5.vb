@@ -11,7 +11,7 @@
         timer.Stop()
     End Sub
     Public Sub AgregaTiempo()
-        alarmTime = Date.Now.AddMinutes(5)
+        alarmTime = Date.Now.AddMinutes(10)
     End Sub
     Public Sub TimerTick(ByVal sender As Object, ByVal e As EventArgs) Handles timer.Tick
 
