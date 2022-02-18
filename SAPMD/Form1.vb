@@ -45,6 +45,7 @@ Public Class Form1
     Private xDepeDs As New DataSet 'este se usa momentaneamente para validar!
     Private rowEstaba As Long
     Private puSSyCat As Integer
+    Private PussyTemp As Integer
     Private cataNombre As String
 
     Private toyTrabajando As Boolean
@@ -791,7 +792,6 @@ Public Class Form1
 
                     Dim filterDT As DataTable = tempDs.Tables(i).DefaultView.ToTable()
 
-
                     For j = 0 To filterDT.Rows.Count - 1
 
                         pos1 = TreeView1.Nodes(0).Nodes(posi).Nodes.IndexOfKey(CStr(filterDT.Rows(j).Item(1)))
@@ -804,6 +804,8 @@ Public Class Form1
                             MySource.Add(CStr(filterDT.Rows(j).Item(2)))
                             TreeView1.Nodes(0).Nodes(posi).Nodes(pos1).Tag = CStr(filterDT.Rows(j).Item(2))
                         End If
+
+                        'If CStr(filterDT.Rows(j).Item(3)) = "TableName" Then Continue For 'no se agrega al nodo!
 
                         TreeView1.Nodes(0).Nodes(posi).Nodes(pos1).Nodes.Add(CStr(filterDT.Rows(j).Item(3)), CStr(filterDT.Rows(j).Item(3)) & " / " & CStr(filterDT.Rows(j).Item(4)), 8, 8)
                         MySource.Add(CStr(filterDT.Rows(j).Item(3)))
@@ -1776,7 +1778,7 @@ Public Class Form1
                     NodoNameActual = ""
                     DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
-
+                    PussyTemp = -1
                     pathFinduse = ""
 
                 Else
@@ -1830,6 +1832,7 @@ Public Class Form1
 
                     For i = 0 To tempDs.Tables.Count - 1
                         If tempDs.Tables(i).TableName = cadFind Then
+                            PussyTemp = i
                             Posi = i
                             tablaNombre = cadFind
                             Exit For
@@ -1875,7 +1878,6 @@ Public Class Form1
                     Next
 
                     filtCat.PrimaryKey = Nothing
-
                     filtCat.Columns.Clear()
                     filtCat.Rows.Clear()
                     filtCat = CatSimple.Tables(0).Clone()
@@ -2305,7 +2307,7 @@ Public Class Form1
 
                         Next
 
-                        DataGridView1.Columns(0).ReadOnly = Not puedoEditar
+                        DataGridView1.Columns(0).ReadOnly = True ' siempre será de solo lectura! Not puedoEditar
                         DataGridView1.Columns(1).ReadOnly = Not puedoEditar
                         DataGridView1.Columns(2).ReadOnly = Not puedoEditar
                         DataGridView1.Columns(3).ReadOnly = Not puedoEditar
@@ -2341,7 +2343,7 @@ Public Class Form1
                             DataGridView1.Columns(i).SortMode = DataGridViewColumnSortMode.NotSortable
                         Next
 
-                        DataGridView1.AllowUserToAddRows = puedoEditar ' True
+                        DataGridView1.AllowUserToAddRows = False ' puedoEditar ' ahora siempre en false!
                         'DataGridView1.AllowUserToDeleteRows = True
 
                         DataGridView1.Columns(1).Frozen = True
@@ -2349,7 +2351,7 @@ Public Class Form1
                     Else
                         DataGridView1.DataSource = Nothing
                         DataGridView1.Rows.Clear()
-                        DataGridView1.AllowUserToAddRows = True
+                        DataGridView1.AllowUserToAddRows = False ' True
                         'DataGridView1.AllowUserToDeleteRows = True
                     End If
 
@@ -2808,7 +2810,8 @@ Public Class Form1
                         TreeView1.Nodes(0).Nodes.Add(Form2.keyValue, Form2.keyValue & " / " & Form2.tabValue, 2, 2)
                         TreeView1.Nodes(0).Nodes(TreeView1.Nodes(0).Nodes.Count - 1).Tag = Form2.tabValue & "#" & Form2.pathValue
 
-
+                        TreeView1.Nodes(0).Nodes(TreeView1.Nodes(0).Nodes.Count - 1).EnsureVisible()
+                        TreeView1.SelectedNode = TreeView1.Nodes(0).Nodes(TreeView1.Nodes(0).Nodes.Count - 1)
 
 
                     Case Is = 2
@@ -2877,10 +2880,15 @@ Public Class Form1
 
                         elNode.Nodes.Add(nodyav, nodyav & " / " & Form2.tabValue, 8, 8)
                         elNode.Nodes(elNode.Nodes.Count - 1).Tag = Form2.tabValue
+                        elNode.Nodes(elNode.Nodes.Count - 1).EnsureVisible()
+                        TreeView1.SelectedNode = elNode.Nodes(elNode.Nodes.Count - 1)
+                        'Y si mejor agregamos de una vez un campo Dummy?
+                        'elNode = TreeView1.SelectedNode
 
 
                     Case Else
                         Exit Sub
+
                 End Select
 
 
@@ -3946,8 +3954,8 @@ Public Class Form1
                     Call ReloadOneNode(CategSelected)
                 End If
 
-                DataGridView1.AllowUserToAddRows = True
-                DataGridView1.AllowUserToDeleteRows = True
+                DataGridView1.AllowUserToAddRows = False ' True
+                DataGridView1.AllowUserToDeleteRows = False ' True
 
                 'comparativa local!
                 'todo lo nuevo vs lo que estaba, 
@@ -7332,7 +7340,7 @@ Public Class Form1
 
         If estoyAgregandoRows = True Then Exit Sub
 
-        If rowEstaba >= DataGridView1.Rows.Count - 1 Then Exit Sub
+        If rowEstaba > DataGridView1.Rows.Count - 1 Then Exit Sub
 
         If e.RowIndex < 0 Then Exit Sub
 
@@ -8331,15 +8339,142 @@ Public Class Form1
 
     End Function
 
-    Private Sub ToolStripButton21_Click(sender As Object, e As EventArgs) Handles ToolStripButton21.Click
+    Private Async Sub ToolStripButton21_Click(sender As Object, e As EventArgs) Handles ToolStripButton21.Click
+
+        If ToolStripComboBox1.SelectedIndex <> 4 Then Exit Sub
+
+        Await SigoVivo()
+        Module5.AgregaTiempo()
+
+        Dim unCamino As String
+        unCamino = RaizFire
+        unCamino = unCamino & "/" & "templates"
+        unCamino = unCamino & "/" & objetoSelek
+        unCamino = unCamino & "/" & tableSelek
+
+        Form2.keyValue = ""
+        Form2.tabValue = ""
+        Form2.elCamino = "templates" & "/" & objetoSelek & "/" & tableSelek
+        Form2.queOpcion = 7
+        Form2.huboExito = False
+        Form2.pathLabel = unCamino
+
+        Form2.ShowDialog()
+
+        If Form2.huboExito = False Then Exit Sub
+        'guardamos el field code primero, y luego lo agregamos al dgv
+        'reload del template unitario?!
+
+        elNode.Nodes.Add(Form2.keyValue, Form2.keyValue & " / " & Form2.tabValue, 8, 8)
+
+        unCamino = RaizFire
+        unCamino = unCamino & "/" & "templates"
+        unCamino = unCamino & "/" & objetoSelek
+
+        Dim dt As New DataTable
+        dt = Await PullDtFireBase(unCamino, "tempunit", objetoSelek)
+        tempDs.Tables.RemoveAt(PussyTemp)
+        tempDs.Tables.Add(dt)
+        PussyTemp = tempDs.Tables.Count - 1
+
+        DataGridView1.Rows.Add()
+        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(0).Value = Form2.keyValue
+        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(1).Value = Form2.tabValue
+        DataGridView1.Rows(DataGridView1.Rows.Count - 1).HeaderCell.Value = CStr(DataGridView1.Rows.Count)
 
     End Sub
 
-    Private Sub ToolStripButton19_Click(sender As Object, e As EventArgs) Handles ToolStripButton19.Click
+    Private Async Sub ToolStripButton19_Click(sender As Object, e As EventArgs) Handles ToolStripButton19.Click
+        'move field down
+        If IsNothing(DataGridView1.CurrentCell) = True Then
+            MsgBox("Please select a row with data to move up or down!", vbCritical, TitBox)
+            Exit Sub
+        End If
+
+        Dim posXold As Integer = DataGridView1.CurrentCell.RowIndex
+        If posXold + 1 > DataGridView1.Rows.Count - 1 Then
+            MsgBox("This field is already on bottom!!", vbExclamation, TitBox)
+            Exit Sub
+        End If
+
+        Dim xRow As New DataGridViewRow
+        xRow = DataGridView1.Rows(posXold).Clone()
+
+        For i = 0 To xRow.Cells.Count - 1
+            xRow.Cells(i).Value = DataGridView1.Rows(posXold).Cells(i).Value
+        Next
+
+        DataGridView1.Rows.InsertRange(posXold + 2, xRow)
+        DataGridView1.Rows.RemoveAt(posXold)
+
+        For i = 0 To DataGridView1.Rows.Count - 1
+            DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
+        Next
+
+        Dim xDt As New DataTable
+        xDt.Columns.Add("FieldCode", GetType(String))
+        xDt.Columns.Add("Position", GetType(String))
+        xDt.Columns.Add("Letter", GetType(String))
+
+        xDt.Rows.Add({CStr(DataGridView1.Rows(posXold).Cells(0).Value), CStr(posXold + 1), LetraNumero.Tables(0).Rows(posXold).Item(1)})
+        xDt.Rows.Add({CStr(DataGridView1.Rows(posXold + 1).Cells(0).Value), CStr(posXold + 1 + 1), LetraNumero.Tables(0).Rows(posXold + 1).Item(1)})
+
+        Dim elCamino As String
+        elCamino = RaizFire
+        elCamino = elCamino & "/" & "templates"
+        elCamino = elCamino & "/" & objetoSelek
+        elCamino = elCamino & "/" & tableSelek
+
+        Await HazPutEnFireBasePathYColumnas(elCamino, xDt, 0)
+
+
 
     End Sub
 
-    Private Sub ToolStripButton20_Click(sender As Object, e As EventArgs) Handles ToolStripButton20.Click
+    Private Async Sub ToolStripButton20_Click(sender As Object, e As EventArgs) Handles ToolStripButton20.Click
+        'move field up
+        If IsNothing(DataGridView1.CurrentCell) = True Then
+            MsgBox("Please select a row with data to move up or down!", vbCritical, TitBox)
+            Exit Sub
+        End If
+
+        Dim posXold As Integer = DataGridView1.CurrentCell.RowIndex
+
+        If posXold - 1 < 0 Then
+            MsgBox("This field is already on top!!", vbExclamation, TitBox)
+            Exit Sub
+        End If
+
+        Dim xRow As New DataGridViewRow
+        xRow = DataGridView1.Rows(posXold).Clone()
+
+        For i = 0 To xRow.Cells.Count - 1
+            xRow.Cells(i).Value = DataGridView1.Rows(posXold).Cells(i).Value
+        Next
+
+        DataGridView1.Rows.InsertRange(posXold - 1, xRow)
+
+        DataGridView1.Rows.RemoveAt(posXold + 1)
+
+        For i = 0 To DataGridView1.Rows.Count - 1
+            DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
+        Next
+
+        Dim xDt As New DataTable
+        xDt.Columns.Add("FieldCode", GetType(String))
+        xDt.Columns.Add("Position", GetType(String))
+        xDt.Columns.Add("Letter", GetType(String))
+
+        xDt.Rows.Add({CStr(DataGridView1.Rows(posXold - 1).Cells(0).Value), CStr(posXold - 1 + 1), LetraNumero.Tables(0).Rows(posXold - 1).Item(1)})
+        xDt.Rows.Add({CStr(DataGridView1.Rows(posXold).Cells(0).Value), CStr(posXold + 1), LetraNumero.Tables(0).Rows(posXold).Item(1)})
+
+        Dim elCamino As String
+        elCamino = RaizFire
+        elCamino = elCamino & "/" & "templates"
+        elCamino = elCamino & "/" & objetoSelek
+        elCamino = elCamino & "/" & tableSelek
+
+        Await HazPutEnFireBasePathYColumnas(elCamino, xDt, 0)
 
     End Sub
 End Class

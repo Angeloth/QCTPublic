@@ -247,7 +247,7 @@
 
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Async Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
 
         Select Case queOpcion
@@ -329,7 +329,10 @@
                 End If
 
                 keyValue = TextBox2.Text
+
                 RemoveInvalidChars(keyValue, ".-,*/()""\{}+´´¿'?&%$#![]=")
+
+                keyValue = keyValue.ToUpper()
 
                 TextBox2.Text = keyValue
 
@@ -350,8 +353,48 @@
                 End If
 
                 'aqui falta validar vs el path del template, que NO haya repetidos!!
+                Dim enCuentra As DataRow
+                Dim miFdt As New DataTable
+                miFdt = Await PullDtFireBase(pathLabel, "tempfields")
+                enCuentra = miFdt.Rows.Find(keyValue)
 
+                If IsNothing(enCuentra) = False Then
+                    MsgBox("This field code already exists!!, please try another one!!", vbCritical, TitBox)
+                    Exit Sub
+                End If
 
+                'lo agregamos de una vez aqui?
+                'Dim resp As String = ""
+                Dim xRen As Integer = 0
+                xRen = miFdt.Rows.Count + 1 'inicia en la última posicion siempre
+
+                Dim Dt As New DataTable
+                Dt.Columns.Add("Blanks", GetType(String)) '0
+                Dt.Columns.Add("CatalogCode", GetType(String)) '1
+                Dt.Columns.Add("CatalogName", GetType(String)) '2
+                Dt.Columns.Add("DataType", GetType(String)) '3
+                Dt.Columns.Add("FillingRule", GetType(String)) '4
+                Dt.Columns.Add("Letter", GetType(String)) '5
+                Dt.Columns.Add("MOC", GetType(String)) '6
+                Dt.Columns.Add("MaxChar", GetType(String)) '7
+                Dt.Columns.Add("Name", GetType(String)) '8
+                Dt.Columns.Add("NonAllowedChars", GetType(String)) '9
+                Dt.Columns.Add("NonRep", GetType(String)) '10
+                Dt.Columns.Add("Position", GetType(String)) '11
+                Dt.Columns.Add("ULCase", GetType(String)) '12
+                Dt.Columns.Add("ValueColumn", GetType(String)) '13
+                Dt.Columns.Add("isKey", GetType(String)) '14
+                Dt.Columns.Add("CatMatchConditions", GetType(String)) '15
+                Dt.Columns.Add("CatMatchField", GetType(String)) '16
+                Dt.Columns.Add("CatalogModule", GetType(String)) '17
+
+                Dt.Rows.Add({"", "", "", "", "", LetraNumero.Tables(0).Rows(xRen - 1).Item(1), "", "", TextBox3.Text, "", "", xRen, "", "", "", "", "", ""})
+
+                Button1.Enabled = False
+
+                Await HazPutConPathRowsyCols(pathLabel & "/" & keyValue, Dt, -1)
+
+                Button1.Enabled = True
 
         End Select
 
@@ -422,5 +465,11 @@
 
         End Select
 
+    End Sub
+
+    Private Sub TextBox3_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox3.KeyDown
+        If e.KeyCode = Keys.Return Then
+            Button1.PerformClick()
+        End If
     End Sub
 End Class

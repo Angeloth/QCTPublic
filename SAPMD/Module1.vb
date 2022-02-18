@@ -1042,6 +1042,8 @@ Module Module1
                                 Select Case catitem.Name
                                     Case Is = "TableName"
                                         miTab = catitem.Value.ToString
+                                        'Siempre noo!
+                                        'xSet.Tables(xSet.Tables.Count - 1).Rows.Add({item.Name & "#" & catitem.Name, item.Name, miTab, catitem.Name, "", "", 0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "None", "To Condition", "", "", ""})
 
                                     Case Else
 
@@ -1878,5 +1880,245 @@ Module Module1
         Return elRegreso
 
     End Function
+
+    Public Async Function PullDtFireBase(ByVal DtPath As String, ByVal elConcepto As String, Optional ByVal elHijo As String = "") As Task(Of DataTable)
+
+        Dim xDt As New DataTable
+        Dim client = New FirebaseClient(DtPath)
+
+        Try
+
+            Dim dinos = Await client.Child("").OnceAsync(Of Object)
+
+            Select Case elConcepto
+
+                Case Is = "tempfields"
+
+
+                    AsignaYavePrimariaATabla(xDt, "FieldCode", False)
+                    xDt.Columns.Add("FieldName", GetType(String))
+
+                    For Each dino In dinos
+
+                        If dino.Key = "TableName" Then Continue For
+
+                        xDt.Rows.Add({dino.Key, ""})
+
+                    Next
+
+
+                Case Is = "tempunit"
+
+                    Dim moduX As String = ""
+                    Dim tabX As String = ""
+                    Dim miTab As String = ""
+                    Dim p1 As Integer = -1
+
+                    For Each dino In dinos
+
+                        Select Case dino.Key
+                            Case Is = "Module"
+                                moduX = dino.Object.ToString
+                                Continue For
+
+                            Case Is = "ObjectName"
+                                Dim iAveprim(1) As DataColumn
+                                Dim kEys As New DataColumn()
+
+                                kEys.ColumnName = "KeyField"
+                                iAveprim(0) = kEys
+
+                                tabX = dino.Object.ToString
+                                xDt.TableName = elHijo & "#" & tabX & "#" & moduX
+                                'xSet.Tables.Add(dino.Key.ToString() & "#" & tabX & "#" & moduX) 'md01#companymaster
+                                xDt.Columns.Add(kEys) '0
+                                xDt.Columns.Add("TableCode", GetType(String)) '1
+                                xDt.Columns.Add("TableName", GetType(String)) '2
+                                xDt.Columns.Add("FieldCode", GetType(String)) '3
+                                xDt.Columns.Add("FieldName", GetType(String)) '4
+                                xDt.Columns.Add("isKey", GetType(String)) '5
+                                xDt.Columns.Add("Position", GetType(Integer)) '6
+                                xDt.Columns.Add("Letter", GetType(String)) '7
+
+                                xDt.Columns.Add("MOC", GetType(String)) '8 Mandatory/Optional/Conditional
+                                'xSet.Tables(xSet.Tables.Count - 1).Columns.Add("ConditionKind", GetType(String)) '9 From same table, from other table, from other object
+                                xDt.Columns.Add("FillingRule", GetType(String)) '9 A,B,D,E,F
+                                xDt.Columns.Add("DataType", GetType(String)) '10 Tipo de dato
+                                xDt.Columns.Add("MaxChar", GetType(String)) '11 Máximo de caracteres
+                                xDt.Columns.Add("ULCase", GetType(String)) '12 Upper/Lower Case
+                                xDt.Columns.Add("Blanks", GetType(String)) '13 Spaces, left, right, both
+                                xDt.Columns.Add("CatalogCode", GetType(String)) '14 Codigo de catalogo
+                                xDt.Columns.Add("CatalogName", GetType(String)) '15 Nombre de catalogo
+                                xDt.Columns.Add("ValueColumn", GetType(String)) '16 Columna Valor (para valores fijos)
+                                xDt.Columns.Add("NonRep", GetType(String)) '17 No-repetibilidad?, checkbox, ó N/A en caso de ser campo llave!
+                                xDt.Columns.Add("NonAllowedChars", GetType(String)) '18 Checkbox ó texto de caracteres válidos
+                                xDt.Columns.Add("ConditionalPath", GetType(String)) '19 Ruta de condicionante md36>md36-0001>FIELD
+                                xDt.Columns.Add("ConditionalObject", GetType(String)) '20 Objeto condicional md36
+                                xDt.Columns.Add("ConditionalTable", GetType(String)) '21 Tabla condicionante
+                                xDt.Columns.Add("ConditionalField", GetType(String)) '22 Campo condicionante
+                                xDt.Columns.Add("ConditionalType", GetType(String)) '23 Internal/External
+                                xDt.Columns.Add("ConditionalRule", GetType(String)) '24 Regla condicionante: OR, AND, NULL, STARTWITH,ENDWITH,EXCEPT, FIXED VALUE
+                                xDt.Columns.Add("ConditionalValue", GetType(String)) '25 Valor condicionante: Si el objeto condicionante es de otra hoja, que el valor exista en la otra hoja, o que se aplique las reglas de arriba: OR, STARTWITH, ENDWITH, CONTAINS,EXCEPT,FIXED
+                                xDt.Columns.Add("ConstructionRule", GetType(String)) '26 Valor
+                                xDt.Columns.Add("MatchingFields", GetType(String)) '27 Valor
+                                xDt.Columns.Add("ConditionalScope", GetType(String)) '28 Scope
+
+                                xDt.Columns.Add("CatalogModule", GetType(String)) '29 Catalog Module
+                                xDt.Columns.Add("CatMatchField", GetType(String)) '30 Catalog Match Field
+                                xDt.Columns.Add("CatMatchConditions", GetType(String)) '31 Catalog Match conditions
+
+                                xDt.PrimaryKey = iAveprim
+                                Continue For
+
+                            Case Else
+
+                                p1 = -1
+
+                                Dim ser As JObject = JObject.Parse(dino.Object.ToString)
+                                Dim datos As List(Of JToken) = ser.Children().ToList
+                                Dim doDatos As List(Of JToken)
+
+                                For Each item As JProperty In datos
+
+                                    Select Case item.Name
+                                        Case Is = "TableName"
+                                            miTab = item.Value.ToString
+                                            'Siempre noo!
+                                            'xSet.Tables(xSet.Tables.Count - 1).Rows.Add({item.Name & "#" & catitem.Name, item.Name, miTab, catitem.Name, "", "", 0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "None", "To Condition", "", "", ""})
+
+                                        Case Else
+
+                                            'xSet.Tables(xSet.Tables.Count - 1).Rows.Add({item.Name & "#" & catitem.Name, item.Name, "", catitem.Name, "", "", 0, ""})
+                                            xDt.Rows.Add({dino.Key & "#" & item.Name, dino.Key, "", item.Name, "", "", 0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "None", "To Condition", "", "", ""})
+
+                                            doDatos = item.Value.Children.ToList()
+
+                                            For Each prap As JProperty In doDatos
+
+                                                Select Case prap.Name
+                                                    Case Is = "Letter"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(7) = prap.Value.ToString()
+
+                                                    Case Is = "Name"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(4) = prap.Value.ToString()
+
+                                                    Case Is = "Position"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(6) = CInt(prap.Value.ToString())
+
+                                                    Case Is = "isKey"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(5) = prap.Value.ToString()
+
+                                                    Case Is = "MOC"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(8) = prap.Value.ToString()
+
+                                                    Case Is = "FillingRule"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(9) = prap.Value.ToString()
+
+                                                    Case Is = "DataType"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(10) = prap.Value.ToString()
+
+                                                    Case Is = "MaxChar"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(11) = prap.Value.ToString()
+
+                                                    Case Is = "ULCase"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(12) = prap.Value.ToString()
+
+                                                    Case Is = "Blanks"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(13) = prap.Value.ToString()
+
+                                                    Case Is = "CatalogCode"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(14) = prap.Value.ToString()
+
+                                                    Case Is = "CatalogName"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(15) = prap.Value.ToString()
+
+                                                    Case Is = "ValueColumn"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(16) = prap.Value.ToString()
+
+                                                    Case Is = "NonRep"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(17) = prap.Value.ToString()
+
+                                                    Case Is = "NonAllowedChars"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(18) = prap.Value.ToString()
+
+                                                    Case Is = "ConditionalPath"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(19) = prap.Value.ToString()
+
+                                                    Case Is = "ConditionalObject"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(20) = prap.Value.ToString()
+
+                                                    Case Is = "ConditionalTable"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(21) = prap.Value.ToString()
+
+                                                    Case Is = "ConditionalField"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(22) = prap.Value.ToString()
+
+                                                    Case Is = "ConditionalType"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(23) = prap.Value.ToString()
+
+                                                    Case Is = "ConditionalRule"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(24) = prap.Value.ToString()
+
+                                                    Case Is = "ConditionalValue"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(25) = prap.Value.ToString()
+
+                                                    Case Is = "Construction"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(26) = prap.Value.ToString()
+
+                                                    Case Is = "MatchingFields"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(27) = prap.Value.ToString()
+
+                                                    Case Is = "ConditionalScope"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(28) = prap.Value.ToString()
+
+                                                    Case Is = "CatalogModule"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(29) = prap.Value.ToString()
+
+                                                    Case Is = "CatMatchField"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(30) = prap.Value.ToString()
+
+                                                    Case Is = "CatMatchConditions"
+                                                        xDt.Rows(xDt.Rows.Count - 1).Item(31) = prap.Value.ToString()
+
+                                                End Select
+
+                                            Next
+
+                                            If p1 < 0 Then p1 = xDt.Rows.Count - 1
+
+                                    End Select
+
+                                Next
+
+                                If p1 < 0 Then Continue For
+
+                                For i = p1 To xDt.Rows.Count - 1
+                                    xDt.Rows(i).Item(2) = miTab
+                                Next
+
+                        End Select
+
+
+                    Next
+
+
+                Case Is = "otro"
+
+
+
+            End Select
+
+        Catch ex As Exception
+
+
+
+        End Try
+
+        'si no tiene tablas o renglones entonces NO existia!!, no hay bronca!!
+
+        Return xDt
+
+    End Function
+
 
 End Module
