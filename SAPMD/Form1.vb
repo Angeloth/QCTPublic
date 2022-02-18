@@ -5547,6 +5547,7 @@ Public Class Form1
                 Dim buskEst As String = ""
                 Dim valBus As String = ""
                 Dim valAjus As String = ""
+
                 'Dim enCuentra As DataRow
                 'Randomize()
                 'Dim value As Integer = CInt(Int((6 * Rnd()) + 1))
@@ -5581,6 +5582,9 @@ Public Class Form1
 
                 For i = 0 To DataGridView1.Rows.Count - 2
 
+                    Application.DoEvents()
+
+                    'System.Threading.Thread.Sleep(0)
                     DataGridView1.Rows(i).Tag = "NO OK"
                     'se pone en cero!
                     For j = 0 To DataGridView1.Columns.Count - 4
@@ -8327,5 +8331,15 @@ Public Class Form1
 
     End Function
 
+    Private Sub ToolStripButton21_Click(sender As Object, e As EventArgs) Handles ToolStripButton21.Click
 
+    End Sub
+
+    Private Sub ToolStripButton19_Click(sender As Object, e As EventArgs) Handles ToolStripButton19.Click
+
+    End Sub
+
+    Private Sub ToolStripButton20_Click(sender As Object, e As EventArgs) Handles ToolStripButton20.Click
+
+    End Sub
 End Class
