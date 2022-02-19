@@ -457,6 +457,18 @@
                         'cambió el  field code!
                         'aplica re-escritura!
                         'pathlabel que traiga hasta el nivel de la tabla
+                        'primero validamos que NO exista otro campo igual!
+                        Dim enCuentra As DataRow
+                        Dim miFdt As New DataTable
+                        miFdt = Await PullDtFireBase(pathLabel, "tempfields")
+
+                        enCuentra = miFdt.Rows.Find(niuField)
+
+                        If IsNothing(enCuentra) = False Then
+                            MsgBox("This field code already exists on another field!!, please try another one!!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
                         Dim mDt As New DataTable
                         mDt = Await PullDtFireBase(pathLabel & "/" & keyValue, "fieldunit")
 
