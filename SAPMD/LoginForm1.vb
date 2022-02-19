@@ -121,16 +121,14 @@ Public Class LoginForm1
 
         setUsuarios = Await PullUrlWs(setMix, "users")
 
-        xSource.Clear()
-
+        My.Settings.Reload()
         If IsNothing(My.Settings.xUsers) = True Then
             My.Settings.xUsers = New DataTable
-        End If
-
-        If My.Settings.xUsers.Columns.Count = 0 Then
+            My.Settings.xUsers.TableName = "Lista"
             AsignaYavePrimariaATabla(My.Settings.xUsers, "Usuarios", True)
         End If
 
+        xSource.Clear()
         For i = 0 To My.Settings.xUsers.Rows.Count - 1
             xSource.Add(My.Settings.xUsers.Rows(i).Item(0))
         Next
