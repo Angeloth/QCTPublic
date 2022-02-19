@@ -1,6 +1,8 @@
 Public Class LoginForm1
     Private setUsuarios As New DataSet
     Private setMix As New DataSet
+    Private xSource As New AutoCompleteStringCollection()
+
     ' TODO: Insert code to perform custom authentication using the provided username and password 
     ' (See https://go.microsoft.com/fwlink/?LinkId=35339).  
     ' The custom principal can then be attached to the current thread's principal as follows: 
@@ -81,6 +83,13 @@ Public Class LoginForm1
 
         End If
 
+
+        enCuentra = My.Settings.xUsers.Rows.Find(UsernameTextBox.Text)
+        If IsNothing(enCuentra) = True Then
+            My.Settings.xUsers.Rows.Add({UsernameTextBox.Text})
+            My.Settings.Save()
+        End If
+
         Form5.Show()
         Me.Close()
 
@@ -112,19 +121,31 @@ Public Class LoginForm1
 
         setUsuarios = Await PullUrlWs(setMix, "users")
 
+        xSource.Clear()
+
+        If IsNothing(My.Settings.xUsers) = True Then
+            My.Settings.xUsers = New DataTable
+        End If
+
+        If My.Settings.xUsers.Columns.Count = 0 Then
+            AsignaYavePrimariaATabla(My.Settings.xUsers, "Usuarios", True)
+        End If
+
+        For i = 0 To My.Settings.xUsers.Rows.Count - 1
+            xSource.Add(My.Settings.xUsers.Rows(i).Item(0))
+        Next
+
+        If xSource.Count = 0 Then Exit Sub
+
+        UsernameTextBox.AutoCompleteCustomSource = xSource
+        UsernameTextBox.AutoCompleteMode = AutoCompleteMode.Suggest
+        UsernameTextBox.AutoCompleteSource = AutoCompleteSource.CustomSource
+
     End Sub
 
     Private Async Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
 
-        'Dim laCade As String
-        'laCade = RaizFire
-        'laCade = laCade & "/" & "inuse"
-        'laCade = laCade & "/" & "catalogs"
-        'laCade = laCade & "/" & "md12"
-        'laCade = laCade & "/" & "md12-0001"
 
-        'Dim miDt As New DataSet
-        'miDt = Await PullDtFb(laCade, "inuse") 'que regresa!?
 
     End Sub
 End Class

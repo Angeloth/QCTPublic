@@ -241,6 +241,23 @@
                 TextBox2.Enabled = True
                 TextBox3.Enabled = True
 
+
+            Case Is = 8
+                Label1.Text = "Edit field " & keyValue
+                Label2.Text = "Path:"
+
+                TextBox1.Text = elCamino
+                TextBox1.Enabled = False
+
+                Label4.Text = "Field code:"
+                Label3.Text = "Field name:"
+                TextBox2.Text = keyValue
+                TextBox3.Text = tabValue
+
+                TextBox2.Enabled = True
+                TextBox3.Enabled = True
+
+
         End Select
 
         Me.CenterToScreen()
@@ -395,6 +412,74 @@
                 Await HazPutConPathRowsyCols(pathLabel & "/" & keyValue, Dt, -1)
 
                 Button1.Enabled = True
+
+
+            Case Is = 8
+                'lo mismo que el anterior, primero escribimos el nuevo y borramos el viejo!, no me grites!!
+                If TextBox2.Text = "" Or TextBox3.Text = "" Then
+                    MsgBox("All fields are required!!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                Dim niuField As String = ""
+
+                niuField = TextBox2.Text
+
+                RemoveInvalidChars(niuField, ".-,*/()""\{}+´´¿'?&%$#![]=")
+
+                niuField = niuField.ToUpper()
+
+                TextBox2.Text = niuField
+
+                If niuField.Length < 4 Then
+                    MsgBox("Field code must be greater equal than 4 characters long!, please fix!" & vbCrLf & "Invalid characters are automatically removed!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                If ContainsSpecialCharacters(niuField) = True Then
+                    MsgBox("Please remove special characters from Field Code field!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                If TextBox3.Text.Length < 4 Then
+                    MsgBox("Field name must be greater equal than 4 characters long!, please fix!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+
+                If niuField = keyValue And tabValue = TextBox3.Text Then
+                    'no hay cambios!
+                    MsgBox("No changes detected!!", vbInformation, TitBox)
+
+                Else
+                    'Si hay cambios
+                    If niuField <> keyValue Then
+                        'cambió el  field code!
+                        'aplica re-escritura!
+                        'pathlabel que traiga hasta el nivel de la tabla
+                        Dim mDt As New DataTable
+                        mDt = Await PullDtFireBase(pathLabel & "/" & keyValue, "fieldunit")
+
+                        Button1.Enabled = False
+
+                        Await HazPutConPathRowsyCols(pathLabel & "/" & niuField, mDt, -1)
+
+                        'por último borramos!
+                        Await HazDeleteEnFbSimple(pathLabel, keyValue)
+
+                        Button1.Enabled = True
+
+                    Else
+                        'solo cambió el Field name!
+                        Button1.Enabled = False
+                        Await HazPutEnFbSimple(pathLabel & "/" & keyValue, "Name", TextBox3.Text)
+                        Button1.Enabled = True
+                    End If
+
+                    MsgBox("Update done!", vbInformation, TitBox)
+
+                End If
+
 
         End Select
 

@@ -355,19 +355,12 @@
                 Case Is = "A - From Catalog"
                     'verificamos que el renglon tenga dato en el dataset!
                     If DataGridView1.Rows(i).Cells(2).Value = "" Or DataGridView1.Rows(i).Cells(2).Value = "None" Then
-                        MsgBox("Please make sure to set a catalog on row " & CStr(i), vbCritical, "QDT")
+                        MsgBox("Please make sure to set a catalog on row " & CStr(i), vbCritical, TitBox)
                         Exit Sub
                     End If
 
                     valorColumna = DataGridView1.Rows(i).Cells(2).Value
 
-                    'enCuentra = miCols.Tables(0).Rows.Find(DataGridView1.Rows(i).Cells(2).Value)
-                    'If IsNothing(enCuentra) = True Then
-                    '    MsgBox("The catalog name you provided on the Value column for row " & CStr(i + 1) & " doesn't exists!!, please verify!", vbCritical, "SAP MD")
-                    '    Exit Sub
-                    'End If
-                    'posiColumna = miCols.Tables(0).Rows.IndexOf(enCuentra)
-                    'valorColumna = miCols.Tables(0).Rows(posiColumna).Item(1)
 
 
                 Case Is = "B - Free Text"
@@ -380,7 +373,7 @@
                     If Integer.TryParse(CStr(DataGridView1.Rows(i).Cells(3).Value), unEntero1) = True Then
                         '
                     Else
-                        MsgBox("The max char length must of Running number rule must be integers!!, please check row:'" & CStr(i + 1), vbCritical, "SAPMD")
+                        MsgBox("The max char length must of Running number rule must be integers!!, please check row:'" & CStr(i + 1), vbCritical, TitBox)
                         Exit Sub
                     End If
 
@@ -427,14 +420,14 @@
                     'ok
                     miLimit = miLimit + CInt(laDer)
                 Else
-                    MsgBox("The left an right part of the max Char Length must be integers!!, please check row:'" & CStr(i + 1), vbCritical, "SAPMD")
+                    MsgBox("The left an right part of the max Char Length must be integers!!, please check row:'" & CStr(i + 1), vbCritical, TitBox)
                     Exit Sub
                 End If
 
             Else
 
                 If IsNumeric(DataGridView1.Rows(i).Cells(3).Value) = False Then
-                    MsgBox("The max char length must be integers!!, please check row:'" & CStr(i + 1), vbCritical, "SAPMD")
+                    MsgBox("The max char length must be integers!!, please check row:'" & CStr(i + 1), vbCritical, TitBox)
                     Exit Sub
                 End If
 

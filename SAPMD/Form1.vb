@@ -2390,12 +2390,12 @@ Public Class Form1
         'Add Node
 
         If CategSelected = 0 Then
-            MsgBox("Please select a category first!", vbCritical, "DQCT")
+            MsgBox("Please select a category first!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If CategSelected = 3 Then
-            MsgBox("Sorry you can't add nodes to this category", vbCritical, "DQCT")
+            MsgBox("Sorry you can't add nodes to this category", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -2450,7 +2450,7 @@ Public Class Form1
                     Dim enCuentra As DataRow
                     enCuentra = ModuPermit.Tables(0).Rows.Find(moduCode.ToUpper())
                     If IsNothing(enCuentra) = True Then
-                        MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "DQCT")
+                        MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, TitBox)
                         Exit Sub
                     End If
 
@@ -2558,7 +2558,7 @@ Public Class Form1
                         catDs.Tables(catDs.Tables.Count - 1).ExtendedProperties.Add("ModuleName", "Undefined")
 
                     Else
-                        MsgBox(unRetorno, vbCritical, "DQCT")
+                        MsgBox(unRetorno, vbCritical, TitBox)
 
                     End If
 
@@ -2567,7 +2567,7 @@ Public Class Form1
 
                 Else
                     'error!!
-                    MsgBox("Please select a node to add the catalog on the corresponding structure!", vbCritical, "DQCT")
+                    MsgBox("Please select a node to add the catalog on the corresponding structure!", vbCritical, TitBox)
 
                 End If
 
@@ -2753,7 +2753,7 @@ Public Class Form1
 
                 If IsNothing(elNode) = True Then
                     'error!!
-                    MsgBox("Please select a node to add the template on the corresponding structure!", vbCritical, "DQCT")
+                    MsgBox("Please select a node to add the template on the corresponding structure!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -2790,7 +2790,7 @@ Public Class Form1
 
                         Posi = TreeView1.Nodes(0).Nodes.IndexOfKey(Form2.keyValue)
                         If Posi >= 0 Then
-                            MsgBox("That template code already exists!!, please choose another name!!", vbCritical, "DQCT")
+                            MsgBox("That template code already exists!!, please choose another name!!", vbCritical, TitBox)
                             Exit Sub
                         End If
 
@@ -2820,7 +2820,7 @@ Public Class Form1
                         Dim enCuentra As DataRow
                         enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(xObj(1)).ToUpper())
                         If IsNothing(enCuentra) = True Then
-                            MsgBox("Sorry you are not allowed to make changes on this template", vbCritical, "DQCT")
+                            MsgBox("Sorry you are not allowed to make changes on this template", vbCritical, TitBox)
                             Exit Sub
                         End If
 
@@ -2955,7 +2955,7 @@ Public Class Form1
                 Next
 
                 If Posi < 0 Then
-                    MsgBox("Unable reload node!", vbCritical, "DQCT")
+                    MsgBox("Unable reload node!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -3020,7 +3020,7 @@ Public Class Form1
                 Next
 
                 If Posi < 0 Then
-                    MsgBox("Unable reload node!", vbCritical, "DQCT")
+                    MsgBox("Unable reload node!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -3076,11 +3076,6 @@ Public Class Form1
             Exit Sub
         End If
 
-        'If CategSelected = 3 Then
-        'MsgBox("Sorry you can't delete nodes to this category", vbCritical, "SAP MD")
-        'Exit Sub
-        'End If
-
         Dim xObj As Object
         Dim nodYav As String = ""
         Dim nodText As String = ""
@@ -3109,14 +3104,14 @@ Public Class Form1
                     xObj = Split(elNode.FullPath, "\")
 
                     If xObj.Length = 1 Then
-                        MsgBox("Please select a node on the second level to delete!", vbCritical, "DQCT")
+                        MsgBox("Please select a node on the second level to delete!", vbCritical, TitBox)
                         Exit Sub
                     Else
 
                         Dim enCuentra As DataRow
                         enCuentra = ModuPermit.Tables(0).Rows.Find(elNode.Parent.Name.ToUpper())
                         If IsNothing(enCuentra) = True Then
-                            MsgBox("Sorry you are not allowed to add or delete on the selected module", vbCritical, "DQCT")
+                            MsgBox("Sorry you are not allowed to add or delete on the selected module", vbCritical, TitBox)
                             Exit Sub
                         End If
 
@@ -3172,12 +3167,12 @@ Public Class Form1
                         elNode.Remove()
                         elNode = Nothing
                         'eliminamos el
-                        MsgBox(elRet, vbInformation, "DQCT")
+                        MsgBox(elRet, vbInformation, TitBox)
 
                     End If
 
                 Else
-                    MsgBox("Please select a node to delete on the corresponding structure!", vbCritical, "DQCT")
+                    MsgBox("Please select a node to delete on the corresponding structure!", vbCritical, TitBox)
                 End If
 
 
@@ -3187,7 +3182,7 @@ Public Class Form1
 
                 If xObj.Length < 4 Then
                     'error!
-                    MsgBox("Please select a field node!!", vbCritical, "DQCT")
+                    MsgBox("Please select a field node!!", vbCritical, TitBox)
                     Exit Sub
                 Else
 
@@ -3235,7 +3230,7 @@ Public Class Form1
                             Dim enCuentra As DataRow
                             enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(moduSel(2)).ToUpper())
                             If IsNothing(enCuentra) = True Then
-                                MsgBox("Sorry you are not allowed to add or delete on the selected module", vbCritical, "DQCT")
+                                MsgBox("Sorry you are not allowed to add or delete on the selected module", vbCritical, TitBox)
                                 Exit Sub
                             End If
 
@@ -3248,7 +3243,7 @@ Public Class Form1
                         Exit Sub
                     End If
 
-                    x = MsgBox("ATTENTION!" & vbCrLf & "Are you sure you want to delete the dependencie of the field: " & campoCode & " / " & campoNombre & " of the table " & tablaFind & " / " & tabName & " of the object " & objCode & " / " & objName & ", of the conditional object: " & vbCrLf & cadCon & vbCrLf & "This action can-not be undone!." & vbCrLf & " Records already set could be affected. Are you sure?", vbExclamation + vbYesNo, "DQCT")
+                    x = MsgBox("ATTENTION!" & vbCrLf & "Are you sure you want to delete the dependencie of the field: " & campoCode & " / " & campoNombre & " of the table " & tablaFind & " / " & tabName & " of the object " & objCode & " / " & objName & ", of the conditional object: " & vbCrLf & cadCon & vbCrLf & "This action can-not be undone!." & vbCrLf & " Records already set could be affected. Are you sure?", vbExclamation + vbYesNo, TitBox)
 
                     If x <> 6 Then Exit Sub
 
@@ -3272,9 +3267,9 @@ Public Class Form1
                         elNode = Nothing
                         'eliminamos el
                         NodoNameActual = ""
-                        MsgBox("Dependencie deleted!", vbInformation, "DQCT")
+                        MsgBox("Dependencie deleted!", vbInformation, TitBox)
                     Else
-                        MsgBox(elRet, vbCritical, "DQCT")
+                        MsgBox(elRet, vbCritical, TitBox)
                     End If
 
 
@@ -3286,7 +3281,7 @@ Public Class Form1
                 'Esto NO se puede, no se pueden eliminar registros!!, ó simplemente eliminar todos a nivel records!
                 xObj = Split(elNode.FullPath, "\")
                 If xObj.Length < 4 Then
-                    MsgBox("Please select a table node!!", vbCritical, "DQCT")
+                    MsgBox("Please select a table node!!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -3305,7 +3300,7 @@ Public Class Form1
                         Dim enCuentra As DataRow
                         enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(moduSel(2)).ToUpper())
                         If IsNothing(enCuentra) = True Then
-                            MsgBox("Sorry you are not allowed to add or delete on the selected module", vbCritical, "DQCT")
+                            MsgBox("Sorry you are not allowed to add or delete on the selected module", vbCritical, TitBox)
                             Exit Sub
                         End If
 
@@ -3318,7 +3313,7 @@ Public Class Form1
                     Exit Sub
                 End If
 
-                x = MsgBox("ATTENTION!!" & vbCrLf & "Are you sure you want to delete the full records of the table " & campoCode & " / " & campoNombre & " of the object " & objCode & " / " & objName & " of the company " & tablaFind & " / " & tabName & " ??" & vbCrLf & "This action can not be undone!!" & vbCrLf & "Are you sure?", vbExclamation + vbYesNo, "DQCT")
+                x = MsgBox("ATTENTION!!" & vbCrLf & "Are you sure you want to delete the full records of the table " & campoCode & " / " & campoNombre & " of the object " & objCode & " / " & objName & " of the company " & tablaFind & " / " & tabName & " ??" & vbCrLf & "This action can not be undone!!" & vbCrLf & "Are you sure?", vbExclamation + vbYesNo, TitBox)
 
                 If x <> 6 Then Exit Sub
 
@@ -3337,10 +3332,10 @@ Public Class Form1
                     DataGridView1.Rows.Clear()
                     DataGridView1.Columns.Clear()
 
-                    MsgBox("Records gone!!", vbInformation, "DQCT")
+                    MsgBox("Records gone!!", vbInformation, TitBox)
 
                 Else
-                    MsgBox("Error deleting: " & vbCrLf & elRet, vbCritical, "DQCT")
+                    MsgBox("Error deleting: " & vbCrLf & elRet, vbCritical, TitBox)
                 End If
 
             Case Is = 4
@@ -3349,7 +3344,7 @@ Public Class Form1
                 xObj = Split(elNode.FullPath, "\")
 
                 If xObj.Length < 3 Then
-                    MsgBox("Please select a table node!!", vbCritical, "DQCT")
+                    MsgBox("Please select a table node!!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -3442,7 +3437,7 @@ Public Class Form1
 
             Select Case CategSelected
                 Case Is = 0
-                    MsgBox("Please select a category first!", vbCritical, "DQCT")
+                    MsgBox("Please select a category first!", vbCritical, TitBox)
 
                 Case Is = 1
                     Dim rowLines As String() = Clipboard.GetText(TextDataFormat.Text).Split(New String(0) {vbCr & vbLf}, StringSplitOptions.None)
@@ -3453,12 +3448,12 @@ Public Class Form1
                     Dim colAs As String() = rowLines(0).Split(New String(0) {vbTab}, StringSplitOptions.None)
 
                     If currentColumnIndex <> 0 Then
-                        MsgBox("Please paste EXACTLY " & catDs.Tables(cataNombre).Columns.Count - 2 & " columns starting from the first column at the left!", vbCritical, "DQCT")
+                        MsgBox("Please paste EXACTLY " & catDs.Tables(cataNombre).Columns.Count - 2 & " columns starting from the first column at the left!", vbCritical, TitBox)
                         Exit Sub
                     End If
 
                     If colAs.Length > catDs.Tables(cataNombre).Columns.Count - 2 Then
-                        MsgBox("Please paste EXACTLY " & catDs.Tables(cataNombre).Columns.Count - 2 & " columns starting from the first column at the left!", vbCritical, "DQCT")
+                        MsgBox("Please paste EXACTLY " & catDs.Tables(cataNombre).Columns.Count - 2 & " columns starting from the first column at the left!", vbCritical, TitBox)
                         Exit Sub
                     End If
 
@@ -3523,12 +3518,12 @@ Public Class Form1
                     Dim colAs As String() = rowLines(0).Split(New String(0) {vbTab}, StringSplitOptions.None)
 
                     If currentColumnIndex <> 0 Then
-                        MsgBox("Please paste only 5 columns data starting from 'Table Code' column", vbCritical, "DQCT")
+                        MsgBox("Please paste only 5 columns data starting from 'Table Code' column", vbCritical, TitBox)
                         Exit Sub
                     End If
 
                     If colAs.Length > DataGridView1.Columns.Count - 3 Then
-                        MsgBox("Please paste exact " & DataGridView1.Columns.Count - 3 & " columns data starting on the first column", vbCritical, "DQCT")
+                        MsgBox("Please paste exact " & DataGridView1.Columns.Count - 3 & " columns data starting on the first column", vbCritical, TitBox)
                         Exit Sub
                     End If
 
@@ -3582,12 +3577,12 @@ Public Class Form1
                     Dim colAs As String() = rowLines(0).Split(New String(0) {vbTab}, StringSplitOptions.None)
 
                     If currentColumnIndex <> 0 Then
-                        MsgBox("Please paste only 5 columns data starting on 'Table Code' column", vbCritical, "DQCT")
+                        MsgBox("Please paste only 5 columns data starting on 'Table Code' column", vbCritical, TitBox)
                         Exit Sub
                     End If
 
                     If colAs.Length > 2 Then
-                        MsgBox("Please paste only 2 columns data starting on 'Table Code' column", vbCritical, "DQCT")
+                        MsgBox("Please paste only 2 columns data starting on 'Table Code' column", vbCritical, TitBox)
                         Exit Sub
                     End If
 
@@ -3648,17 +3643,17 @@ Public Class Form1
     Private Async Sub ToolStripButton8_Click(sender As Object, e As EventArgs) Handles ToolStripButton8.Click
 
         If CategSelected = 0 Then
-            MsgBox("Please select a category first!!", vbCritical, "DQCT")
+            MsgBox("Please select a category first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If NodoNameActual = "" Then
-            MsgBox("Please select a catalog to update first!!", vbCritical, "DQCT")
+            MsgBox("Please select a catalog to update first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If IsNothing(elNode) = True Then
-            MsgBox("No node detected!", vbCritical, "DQCT")
+            MsgBox("No node detected!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -3688,14 +3683,14 @@ Public Class Form1
 
                 If xObj.Length = 1 Then
                     'seleccionó el nodo principal, nada que agregar!
-                    MsgBox("Please select a catalog to update first!", vbCritical, "DQCT")
+                    MsgBox("Please select a catalog to update first!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
                 'Dim enCuentra As DataRow
                 encuentra = ModuPermit.Tables(0).Rows.Find(elNode.Parent.Name.ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to make changes on the selected module", vbCritical, "DQCT")
+                    MsgBox("Sorry you are not allowed to make changes on the selected module", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -3744,7 +3739,7 @@ Public Class Form1
                 DataGridView1.AllowUserToDeleteRows = False
 
                 If DataGridView1.Rows.Count = 0 Then
-                    MsgBox("Sorry, there must be at least one record per catalog, if you want to delete the whole table please select the node and click on 'Delete node' button!", vbCritical, "DQCT")
+                    MsgBox("Sorry, there must be at least one record per catalog, if you want to delete the whole table please select the node and click on 'Delete node' button!", vbCritical, TitBox)
                     DataGridView1.AllowUserToAddRows = True
                     DataGridView1.AllowUserToDeleteRows = True
                     Exit Sub
@@ -3811,13 +3806,13 @@ Public Class Form1
                     ToolStripLabel1.Visible = False
                     ToolStripLabel1.Text = "Ready"
 
-                    MsgBox("Update complete!", vbInformation, "DQCT")
+                    MsgBox("Update complete!", vbInformation, TitBox)
 
                     unReg = Await CargaOpcion(CategSelected)
 
                 Else
 
-                    MsgBox("No changes detected!", vbInformation, "DQCT")
+                    MsgBox("No changes detected!", vbInformation, TitBox)
 
                 End If
 
@@ -3831,7 +3826,7 @@ Public Class Form1
                 xObj = Split(elNode.FullPath, "\")
                 If xObj.Length = 1 Or xObj.Length = 2 Then
                     'seleccionó el nodo principal, nada que agregar!
-                    MsgBox("Please select a dependecie table to update first!", vbCritical, "DQCT")
+                    MsgBox("Please select a dependecie table to update first!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -3849,7 +3844,7 @@ Public Class Form1
 
                 If xObj.Length = 1 Or xObj.Length = 2 Then
                     'seleccionó el nodo principal, nada que agregar!
-                    MsgBox("Please select first a template to update!", vbCritical, "DQCT")
+                    MsgBox("Please select first a template to update!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -3895,7 +3890,7 @@ Public Class Form1
                 'Dim enCuentra As DataRow
                 encuentra = ModuPermit.Tables(0).Rows.Find(CStr(moduSel(1)).ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to make changes on the selected template", vbCritical, "DQCT")
+                    MsgBox("Sorry you are not allowed to make changes on the selected template", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -3970,7 +3965,7 @@ Public Class Form1
         If CategSelected <> 3 Then Exit Sub
         'bajar info de firebase
         If IsNothing(elNode) = True Then
-            MsgBox("Please select a valid node!", vbCritical, "DQCT")
+            MsgBox("Please select a valid node!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -3978,7 +3973,7 @@ Public Class Form1
         xObj = Split(elNode.FullPath, "\")
 
         If xObj.Length < 4 Then
-            MsgBox("Please select a node at a table level!", vbCritical, "DQCT")
+            MsgBox("Please select a node at a table level!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -4045,7 +4040,7 @@ Public Class Form1
             'Next
 
         Else
-            MsgBox("No records found for this object!!", vbInformation, "DQCT")
+            MsgBox("No records found for this object!!", vbInformation, TitBox)
         End If
 
         DataGridView1.RowHeadersWidth = 70
@@ -4065,7 +4060,7 @@ Public Class Form1
         If CategSelected <> 3 And CategSelected <> 1 Then Exit Sub
 
         If IsNothing(elNode) = True Then
-            MsgBox("Please select a valid node!", vbCritical, "DQCT")
+            MsgBox("Please select a valid node!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -4104,13 +4099,13 @@ Public Class Form1
                 'moduloSelek
 
                 If xObj.Length < 4 Then
-                    MsgBox("Please select a node at a table level!", vbCritical, "QCT")
+                    MsgBox("Please select a node at a table level!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
                 enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to import record to the selected module!!", vbCritical, "QCT")
+                    MsgBox("Sorry you are not allowed to import record to the selected module!!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -4213,7 +4208,7 @@ Public Class Form1
                 Dim enCuentra As DataRow
                 enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(yObj(2)).ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to make changes on the selected template", vbCritical, "DQCT")
+                    MsgBox("Sorry you are not allowed to make changes on the selected template", vbCritical, TitBox)
                     Exit Sub
                 End If
                 Exit For
@@ -4464,7 +4459,7 @@ Public Class Form1
                 Dim enCuentra As DataRow
                 enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(xObj(0)).ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "DQCT")
+                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -4497,7 +4492,7 @@ Public Class Form1
                 elRegreso = Await HazPutEnFbSimple(cadeFb, "CatalogName", Form2.tabValue)
 
                 If elRegreso = "Ok" Then
-                    MsgBox("Information updated!!", vbInformation, "DQCT")
+                    MsgBox("Information updated!!", vbInformation, TitBox)
                     elNode.Text = Form2.tabValue
                     Await CargaOpcion(1)
                 End If
@@ -4593,7 +4588,7 @@ Public Class Form1
                 elRegreso = Await HazPutEnFbSimple(cadeFb, camiOpcion, Form2.tabValue)
 
                 If elRegreso = "Ok" Then
-                    MsgBox("Information updated!!", vbInformation, "DQCT")
+                    MsgBox("Information updated!!", vbInformation, TitBox)
                     elNode.Text = elNode.Name & " / " & Form2.tabValue
                     Select Case xObj.Length
                         Case Is = 2
@@ -4853,7 +4848,7 @@ Public Class Form1
 
                             Case Is = "Decimal"
                                 If cadeX.Contains(".") = False Then
-                                    MsgBox("This is a decimal field, you should put a integer and decimal part for the number in this format> Example: '10.3'", vbCritical, "SAP MD")
+                                    MsgBox("This is a decimal field, you should put a integer and decimal part for the number in this format> Example: '10.3'", vbCritical, TitBox)
                                     DataGridView1.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = "15.2"
                                     Exit Sub
                                 End If
@@ -4864,7 +4859,7 @@ Public Class Form1
 
                             Case Is = "Time"
                                 If cadeX.Contains(".") = True Then
-                                    MsgBox("Only integers allowed!!!", vbCritical, "DQCT")
+                                    MsgBox("Only integers allowed!!!", vbCritical, TitBox)
                                     DataGridView1.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = ""
                                     Exit Sub
                                 End If
@@ -5212,7 +5207,7 @@ Public Class Form1
                             'que tome el tag y que muestre la info en un box?
                             'ok 
                             If DataGridView1.Rows(e.RowIndex).Cells(4).Value <> "A - From Catalog" Then
-                                MsgBox("Please select filling rule 'A - From Catalog' for setting this rule", vbCritical, "DQCT")
+                                MsgBox("Please select filling rule 'A - From Catalog' for setting this rule", vbCritical, TitBox)
                                 Exit Sub
                             End If
 
@@ -7382,8 +7377,7 @@ Public Class Form1
                 xObj = Split(elNode.FullPath, "\")
 
                 If xObj.Length = 1 Or xObj.Length = 2 Then
-                    'seleccionó el nodo principal, nada que agregar!
-                    'MsgBox("Please select first a template to update!", vbCritical, "SAP MD")
+
                     Exit Sub
                 End If
 
@@ -7429,7 +7423,6 @@ Public Class Form1
                 Dim enCuentra As DataRow
                 enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(moduSel(1)).ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    'MsgBox("Sorry you are not allowed to make changes on the selected template", vbCritical, "SAP MD")
                     Exit Sub
                 End If
 
@@ -7491,7 +7484,7 @@ Public Class Form1
                 Dim enCuentra As DataRow
                 enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "DQCT")
+                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -7593,7 +7586,7 @@ Public Class Form1
         Dim enCuentra As DataRow
         enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
         If IsNothing(enCuentra) = True Then
-            MsgBox("Sorry you are not allowed to add/change table relations to the selected module", vbCritical, "DQCT")
+            MsgBox("Sorry you are not allowed to add/change table relations to the selected module", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -7787,7 +7780,7 @@ Public Class Form1
 
 
                 If puSSyCat < 0 Then
-                    MsgBox("Please select a catalog first!!", vbCritical, "DQCT")
+                    MsgBox("Please select a catalog first!!", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -7796,7 +7789,7 @@ Public Class Form1
                 Dim enCuentra As DataRow
                 enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(catDs.Tables(cataNombre).ExtendedProperties.Item("ModuleCode")).ToUpper())
                 If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, "DQCT")
+                    MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, TitBox)
                     Exit Sub
                 End If
 
@@ -7960,7 +7953,7 @@ Public Class Form1
 
     Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
         If ToolStripTextBox1.Text = "" Then
-            MsgBox("Please type some info to search", vbCritical, "SAP Master Data")
+            MsgBox("Please type some info to search", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -7988,7 +7981,7 @@ Public Class Form1
 
 
         If euReka = False Then
-            MsgBox("Node not found!!", vbCritical, "SAP Master Data")
+            MsgBox("Node not found!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -8114,6 +8107,16 @@ Public Class Form1
                 enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
                 If IsNothing(enCuentra) = True Then
                     MsgBox("Sorry you are not allowed to delete fields on the selected template", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                If PussyTemp < 0 Then
+                    MsgBox("Please select a table first!!", vbExclamation, TitBox)
+                    Exit Sub
+                End If
+
+                If objetoSelek = "" Or tableSelek = "" Then
+                    MsgBox("Please select a table first!!", vbExclamation, TitBox)
                     Exit Sub
                 End If
 
@@ -8343,6 +8346,21 @@ Public Class Form1
 
         If ToolStripComboBox1.SelectedIndex <> 4 Then Exit Sub
 
+        If PussyTemp < 0 Then
+            MsgBox("Please select a table first!!", vbExclamation, TitBox)
+            Exit Sub
+        End If
+
+        If objetoSelek = "" Or tableSelek = "" Then
+            MsgBox("Please select a table first!!", vbExclamation, TitBox)
+            Exit Sub
+        End If
+
+        If puedoEditar = False Then
+            MsgBox("Sorry you are not allowed to edit this template at this time!, please try again later!", vbExclamation, TitBox)
+            Exit Sub
+        End If
+
         Await SigoVivo()
         Module5.AgregaTiempo()
 
@@ -8404,6 +8422,8 @@ Public Class Form1
             xRow.Cells(i).Value = DataGridView1.Rows(posXold).Cells(i).Value
         Next
 
+        estoyAgregandoRows = True
+
         DataGridView1.Rows.InsertRange(posXold + 2, xRow)
         DataGridView1.Rows.RemoveAt(posXold)
 
@@ -8427,7 +8447,11 @@ Public Class Form1
 
         Await HazPutEnFireBasePathYColumnas(elCamino, xDt, 0)
 
+        DataGridView1.CurrentCell = DataGridView1.Rows(posXold).Cells(0)
 
+        rowEstaba = posXold
+
+        estoyAgregandoRows = False
 
     End Sub
 
@@ -8452,6 +8476,8 @@ Public Class Form1
             xRow.Cells(i).Value = DataGridView1.Rows(posXold).Cells(i).Value
         Next
 
+        estoyAgregandoRows = True
+
         DataGridView1.Rows.InsertRange(posXold - 1, xRow)
 
         DataGridView1.Rows.RemoveAt(posXold + 1)
@@ -8475,6 +8501,68 @@ Public Class Form1
         elCamino = elCamino & "/" & tableSelek
 
         Await HazPutEnFireBasePathYColumnas(elCamino, xDt, 0)
+
+        DataGridView1.CurrentCell = DataGridView1.Rows(posXold - 1).Cells(0)
+
+        rowEstaba = posXold - 1
+
+        estoyAgregandoRows = False
+
+
+    End Sub
+
+    Private Sub ToolStripButton22_Click(sender As Object, e As EventArgs) Handles ToolStripButton22.Click
+
+        If ToolStripComboBox1.SelectedIndex <> 4 Then Exit Sub
+
+        If PussyTemp < 0 Then
+            MsgBox("Please select a table first!!", vbExclamation, TitBox)
+            Exit Sub
+        End If
+
+        If objetoSelek = "" Or tableSelek = "" Then
+            MsgBox("Please select a table first!!", vbExclamation, TitBox)
+            Exit Sub
+        End If
+
+        If puedoEditar = False Then
+            MsgBox("Sorry you are not allowed to edit this template at this time!, please try again later!", vbExclamation, TitBox)
+            Exit Sub
+        End If
+
+        If DataGridView1.CurrentCell.RowIndex < 0 Then Exit Sub
+
+        If IsNothing(DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value) = True Then
+            MsgBox("Please define a field code first!", vbCritical, TitBox)
+            Exit Sub
+        End If
+
+        If DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value = "" Then
+            MsgBox("Please define a field code first!", vbCritical, TitBox)
+            Exit Sub
+        End If
+
+        'Editar el campo, Solo puede 
+        Dim elPa As String = ""
+        elPa = RaizFire
+        elPa = elPa & "/" & "templates"
+        elPa = elPa & "/" & objetoSelek
+        elPa = elPa & "/" & tableSelek
+
+        Form2.pathLabel = elPa
+        Form2.elCamino = "templates/" & objetoSelek & "/" & tableSelek
+        Form2.keyValue = DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value
+        Form2.tabValue = DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(1).Value
+        Form2.queOpcion = 8
+        Form2.huboExito = False
+
+        Form2.ShowDialog()
+
+        If Form2.huboExito = False Then Exit Sub
+
+        DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value = Form2.keyValue
+        DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(1).Value = Form2.tabValue
+
 
     End Sub
 End Class

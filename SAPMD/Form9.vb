@@ -184,22 +184,22 @@
             'validamos que haya algo en la columnas de los códigos!
 
             If IsNothing(DataGridView1.Rows(i).Cells(1).Value) = True Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the 'Child Field Code', please fill it accordingly!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " is missing the 'Child Field Code', please fill it accordingly!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
             If IsNothing(DataGridView1.Rows(i).Cells(3).Value) = True Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the 'Parent Field Code', please fill it accordingly!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " is missing the 'Parent Field Code', please fill it accordingly!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
             If DataGridView1.Rows(i).Cells(1).Value = "" Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the 'Child Field Code', please fill it accordingly!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " is missing the 'Child Field Code', please fill it accordingly!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
             If DataGridView1.Rows(i).Cells(3).Value = "" Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the 'Parent Field Code', please fill it accordingly!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " is missing the 'Parent Field Code', please fill it accordingly!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -207,13 +207,13 @@
 
             enCuentra = TablaHijos.Rows.Find(CStr(DataGridView1.Rows(i).Cells(1).Value))
             If IsNothing(enCuentra) = True Then
-                MsgBox("The row " & CStr(i + 1) & " does not contain a valid Child Field Code, please verify!!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " does not contain a valid Child Field Code, please verify!!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
             enCuentra = TablaPapas.Rows.Find(CStr(DataGridView1.Rows(i).Cells(3).Value))
             If IsNothing(enCuentra) = True Then
-                MsgBox("The row " & CStr(i + 1) & " does not contain a valid Parent Field Code, please verify!!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " does not contain a valid Parent Field Code, please verify!!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -223,7 +223,7 @@
                 xTab.Rows.Add({CStr(DataGridView1.Rows(i).Cells(1).Value)})
             Else
                 z = xTab.Rows.IndexOf(enCuentra)
-                MsgBox("The row " & CStr(i + 1) & " has a duplicate record of the Child Field Code on the row: " & CStr(z + 1) & ", please verify!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " has a duplicate record of the Child Field Code on the row: " & CStr(z + 1) & ", please verify!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -231,7 +231,7 @@
             If IsNothing(enCuentra) = True Then
                 yTab.Rows.Add({CStr(DataGridView1.Rows(i).Cells(3).Value)})
             Else
-                MsgBox("The row " & CStr(i + 1) & " has a duplicate record of the Parent Field Code on the row " & CStr(z + 1) & ", please verify!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " has a duplicate record of the Parent Field Code on the row " & CStr(z + 1) & ", please verify!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -261,12 +261,12 @@
 
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
         If IsNothing(DataGridView1.CurrentCell) = True Then
-            MsgBox("Please select a row first!!", vbCritical, "DQCT")
+            MsgBox("Please select a row first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If DataGridView1.CurrentCell.RowIndex < 0 Then
-            MsgBox("Please select a row first!!", vbCritical, "DQCT")
+            MsgBox("Please select a row first!!", vbCritical, TitBox)
             Exit Sub
         End If
 

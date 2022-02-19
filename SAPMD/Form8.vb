@@ -645,12 +645,12 @@
         'add new rule!
 
         If ToolStripComboBox1.SelectedIndex < 0 Then
-            MsgBox("Please select a child table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a child table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If tableSelekted = "" Then
-            MsgBox("Please select a child table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a child table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -659,23 +659,23 @@
         niuRul = InputBox("New relation for " & tableSelekted, "Please type the name of this new relation", "")
 
         If niuRul = "" Then
-            MsgBox("Please type a name for this new rule!!", vbCritical, "DQCT")
+            MsgBox("Please type a name for this new rule!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If niuRul.Length <= 4 Then
-            MsgBox("Please type name longer than 4 characters!!", vbCritical, "DQCT")
+            MsgBox("Please type name longer than 4 characters!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If niuRul.Contains(".") = True Then
-            MsgBox("The rule name must NOT contain special characters, please type another one!", vbCritical, "DQCT")
+            MsgBox("The rule name must NOT contain special characters, please type another one!", vbCritical, TitBox)
             Exit Sub
         End If
 
         'verificar que NO exista previamente el mismo nombre de esta tabla
         If ListView1.Items.IndexOfKey(niuRul) >= 0 Then
-            MsgBox("This name for this relation already exists!!, please type another one!", vbCritical, "DQCT")
+            MsgBox("This name for this relation already exists!!, please type another one!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -703,7 +703,7 @@
 
         Call ReCargaListaDeListView(tableSelekted)
 
-        MsgBox(resP, vbInformation, "DQCT")
+        MsgBox(resP, vbInformation, TitBox)
     End Sub
 
 
@@ -725,19 +725,19 @@
     Private Async Sub ToolStripButton6_Click(sender As Object, e As EventArgs) Handles ToolStripButton6.Click
 
         If reglaSelekted = "" Then
-            MsgBox("Please select a relation key first!!", vbCritical, "DQCT")
+            MsgBox("Please select a relation key first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
 
         If ToolStripComboBox2.SelectedIndex = 0 Then
-            MsgBox("Please select a parent table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a parent table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         'If ToolStripComboBox2.selectedindex0
         If parentTable = "" Then
-            MsgBox("Please select a parent table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a parent table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -767,7 +767,7 @@
             'ToolStripComboBox2.SelectedItem = CStr(parentTable)
 
         Else
-            MsgBox(laResp, vbCritical, "DQCT")
+            MsgBox(laResp, vbCritical, TitBox)
         End If
 
     End Sub
@@ -775,29 +775,29 @@
     Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
 
         If reglaSelekted = "" Then
-            MsgBox("Please select a relation key first!!", vbCritical, "DQCT")
+            MsgBox("Please select a relation key first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
 
         If ToolStripComboBox2.SelectedIndex = 0 Then
-            MsgBox("Please select a parent table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a parent table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         'If ToolStripComboBox2.selectedindex0
         If parentTable = "" Then
-            MsgBox("Please select a parent table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a parent table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If IsNothing(DataGridView1.CurrentCell) = True Then
-            MsgBox("Please select a row first!!", vbCritical, "DQCT")
+            MsgBox("Please select a row first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If DataGridView1.CurrentCell.RowIndex < 0 Then
-            MsgBox("Please select a row first!!", vbCritical, "DQCT")
+            MsgBox("Please select a row first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -812,22 +812,22 @@
     Private Async Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
 
         If ToolStripComboBox1.SelectedIndex < 0 Then
-            MsgBox("Please select a child table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a child table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If tableSelekted = "" Then
-            MsgBox("Please select a child table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a child table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If reglaSelekted = "" Then
-            MsgBox("Please select a relation rule first!!", vbCritical, "DQCT")
+            MsgBox("Please select a relation rule first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         Dim x As Integer = 0
-        x = MsgBox("ATTENTION!" & vbCrLf & "Are you sure you want to delete this rule relationship?, this action can not be undone!!", vbExclamation + vbYesNo, "DQCT")
+        x = MsgBox("ATTENTION!" & vbCrLf & "Are you sure you want to delete this rule relationship?, this action can not be undone!!", vbExclamation + vbYesNo, TitBox)
 
         If x <> 6 Then Exit Sub
 
@@ -865,10 +865,10 @@
 
             ToolStripLabel2.Text = "No parent selected"
 
-            MsgBox("Rule gone!", vbInformation, "DQCT")
+            MsgBox("Rule gone!", vbInformation, TitBox)
 
         Else
-            MsgBox(laResp, vbInformation, "DQCT")
+            MsgBox(laResp, vbInformation, TitBox)
         End If
 
     End Sub
@@ -877,22 +877,22 @@
 
         'validar los campos!!
         If tableSelekted = "" Then
-            MsgBox("Please select a child table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a child table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If reglaSelekted = "" Then
-            MsgBox("Please select a rule first!!", vbCritical, "DQCT")
+            MsgBox("Please select a rule first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If parentTable = "" Then
-            MsgBox("Please select a parent table first!!", vbCritical, "DQCT")
+            MsgBox("Please select a parent table first!!", vbCritical, TitBox)
             Exit Sub
         End If
 
         If DataGridView1.Rows.Count = 0 Then
-            MsgBox("Please add at least 1 row relation!!", vbCritical, "DQCT")
+            MsgBox("Please add at least 1 row relation!!", vbCritical, TitBox)
             Exit Sub
         End If
 
@@ -937,22 +937,22 @@
             'validamos que haya algo en la columnas de los códigos!
 
             If IsNothing(DataGridView1.Rows(i).Cells(1).Value) = True Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the 'Child Field Code', please fill it accordingly!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " is missing the 'Child Field Code', please fill it accordingly!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
             If IsNothing(DataGridView1.Rows(i).Cells(3).Value) = True Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the 'Parent Field Code', please fill it accordingly!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " is missing the 'Parent Field Code', please fill it accordingly!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
             If DataGridView1.Rows(i).Cells(1).Value = "" Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the 'Child Field Code', please fill it accordingly!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " is missing the 'Child Field Code', please fill it accordingly!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
             If DataGridView1.Rows(i).Cells(3).Value = "" Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the 'Parent Field Code', please fill it accordingly!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " is missing the 'Parent Field Code', please fill it accordingly!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -960,13 +960,13 @@
 
             enCuentra = TablaChilds.Rows.Find(CStr(DataGridView1.Rows(i).Cells(1).Value))
             If IsNothing(enCuentra) = True Then
-                MsgBox("The row " & CStr(i + 1) & " does not contain a valid Child Field Code, please verify!!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " does not contain a valid Child Field Code, please verify!!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
             enCuentra = TablaParents.Rows.Find(CStr(DataGridView1.Rows(i).Cells(3).Value))
             If IsNothing(enCuentra) = True Then
-                MsgBox("The row " & CStr(i + 1) & " does not contain a valid Parent Field Code, please verify!!!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " does not contain a valid Parent Field Code, please verify!!!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -976,7 +976,7 @@
                 xTab.Rows.Add({CStr(DataGridView1.Rows(i).Cells(1).Value)})
             Else
                 z = xTab.Rows.IndexOf(enCuentra)
-                MsgBox("The row " & CStr(i + 1) & " has a duplicate record of the Child Field Code on the row: " & CStr(z + 1) & ", please verify!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " has a duplicate record of the Child Field Code on the row: " & CStr(z + 1) & ", please verify!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -984,7 +984,7 @@
             If IsNothing(enCuentra) = True Then
                 yTab.Rows.Add({CStr(DataGridView1.Rows(i).Cells(3).Value)})
             Else
-                MsgBox("The row " & CStr(i + 1) & " has a duplicate record of the Parent Field Code on the row " & CStr(z + 1) & ", please verify!", vbCritical, "DQCT")
+                MsgBox("The row " & CStr(i + 1) & " has a duplicate record of the Parent Field Code on the row " & CStr(z + 1) & ", please verify!", vbCritical, TitBox)
                 Exit Sub
             End If
 
@@ -1023,7 +1023,7 @@
 
             RecargaBinds()
 
-            MsgBox("Relation updated!!", vbInformation, "DQCT")
+            MsgBox("Relation updated!!", vbInformation, TitBox)
 
         End If
 

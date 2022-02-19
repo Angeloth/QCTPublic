@@ -66,7 +66,7 @@ Module Module3
         'System.Diagnostics.Process.Start(xFile)
         GC.Collect()
         Dim X As Integer
-        X = MsgBox("Report exported at: " & xFile & " !" & vbCrLf & "You want to open the file now?", vbQuestion + vbYesNo, "QCT")
+        X = MsgBox("Report exported at: " & xFile & " !" & vbCrLf & "You want to open the file now?", vbQuestion + vbYesNo, TitBox)
         If X = 6 Then
             System.Diagnostics.Process.Start(xFile)
         End If
@@ -154,7 +154,7 @@ Module Module3
         oWrite = Nothing
 
         Dim X As Integer
-        X = MsgBox("Report exported at: " & xFile & " !" & vbCrLf & "You want to open the file now?", vbQuestion + vbYesNo, "QCT")
+        X = MsgBox("Report exported at: " & xFile & " !" & vbCrLf & "You want to open the file now?", vbQuestion + vbYesNo, TitBox)
         If X = 6 Then
             System.Diagnostics.Process.Start(xFile)
         End If

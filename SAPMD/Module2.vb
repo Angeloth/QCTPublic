@@ -181,11 +181,10 @@ Module Module2
         Loop
 
         If Dup + Bla > 0 Then
-            'MsgBox("Removed: " & Dup & " duplicates and " & Bla & " blanks!", vbInformation, "ContiShip")
 
             Resultado = "Removed: " & Dup & " duplicates and " & Bla & " blanks!"
         Else
-            'MsgBox("No duplicates or blanks found!", vbInformation, "ContiShip")
+
             Resultado = "No duplicates or blanks found!"
         End If
 
@@ -262,11 +261,10 @@ Module Module2
         Loop
 
         If Dup + Bla > 0 Then
-            'MsgBox("Removed: " & Dup & " duplicates and " & Bla & " blanks!", vbInformation, "ContiShip")
 
             Resultado = "Removed: " & Dup & " duplicates and " & Bla & " blanks!"
         Else
-            'MsgBox("No duplicates or blanks found!", vbInformation, "ContiShip")
+
             Resultado = "No duplicates or blanks found!"
         End If
 
@@ -339,11 +337,10 @@ Module Module2
         Loop
 
         If Dup + Bla > 0 Then
-            'MsgBox("Removed: " & Dup & " duplicates and " & Bla & " blanks!", vbInformation, "ContiShip")
 
             Resultado = "Removed: " & Dup & " duplicates and " & Bla & " blanks!"
         Else
-            'MsgBox("No duplicates or blanks found!", vbInformation, "ContiShip")
+
             Resultado = "No duplicates or blanks found!"
         End If
 

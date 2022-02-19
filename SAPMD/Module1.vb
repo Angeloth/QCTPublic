@@ -9,8 +9,8 @@ Imports System.Security.Cryptography
 
 Module Module1
     'Modulo para realizar las escrituras y lecturas de FireBase!
-    Public Const TitBox As String = "DQCT"
-    Public Const RaizFire As String = "https://radiant-rig-337421-default-rtdb.firebaseio.com/" 'sustituir por el de la empresa
+    Public Const TitBox As String = "QDT"
+    Public Const RaizFire As String = "https://radiant-rig-337421-default-rtdb.firebaseio.com" 'sustituir por el de la empresa
     Public RoleUsuario As String
     Public ModuPermit As New DataSet
     Public LetraNumero As New DataSet
@@ -2102,8 +2102,92 @@ Module Module1
                     Next
 
 
-                Case Is = "otro"
+                Case Is = "fieldunit"
 
+                    xDt.Columns.Add("Blanks", GetType(String)) '0
+                    xDt.Columns.Add("CatMatchConditions", GetType(String)) '1
+                    xDt.Columns.Add("CatMatchField", GetType(String)) '2
+                    xDt.Columns.Add("CatalogCode", GetType(String)) '3
+                    xDt.Columns.Add("CatalogModule", GetType(String)) '4
+                    xDt.Columns.Add("CatalogName", GetType(String)) '5
+                    xDt.Columns.Add("DataType", GetType(String)) '6
+                    xDt.Columns.Add("FillingRule", GetType(String)) '7
+                    xDt.Columns.Add("Letter", GetType(String)) '8
+                    xDt.Columns.Add("MOC", GetType(String)) '9
+                    xDt.Columns.Add("MaxChar", GetType(String)) '10
+                    xDt.Columns.Add("Name", GetType(String)) '11
+                    xDt.Columns.Add("NonAllowedChars", GetType(String)) '12
+                    xDt.Columns.Add("NonRep", GetType(String)) '13
+                    xDt.Columns.Add("Position", GetType(String)) '14
+                    xDt.Columns.Add("ULCase", GetType(String)) '15
+                    xDt.Columns.Add("ValueColumn", GetType(String)) '16
+                    xDt.Columns.Add("isKey", GetType(String)) '17
+
+                    xDt.Rows.Add({"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""})
+
+                    For Each dino In dinos
+
+                        Select Case dino.Key
+                            Case Is = "Blanks"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(0) = dino.Object.ToString()
+
+                            Case Is = "CatMatchConditions"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(1) = dino.Object.ToString()
+
+                            Case Is = "CatMatchField"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(2) = dino.Object.ToString()
+
+                            Case Is = "CatalogCode"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(3) = dino.Object.ToString()
+
+                            Case Is = "CatalogModule"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(4) = dino.Object.ToString()
+
+                            Case Is = "CatalogName"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(5) = dino.Object.ToString()
+
+                            Case Is = "DataType"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(6) = dino.Object.ToString()
+
+                            Case Is = "FillingRule"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(7) = dino.Object.ToString()
+
+                            Case Is = "Letter"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(8) = dino.Object.ToString()
+
+                            Case Is = "MOC"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(9) = dino.Object.ToString()
+
+                            Case Is = "MaxChar"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(10) = dino.Object.ToString()
+
+                            Case Is = "Name"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(11) = dino.Object.ToString()
+
+                            Case Is = "NonAllowedChars"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(12) = dino.Object.ToString()
+
+                            Case Is = "NonRep"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(13) = dino.Object.ToString()
+
+                            Case Is = "Position"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(14) = dino.Object.ToString()
+
+                            Case Is = "ULCase"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(15) = dino.Object.ToString()
+
+                            Case Is = "ValueColumn"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(16) = dino.Object.ToString()
+
+                            Case Is = "isKey"
+                                xDt.Rows(xDt.Rows.Count - 1).Item(17) = dino.Object.ToString()
+
+                        End Select
+
+                    Next
+
+
+                Case Is = "otro"
 
 
             End Select
