@@ -856,18 +856,21 @@ Module Module1
 
                         If xSet.Tables.Count = 0 Then
                             xSet.Tables.Add("Records")
+                            xSet.Tables(0).Columns.Add("FireBaseKey")
                             For Each motem As JProperty In datos
                                 'se crea!!
                                 motem.CreateReader()
                                 xSet.Tables(0).Columns.Add(motem.Name)
                             Next
+
                         End If
 
                         xSet.Tables(0).Rows.Add()
-
                         For i = 0 To xSet.Tables(0).Columns.Count - 1
                             xSet.Tables(0).Rows(xSet.Tables(0).Rows.Count - 1).Item(i) = "" 'vaciamos todo!
                         Next
+
+                        xSet.Tables(0).Rows(xSet.Tables(0).Rows.Count - 1).Item(0) = dino.Key
 
                         For Each item As JProperty In datos
                             item.CreateReader()

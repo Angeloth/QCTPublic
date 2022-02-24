@@ -8098,7 +8098,57 @@ Public Class Form1
 
 
             Case Is = 3
+                'Records!!
+                If compaSelekted = "" Then
+                    MsgBox("Please select a company first!!", vbExclamation, TitBox)
+                    Exit Sub
+                End If
 
+                If objetoSelek = "" Or tableSelek = "" Then
+                    MsgBox("Please select a table first!!", vbExclamation, TitBox)
+                    Exit Sub
+                End If
+
+                If puedoEditar = False Then
+                    MsgBox("Sorry, you are not allowed to edit this template at this time, please try again later or when it becomes available.", vbExclamation, TitBox)
+                    Exit Sub
+                End If
+
+                Await SigoVivo()
+                Module5.AgregaTiempo()
+
+                'https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.datagridview.selectionmode?view=windowsdesktop-6.0
+
+                If DataGridView1.Rows.GetRowCount(DataGridViewElementStates.Selected) <= 0 Then Exit Sub
+
+                If DataGridView1.CurrentCell.RowIndex < 0 Then Exit Sub
+
+                Dim campoYav As String = "" ' RecDt.Rows(DataGridView1.CurrentCell.RowIndex).Item(0)
+
+                Dim bs As New BindingSource
+                bs.DataSource = DataGridView1.DataSource
+
+                Dim xTipo As String = ""
+                xTipo = bs.DataSource.GetType().ToString
+
+                Dim fixDt As DataRow
+                fixDt = CType(bs.DataSource.Current.Row, DataRow)
+
+                'campoYav = fixDt.Item(0).
+
+                'Dim SelectedIndexes As List(Of Integer) = DataGridView1.SelectedRows.Cast(Of DataRow)().Select(Function(view) RecDt.Rows.IndexOf(view)).ToList()
+                Dim miDv As DataView
+                miDv = CType(bs.DataSource.DataSource.DefaultView, DataView)
+
+                Dim xDr As DataRowView = miDv(bs.DataSource.Position)
+
+                Dim alGi As Integer = 0
+                campoYav = fixDt.Item(0)
+                campoYav = xDr.Item(0)
+
+                'se elimina en la base y de paso en 
+
+                'alGi = RecDt.Rows(0).Item(0)
 
             Case Is = 4
                 'templates!!
@@ -8563,6 +8613,36 @@ Public Class Form1
         DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(0).Value = Form2.keyValue
         DataGridView1.Rows(DataGridView1.CurrentCell.RowIndex).Cells(1).Value = Form2.tabValue
 
+
+    End Sub
+
+    Private Sub ToolStripButton23_Click(sender As Object, e As EventArgs) Handles ToolStripButton23.Click
+
+        Select Case ToolStripComboBox1.SelectedIndex
+            Case Is = 0
+
+
+            Case Is = 1
+
+
+            Case Is = 2
+
+
+            Case Is = 3
+                'records
+                If puedoEditar = False Then
+                    MsgBox("Sorry you are not allowed to modify this template!!", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+                DataGridView1.DataSource = Nothing
+                DataGridView1.Rows.Clear()
+
+            Case Is = 4
+                'templates
+
+
+        End Select
 
     End Sub
 End Class
