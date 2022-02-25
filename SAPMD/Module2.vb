@@ -293,6 +293,8 @@ Module Module2
         Do While i < elGrid.Rows.Count - 1
             Yav = ""
 
+            Application.DoEvents()
+
             For j = 0 To UBound(xObj)
                 If IsDBNull(elGrid.Rows(i).Cells(CInt(xObj(j))).Value) = True Then
                     Bla = Bla + 1
@@ -685,7 +687,76 @@ Module Module2
 
     End Sub
 
+    Public Function DtToJsonWithKey(ByVal laDt As DataTable, ByVal elCampoKey As String) As String
 
+        Dim laCad As String
+
+        laCad = JsonConvert.SerializeObject(DatatableToDictionary(laDt, elCampoKey))
+
+        Return laCad
+
+    End Function
+
+    Public Function DatatableToDictionary(ByVal dt As DataTable, ByVal id As String) As Dictionary(Of String, Dictionary(Of String, Object))
+        Dim cols = dt.Columns.Cast(Of DataColumn)().Where(Function(c) c.ColumnName <> id)
+        Return dt.Rows.Cast(Of DataRow)().ToDictionary(Function(r) r(id).ToString(), Function(r) cols.ToDictionary(Function(c) c.ColumnName, Function(c) r(c.ColumnName)))
+    End Function
+
+    Public Function DtToJsonLoop(ByVal elSet As DataTable, ByVal colYave As Integer) As String
+        'https://stackoverflow.com/questions/11138035/convert-datatable-to-json-with-key-per-row
+        'https://www.c-sharpcorner.com/UploadFile/9bff34/3-ways-to-convert-datatable-to-json-string-in-Asp-Net-C-Sharp/
+        'https://stackoverflow.com/questions/17398019/convert-datatable-to-json-in-c-sharp
+        Dim cadJson As String = ""
+        Dim guiMov As String = ""
+        Dim miDato As String = ""
+        Dim k As Integer
+
+        cadJson = "{" & vbCrLf
+
+        cadJson = cadJson & """records""" & ": {"
+
+        For i = 0 To elSet.Rows.Count - 1
+
+            Application.DoEvents()
+
+            guiMov = Guid.NewGuid().ToString()
+
+            If i <> 0 Then cadJson = cadJson & ","
+
+            cadJson = cadJson & vbCrLf
+
+            cadJson = cadJson & """" & guiMov & """" & ": {"
+
+            'cadJson = cadJson & "{"
+            cadJson = cadJson & vbCrLf
+
+            k = 0
+            For j = 0 To elSet.Columns.Count - 1
+
+                If j = colYave Then Continue For
+
+                If k > 0 Then cadJson = cadJson & "," & vbCrLf
+
+                miDato = """" & elSet.Rows(i).Item(j) & """"
+
+                cadJson = cadJson & """" & elSet.Columns(j).ColumnName & """:" & miDato
+
+                k = k + 1
+
+            Next
+
+            cadJson = cadJson & vbCrLf & "}"
+
+        Next
+
+        cadJson = cadJson & vbCrLf
+        cadJson = cadJson & "}"
+        cadJson = cadJson & vbCrLf & "}"
+
+
+
+
+    End Function
 
 
 End Module

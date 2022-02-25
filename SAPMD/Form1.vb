@@ -3991,8 +3991,6 @@ Public Class Form1
         usaDataset.Tables(0).Rows.Add({"records"})
 
         'xdepeds
-        'Dim xDt As New DataTable
-        'xDt = Await PullRecordsDtJs(elCamino, "records")
 
         Dim xDs As New DataSet
         xDs = Await PullUrlWs(usaDataset, "records")
@@ -4255,9 +4253,14 @@ Public Class Form1
         'primero deberíamos limpiar el grid no?
         'quitar blancos, y campos llave
         Dim xResp As String = ""
+        ToolStripLabel1.Visible = True
+
+        toyTrabajando = True
 
         If cadYave <> "" Then
             'SI hay campos llave!
+            ToolStripLabel1.Text = "Finding duplicates..."
+
             Call QuitaDuplicadosMultiplesGrid(DataGridView1, cadYave, xResp)
             MsgBox(xResp, vbInformation, TitBox)
 
@@ -4267,6 +4270,8 @@ Public Class Form1
         DataGridView1.AllowUserToDeleteRows = False
 
         Dim yavEField As String = ""
+
+        ToolStripLabel1.Text = "Getting data..."
 
         For i = 0 To DataGridView1.Rows.Count - 1
             k = 0
@@ -4332,6 +4337,7 @@ Public Class Form1
             If x <> 6 Then
                 DataGridView1.AllowUserToAddRows = puedoEditar ' True
                 DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
+                toyTrabajando = False
                 Exit Sub
             End If
 
@@ -4348,18 +4354,18 @@ Public Class Form1
         elCamino = elCamino & "/records/" & elNode.Parent.Parent.Name 'compania
         elCamino = elCamino & "/" & elNode.Parent.Name 'objeto
         elCamino = elCamino & "/" & elNode.Name 'la tabla
+        elCamino = elCamino & "/" & "records"
 
-        ToolStripLabel1.Visible = True
         ToolStripLabel1.Text = "Uploading..."
 
         ToolStripButton10.Enabled = False
         ToolStripButton11.Enabled = False
 
-        toyTrabajando = True
-
         'xResp = Await HazPostMasivoFbArraysConPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
+        Dim cadComp As String = DtToJsonWithKey(MutaDs.Tables(0), "CampoYave")
 
-        xResp = Await HazPostMasivoFbWithKeysPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
+        xResp = Await HazPostMasivoFbSingleJson(elCamino, cadComp)
+        'xResp = Await HazPostMasivoFbWithKeysPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
 
         'OJOO; este si estaba:
         'xResp = Await HazPostEnFireBaseConPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)

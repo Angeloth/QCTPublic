@@ -58,10 +58,25 @@ Module Module1
 
     End Function
 
+    Public Async Function HazPostMasivoFbSingleJson(ByVal elPath As String, ByVal elJson As String) As Task(Of String)
+
+        Dim elRegreso As String = ""
+        Try
+            Dim client = New FirebaseClient(elPath)
+            Await client.Child("").PatchAsync(elJson)
+            elRegreso = "ok"
+        Catch ex As Exception
+            elRegreso = "fail"
+        End Try
+
+        Return elRegreso
+    End Function
+
+
     Public Async Function HazPostMasivoFbWithKeysPathYColumnas(ByVal elPath As String, ByVal elSet As DataTable, ByVal elChild As String, ByVal colYave As Integer) As Task(Of String)
 
         If elSet.Rows.Count = 0 Then Return "No records to write!"
-        Dim client = New FirebaseClient(elPath)
+
         Dim laYave As String = ""
         Dim miDato As String = ""
         Dim elHijo As String = ""
@@ -80,6 +95,8 @@ Module Module1
         cadJson = cadJson & """records""" & ": {"
 
         For i = 0 To elSet.Rows.Count - 1
+
+            Application.DoEvents()
 
             guiMov = Guid.NewGuid().ToString()
 
@@ -115,6 +132,8 @@ Module Module1
         cadJson = cadJson & "}"
         cadJson = cadJson & vbCrLf & "}"
 
+
+        Dim client = New FirebaseClient(elPath)
 
         Try
 
