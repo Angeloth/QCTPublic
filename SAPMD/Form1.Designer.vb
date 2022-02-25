@@ -507,7 +507,7 @@ Partial Class Form1
         Me.ToolStripButton18.Name = "ToolStripButton18"
         Me.ToolStripButton18.Size = New System.Drawing.Size(29, 34)
         Me.ToolStripButton18.Text = "ToolStripButton18"
-        Me.ToolStripButton18.ToolTipText = "Delete field"
+        Me.ToolStripButton18.ToolTipText = "Delete field(s)"
         '
         'ToolStripButton22
         '

@@ -58,6 +58,140 @@ Module Module1
 
     End Function
 
+    Public Async Function HazPostMasivoFbWithKeysPathYColumnas(ByVal elPath As String, ByVal elSet As DataTable, ByVal elChild As String, ByVal colYave As Integer) As Task(Of String)
+
+        If elSet.Rows.Count = 0 Then Return "No records to write!"
+        Dim client = New FirebaseClient(elPath)
+        Dim laYave As String = ""
+        Dim miDato As String = ""
+        Dim elHijo As String = ""
+
+        Dim elRegreso As String = ""
+        Dim cuentaErrores As Long = 0
+        Dim cuentaOk As Long = 0
+        Dim errLog As String = ""
+
+        Dim guiMov As String
+        Dim cadJson As String = ""
+        Dim k As Integer = 0
+
+        cadJson = "{" & vbCrLf
+
+        cadJson = cadJson & """records""" & ": {"
+
+        For i = 0 To elSet.Rows.Count - 1
+
+            guiMov = Guid.NewGuid().ToString()
+
+            If i <> 0 Then cadJson = cadJson & ","
+
+            cadJson = cadJson & vbCrLf
+
+            cadJson = cadJson & """" & guiMov & """" & ": {"
+
+            'cadJson = cadJson & "{"
+            cadJson = cadJson & vbCrLf
+
+            k = 0
+            For j = 0 To elSet.Columns.Count - 1
+
+                If j = colYave Then Continue For
+
+                If k > 0 Then cadJson = cadJson & "," & vbCrLf
+
+                miDato = """" & elSet.Rows(i).Item(j) & """"
+
+                cadJson = cadJson & """" & elSet.Columns(j).ColumnName & """:" & miDato
+
+                k = k + 1
+
+            Next
+
+            cadJson = cadJson & vbCrLf & "}"
+
+        Next
+
+        cadJson = cadJson & vbCrLf
+        cadJson = cadJson & "}"
+        cadJson = cadJson & vbCrLf & "}"
+
+
+        Try
+
+            Await client.Child("").PatchAsync(cadJson)
+            elRegreso = "ok"
+        Catch ex As Exception
+            elRegreso = "fail"
+        End Try
+
+        Return elRegreso
+
+    End Function
+
+    Public Async Function HazPostMasivoFbArraysConPathYColumnas(ByVal elPath As String, ByVal elSet As DataTable, ByVal elChild As String, ByVal colYave As Integer) As Task(Of String)
+
+        If elSet.Rows.Count = 0 Then Return "No records to write!"
+        Dim client = New FirebaseClient(elPath)
+        Dim laYave As String = ""
+        Dim miDato As String = ""
+        Dim elHijo As String = ""
+
+        Dim elRegreso As String = ""
+        Dim cuentaErrores As Long = 0
+        Dim cuentaOk As Long = 0
+        Dim errLog As String = ""
+
+        Dim cadJson As String = ""
+        Dim k As Integer = 0
+
+
+        cadJson = "{" & vbCrLf
+
+        cadJson = cadJson & """records""" & ": ["
+
+        For i = 0 To elSet.Rows.Count - 1
+
+            If i <> 0 Then cadJson = cadJson & ","
+
+            cadJson = cadJson & vbCrLf
+            cadJson = cadJson & "{"
+            cadJson = cadJson & vbCrLf
+
+            k = 0
+            For j = 0 To elSet.Columns.Count - 1
+
+                If j = colYave Then Continue For
+
+                If k > 0 Then cadJson = cadJson & "," & vbCrLf
+
+                miDato = """" & elSet.Rows(i).Item(j) & """"
+
+                cadJson = cadJson & """" & elSet.Columns(j).ColumnName & """:" & miDato
+
+                k = k + 1
+
+            Next
+
+            cadJson = cadJson & vbCrLf & "}"
+
+        Next
+
+        cadJson = cadJson & vbCrLf
+        cadJson = cadJson & "]"
+        cadJson = cadJson & vbCrLf & "}"
+
+        Try
+
+            Await client.Child("").PatchAsync(cadJson)
+            elRegreso = "ok"
+        Catch ex As Exception
+            elRegreso = "fail"
+        End Try
+
+        Return elRegreso
+
+    End Function
+
     Public Async Function HazPostEnFireBaseConPathYColumnas(ByVal elPath As String, ByVal elSet As DataTable, ByVal elChild As String, ByVal colYave As Integer) As Task(Of String)
 
         If elSet.Rows.Count = 0 Then Return "No records to write!"
@@ -2207,5 +2341,73 @@ Module Module1
 
     End Function
 
+    Public Async Function PullRecordsDtJs(ByVal elCamino As String, ByVal elConcepto As String) As Task(Of DataTable)
+
+        Dim xDt As New DataTable
+
+        Dim client = New FirebaseClient(elCamino)
+
+        'https://stackoverflow.com/questions/49424684/storing-an-array-in-a-firebase-database
+        'https://cloud.google.com/firestore/docs/query-data/queries
+        'https://stackoverflow.com/questions/68554584/how-to-query-firebase-realtime-database-array-and-return-the-object-representati
+        'https://www.tutorialspoint.com/firebase/firebase_write_list_data.htm
+        'https://stackoverflow.com/questions/42384675/how-to-get-array-data-on-firebase
+
+        Try
+            Dim dinos = Await client.Child("").OnceAsync(Of JsonArrayAttribute)
+
+            Select Case elConcepto
+                Case Is = "records"
+                    Dim k As Integer = 0
+
+                    xDt.TableName = "records"
+
+                    For Each dino In dinos
+                        Dim ser As JObject = JObject.Parse(dino.ToString)
+                        Dim datos As List(Of JToken) = ser.Children().ToList
+                        Dim doDatos As List(Of JToken)
+
+                        If xDt.Columns.Count = 0 Then
+                            'xSet.Tables.Add("Records")
+                            xDt.Columns.Add("FireBaseKey")
+                            For Each motem As JProperty In datos
+                                'se crea!!
+                                motem.CreateReader()
+                                xDt.Columns.Add(motem.Name)
+                            Next
+
+                        End If
+
+                        xDt.Rows.Add()
+                        For i = 0 To xDt.Columns.Count - 1
+                            xDt.Rows(xDt.Rows.Count - 1).Item(i) = "" 'vaciamos todo!
+                        Next
+
+                        'xDt.Rows(xDt.Rows.Count - 1).Item(0) = dino.Key
+
+                        For Each item As JProperty In datos
+                            item.CreateReader()
+                            k = xDt.Columns.IndexOf(item.Name)
+                            If k >= 0 Then
+                                xDt.Rows(xDt.Rows.Count - 1).Item(k) = item.Value.ToString()
+                            End If
+
+                        Next
+
+                    Next
+
+                Case Is = "otro"
+
+            End Select
+
+
+        Catch ex As Exception
+
+        End Try
+
+
+        Return xDt
+
+    End Function
 
 End Module

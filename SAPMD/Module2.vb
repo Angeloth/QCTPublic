@@ -380,6 +380,17 @@ Module Module2
                         elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2) = ""
                     Case Else
                         elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2) = elGrid.Rows(i).Cells(j).Value
+
+                        If IsDBNull(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2)) = False Then
+                            If CStr(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2)).Contains("\") = True Then
+                                elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2) = Replace(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2), "\", "")
+                            End If
+
+                            If CStr(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2)).Contains(vbLf) = True Then
+                                elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2) = Replace(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2), vbLf, "")
+                            End If
+                        End If
+
                 End Select
 
             Next
@@ -411,13 +422,26 @@ Module Module2
 
         elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(4) = LetraNumero.Tables(0).Rows(posDg - 1).Item(1)
 
-            For j = fromCol To toCol 'elGrid.Columns.Count - 1
+        For j = fromCol To toCol 'elGrid.Columns.Count - 1
 
             Select Case elGrid.Rows(elRenglon).Cells(j).Value
                 Case Is = "No selection", "None", "N/A"
                     elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2) = ""
                 Case Else
                     elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2) = elGrid.Rows(elRenglon).Cells(j).Value
+
+                    If IsDBNull(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2)) = False Then
+                        If CStr(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2)).Contains("\") = True Then
+                            elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2) = Replace(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2), "\", "")
+                        End If
+
+                        If CStr(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2)).Contains(vbLf) = True Then
+                            elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2) = Replace(elDs.Tables(laTabInd).Rows(elDs.Tables(laTabInd).Rows.Count - 1).Item(j + 2), vbLf, "")
+                        End If
+                    End If
+
+
+
             End Select
 
         Next

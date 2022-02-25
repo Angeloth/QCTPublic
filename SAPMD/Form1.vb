@@ -740,22 +740,22 @@ Public Class Form1
 
                 writeDs.Tables(3).Columns.Add(kEys) '0
                 'writeDs.Tables(3).Columns.Add("FieldCode") '1
-                writeDs.Tables(3).Columns.Add("Name") '2
-                writeDs.Tables(3).Columns.Add("isKey") '3
-                writeDs.Tables(3).Columns.Add("Position") '4
-                writeDs.Tables(3).Columns.Add("Letter") '5
+                writeDs.Tables(3).Columns.Add("Name") '1
+                writeDs.Tables(3).Columns.Add("isKey") '2
+                writeDs.Tables(3).Columns.Add("Position") '3
+                writeDs.Tables(3).Columns.Add("Letter") '4
 
-                writeDs.Tables(3).Columns.Add("MOC") '6
-                writeDs.Tables(3).Columns.Add("FillingRule") '7
-                writeDs.Tables(3).Columns.Add("DataType") '8
-                writeDs.Tables(3).Columns.Add("MaxChar") '9
-                writeDs.Tables(3).Columns.Add("ULCase") '10
-                writeDs.Tables(3).Columns.Add("Blanks") '11
-                writeDs.Tables(3).Columns.Add("CatalogName") '12
-                writeDs.Tables(3).Columns.Add("CatalogCode") '13
-                writeDs.Tables(3).Columns.Add("ValueColumn") '14
-                writeDs.Tables(3).Columns.Add("NonRep") '15
-                writeDs.Tables(3).Columns.Add("NonAllowedChars") '16
+                writeDs.Tables(3).Columns.Add("MOC") '5
+                writeDs.Tables(3).Columns.Add("FillingRule") '6
+                writeDs.Tables(3).Columns.Add("DataType") '7
+                writeDs.Tables(3).Columns.Add("MaxChar") '8
+                writeDs.Tables(3).Columns.Add("ULCase") '9
+                writeDs.Tables(3).Columns.Add("Blanks") '10
+                writeDs.Tables(3).Columns.Add("CatalogName") '11
+                writeDs.Tables(3).Columns.Add("CatalogCode") '12
+                writeDs.Tables(3).Columns.Add("ValueColumn") '13
+                writeDs.Tables(3).Columns.Add("NonRep") '14
+                writeDs.Tables(3).Columns.Add("NonAllowedChars") '15
 
                 'writeDs.Tables(3).Columns.Add("ConditionalPath") '17
                 'writeDs.Tables(3).Columns.Add("ConditionalObject") '18
@@ -3990,8 +3990,9 @@ Public Class Form1
         usaDataset.Tables(0).Rows.Add({elNode.Name})
         usaDataset.Tables(0).Rows.Add({"records"})
 
-
         'xdepeds
+        'Dim xDt As New DataTable
+        'xDt = Await PullRecordsDtJs(elCamino, "records")
 
         Dim xDs As New DataSet
         xDs = Await PullUrlWs(usaDataset, "records")
@@ -4171,8 +4172,8 @@ Public Class Form1
 
             estoyAgregandoRows = False
 
-            DataGridView1.AllowUserToAddRows = True
-            DataGridView1.AllowUserToDeleteRows = True
+            DataGridView1.AllowUserToAddRows = puedoEditar ' True
+            DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
 
 
 
@@ -4329,8 +4330,8 @@ Public Class Form1
             x = MsgBox("WARNING! " & vbCrLf & "There are zero records in the table, you want to delete the whole table?", vbQuestion + vbYesNo, "Delete records?")
 
             If x <> 6 Then
-                DataGridView1.AllowUserToAddRows = True
-                DataGridView1.AllowUserToDeleteRows = True
+                DataGridView1.AllowUserToAddRows = puedoEditar ' True
+                DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
                 Exit Sub
             End If
 
@@ -4356,7 +4357,12 @@ Public Class Form1
 
         toyTrabajando = True
 
-        xResp = Await HazPostEnFireBaseConPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
+        'xResp = Await HazPostMasivoFbArraysConPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
+
+        xResp = Await HazPostMasivoFbWithKeysPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
+
+        'OJOO; este si estaba:
+        'xResp = Await HazPostEnFireBaseConPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
 
         toyTrabajando = False
 
@@ -4368,8 +4374,8 @@ Public Class Form1
 
         MsgBox(xResp, vbInformation, TitBox)
 
-        DataGridView1.AllowUserToAddRows = True
-        DataGridView1.AllowUserToDeleteRows = True
+        DataGridView1.AllowUserToAddRows = puedoEditar ' True
+        DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
 
     End Sub
 
@@ -7887,8 +7893,8 @@ Public Class Form1
             DataGridView1.Columns(i).AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
         Next
 
-        DataGridView1.AllowUserToAddRows = True
-        DataGridView1.AllowUserToDeleteRows = True
+        DataGridView1.AllowUserToAddRows = puedoEditar ' True
+        DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
 
     End Sub
 
@@ -7942,13 +7948,13 @@ Public Class Form1
                 Next
 
             Next
-            'MsgBox("All records downloaded!", vbInformation, "SAP MD")
+
         Else
             MsgBox("No records found for this object!!", vbInformation, TitBox)
         End If
 
-        DataGridView1.AllowUserToAddRows = True
-        DataGridView1.AllowUserToDeleteRows = True
+        DataGridView1.AllowUserToAddRows = puedoEditar ' True
+        DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
     End Sub
 
     Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
@@ -8114,28 +8120,62 @@ Public Class Form1
                     Exit Sub
                 End If
 
-                Await SigoVivo()
-                Module5.AgregaTiempo()
-
                 'https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.datagridview.selectionmode?view=windowsdesktop-6.0
 
-                If DataGridView1.Rows.GetRowCount(DataGridViewElementStates.Selected) <= 0 Then Exit Sub
 
-                If DataGridView1.CurrentCell.RowIndex < 0 Then Exit Sub
+                If DataGridView1.SelectedRows.Count = 0 Then
+                    MsgBox("Please select at least 1 row to delete!", vbExclamation, TitBox)
+                    Exit Sub
+                End If
 
-                Dim campoYav As String = "" ' RecDt.Rows(DataGridView1.CurrentCell.RowIndex).Item(0)
 
+                Dim X As Integer
+                X = MsgBox("Are you sure you want to delete this records?!" & vbCrLf & "This action can not be undone!", vbExclamation + vbYesNo, TitBox)
+
+                If X <> 6 Then Exit Sub
+
+                Await SigoVivo()
+                Module5.AgregaTiempo()
+                'Dim SelectedIndexes As List(Of Integer) = DataGridView1.SelectedRows.Cast(Of DataRow)().Select(Function(view) RecDt.Rows.IndexOf(view)).ToList()
+                Dim campoYav As String = "" ' DataGridView1.SelectedRows(0).DataBoundItem
+
+                Dim unPath As String
+
+                'OJOO, esto también funciono pero es para borrar 1 registro!!
+                ToolStripLabel1.Visible = True
+
+                For i = 0 To DataGridView1.SelectedRows.Count - 1
+                    Dim unDr As DataRowView = DataGridView1.SelectedRows(i).DataBoundItem
+                    campoYav = unDr.Row.Item(0)
+                    ToolStripLabel1.Text = "Deleting row..." & CStr(i + 1)
+                    'se elimina y se van borrando aqui también!
+                    unPath = RaizFire
+                    unPath = unPath & "/" & "records"
+                    unPath = unPath & "/" & compaSelekted
+                    unPath = unPath & "/" & objetoSelek
+                    unPath = unPath & "/" & tableSelek
+                    unPath = unPath & "/" & "records"
+                    Await HazDeleteEnFbSimple(unPath, campoYav)
+
+                Next
+
+                ToolStripLabel1.Text = "Ready"
+                ToolStripLabel1.Visible = False
+
+                MuestraRecords()
+
+                Exit Sub
+
+
+                'Dim xTipo As String = ""
+                'xTipo = bs.DataSource.GetType().ToString
                 Dim bs As New BindingSource
                 bs.DataSource = DataGridView1.DataSource
-
-                Dim xTipo As String = ""
-                xTipo = bs.DataSource.GetType().ToString
 
                 Dim fixDt As DataRow
                 fixDt = CType(bs.DataSource.Current.Row, DataRow)
 
                 'campoYav = fixDt.Item(0).
-
                 'Dim SelectedIndexes As List(Of Integer) = DataGridView1.SelectedRows.Cast(Of DataRow)().Select(Function(view) RecDt.Rows.IndexOf(view)).ToList()
                 Dim miDv As DataView
                 miDv = CType(bs.DataSource.DataSource.DefaultView, DataView)
@@ -8645,4 +8685,6 @@ Public Class Form1
         End Select
 
     End Sub
+
+
 End Class
