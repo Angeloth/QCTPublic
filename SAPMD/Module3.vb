@@ -73,6 +73,119 @@ Module Module3
 
     End Sub
 
+    Public Sub ExportErrors(ByVal dt As DataGridView, ByVal xFile As String, ByVal limCols As Integer)
+
+        Dim oWrite As System.IO.StreamWriter
+        oWrite = IO.File.CreateText(xFile)
+
+        Dim CSV As StringBuilder = New StringBuilder()
+
+        Dim j As Integer = 0
+        Dim i As Integer = 1
+        Dim k As Integer = 0
+        Dim CSVHeader As StringBuilder = New StringBuilder()
+
+        For j = 1 To 2
+
+            CSVHeader.Clear()
+
+            i = 1
+
+            '-1, ó -4
+            '2 vueltas!, registro y evaluación
+            For k = 0 To dt.Columns.Count - limCols 'siempre se elimina las ultimas 3 columnas!
+                If j = 1 Then
+                    If i = 1 Then
+                        CSVHeader.Append(dt.Columns(k).Name.ToString())
+                    Else
+                        CSVHeader.Append("," & dt.Columns(k).Name.ToString())
+                    End If
+                Else
+                    If i = 1 Then
+                        CSVHeader.Append(dt.Columns(k).HeaderText.ToString())
+                    Else
+                        CSVHeader.Append("," & dt.Columns(k).HeaderText.ToString())
+                    End If
+                End If
+
+                i = i + 1
+            Next
+
+            For k = 0 To dt.Columns.Count - limCols
+
+                If j = 1 Then
+                    CSVHeader.Append(", Res - " & dt.Columns(k).Name.ToString())
+                Else
+                    CSVHeader.Append(", Res - " & dt.Columns(k).HeaderText.ToString())
+                End If
+
+                i = i + 1
+
+            Next
+
+
+            oWrite.WriteLine(CSVHeader.ToString())
+
+        Next
+
+        'CSV.AppendLine(CSVHeader.ToString())
+        'oWrite.WriteLine(CSVHeader.ToString())
+        oWrite.Flush()
+
+        For r As Integer = 0 To dt.Rows.Count - 2
+
+            Dim CSVLine As StringBuilder = New StringBuilder()
+            Dim s As String = ""
+
+            If dt.Rows(r).Visible = False Then Continue For 'lo invisible no lo descarga!
+
+            For k = 0 To dt.Columns.Count - limCols
+
+                If k = 0 Then
+                    If IsNothing(dt.Rows(r).Cells(k).Value) = True Then
+                        s = s & ""
+                    Else
+                        s = s & dt.Rows(r).Cells(k).Value.ToString()
+                    End If
+                Else
+                    If IsNothing(dt.Rows(r).Cells(k).Value) = True Then
+                        s = s & "," & ""
+                    Else
+                        s = s & "," & dt.Rows(r).Cells(k).Value.ToString()
+                    End If
+                End If
+
+            Next
+
+
+            'segunda vuelta con los tags!
+            For k = 0 To dt.Columns.Count - limCols
+                If IsNothing(dt.Rows(r).Cells(k).Tag) = True Then
+                    s = s & "," & ""
+                Else
+                    s = s & "," & dt.Rows(r).Cells(k).Tag.ToString()
+                End If
+
+            Next
+
+            oWrite.WriteLine(s)
+            oWrite.Flush()
+
+        Next
+
+        GC.Collect()
+
+        oWrite.Close()
+        oWrite = Nothing
+
+        Dim X As Integer
+        X = MsgBox("Report exported at: " & xFile & " !" & vbCrLf & "You want to open the file now?", vbQuestion + vbYesNo, TitBox)
+        If X = 6 Then
+            System.Diagnostics.Process.Start(xFile)
+        End If
+
+    End Sub
+
     Public Sub ExportToCsv2(ByVal dt As DataGridView, ByVal xFile As String, ByVal limCols As Integer)
 
         Dim oWrite As System.IO.StreamWriter

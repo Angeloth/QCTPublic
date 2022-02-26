@@ -284,7 +284,11 @@ Module Module2
         Dim Dup As Integer = 0
         Dim Bla As Integer = 0
         Dim sisTa As Boolean = False
-        setDupli.Columns.Add()
+
+        Dim enCuentra As DataRow
+        AsignaYavePrimariaATabla(setDupli, "Key", True)
+
+        'setDupli.Columns.Add()
         Dim xObj As Object
         Dim Yav As String = ""
         xObj = Split(ColumnasYave, "#")
@@ -317,22 +321,30 @@ Module Module2
                 Yav = Yav & elGrid.Rows(i).Cells(CInt(xObj(j))).Value
             Next
 
-            sisTa = False
-            For j = 0 To setDupli.Rows.Count - 1
-                If setDupli.Rows(j).Item(0) = Yav Then
-                    sisTa = True
-                    Exit For
-                End If
-
-            Next
-
-            If sisTa = True Then
+            enCuentra = setDupli.Rows.Find(Yav)
+            If IsNothing(enCuentra) = False Then
                 elGrid.Rows.RemoveAt(i)
                 Dup = Dup + 1
                 Continue Do
             End If
 
             setDupli.Rows.Add({Yav})
+
+            'sisTa = False
+            'For j = 0 To setDupli.Rows.Count - 1
+            '    If setDupli.Rows(j).Item(0) = Yav Then
+            '        sisTa = True
+            '        Exit For
+            '    End If
+            'Next
+
+            'If sisTa = True Then
+            '    elGrid.Rows.RemoveAt(i)
+            '    Dup = Dup + 1
+            '    Continue Do
+            'End If
+
+            'setDupli.Rows.Add({Yav})
 
             i = i + 1
 

@@ -1005,7 +1005,7 @@ Module Module1
                     For Each dino In dinos
                         Dim ser As JObject = JObject.Parse(dino.Object.ToString)
                         Dim datos As List(Of JToken) = ser.Children().ToList
-                        Dim doDatos As List(Of JToken)
+                        'Dim doDatos As List(Of JToken)
 
                         If xSet.Tables.Count = 0 Then
                             xSet.Tables.Add("Records")

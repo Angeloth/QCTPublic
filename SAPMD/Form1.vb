@@ -54,7 +54,13 @@ Public Class Form1
     Private editDs As New DataSet 'set para ver los datos si se puede editar o no!
     Private puedoEditar As Boolean
     Private lastNodeEdit As String
+
+    Private DoneEvaluacion As Boolean
+
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        DoneEvaluacion = False
+
         'Para el status de objeto en uso
         'Que se postee el objeto, su nombre, la hoja, su nombre, y el nodo de inuse:X ó vacío
         'Y que se postee la hora, timestamp de utc
@@ -280,6 +286,8 @@ Public Class Form1
         Dim seCarga As Boolean = False
         Dim suReg As String = ""
         rowEstaba = -1
+
+        DoneEvaluacion = False
 
         Select Case ToolStripComboBox1.SelectedIndex
             Case Is = 0
@@ -1652,6 +1660,8 @@ Public Class Form1
                 DataGridView1.Columns.Clear()
 
                 JalaRegistrosHermanos(elNode.Parent.Parent.Name)
+
+                DoneEvaluacion = False
 
                 For i = 0 To tempDs.Tables.Count - 1
                     xObj = Nothing
@@ -3911,7 +3921,8 @@ Public Class Form1
 
                 toyTrabajando = True
 
-                Call QuitaDuplicadosMultiplesGrid(DataGridView1, "0", unResp)
+                'Segun yo este metodo ya no sería necesario!!
+                'Call QuitaDuplicadosMultiplesGrid(DataGridView1, "0", unResp)
 
                 DataGridView1.AllowUserToAddRows = False
                 DataGridView1.AllowUserToDeleteRows = False
@@ -4271,11 +4282,14 @@ Public Class Form1
 
         Dim yavEField As String = ""
 
-        ToolStripLabel1.Text = "Getting data..."
+        'ToolStripLabel1.Text = "Getting data..."
+        ToolStripLabel1.Text = "Fetching data..."
+        Application.DoEvents()
 
         For i = 0 To DataGridView1.Rows.Count - 1
             k = 0
             yavEField = ""
+
             MutaDs.Tables(0).Rows.Add()
             For j = 0 To DataGridView1.Columns.Count - 4
                 MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1) = DataGridView1.Rows(i).Cells(j).Value
@@ -4362,9 +4376,17 @@ Public Class Form1
         ToolStripButton11.Enabled = False
 
         'xResp = Await HazPostMasivoFbArraysConPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
-        Dim cadComp As String = DtToJsonWithKey(MutaDs.Tables(0), "CampoYave")
 
-        xResp = Await HazPostMasivoFbSingleJson(elCamino, cadComp)
+        If MutaDs.Tables(0).Rows.Count > 0 Then
+
+            Dim cadComp As String = DtToJsonWithKey(MutaDs.Tables(0), "CampoYave")
+
+            'Me tapo los ojos!:
+            xResp = Await HazPostMasivoFbSingleJson(elCamino, cadComp)
+        Else
+            xResp = "ok"
+        End If
+
         'xResp = Await HazPostMasivoFbWithKeysPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
 
         'OJOO; este si estaba:
@@ -4378,7 +4400,11 @@ Public Class Form1
         ToolStripButton10.Enabled = True
         ToolStripButton11.Enabled = True
 
-        MsgBox(xResp, vbInformation, TitBox)
+        If xResp = "ok" Then
+            MsgBox("Update complete!", vbInformation, TitBox)
+        Else
+            MsgBox("Failure on upload!", vbInformation, TitBox)
+        End If
 
         DataGridView1.AllowUserToAddRows = puedoEditar ' True
         DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
@@ -5590,14 +5616,21 @@ Public Class Form1
                 'Yavez.ColumnName = "Unique"
                 'YavePrimaria(0) = Yavez
                 'uniTabla.Columns.Add(Yavez)
+                Dim mixPobl As String = ""
 
                 Await SigoVivo()
                 Module5.AgregaTiempo()
                 toyTrabajando = True
 
+                ToolStripLabel1.Visible = True
+
+                DoneEvaluacion = False
+
                 For i = 0 To DataGridView1.Rows.Count - 2
 
                     Application.DoEvents()
+
+                    ToolStripLabel1.Text = "Evaluating..." & CStr(i + 1) & " / " & DataGridView1.Rows.Count - 1
 
                     'System.Threading.Thread.Sleep(0)
                     DataGridView1.Rows(i).Tag = "NO OK"
@@ -5651,6 +5684,8 @@ Public Class Form1
 
                         End Select
 
+
+
                         If ValidaDt.Rows(z).Item(5) = "X" Then
                             esMandatorio = True
                             esYave = True
@@ -5693,7 +5728,6 @@ Public Class Form1
                                     xObj = Nothing
                                     Dim valPrufz As String = ""
                                     Dim misRows() As DataRow
-                                    Dim mixPobl As String = ""
                                     Dim busCad As String = ""
                                     Dim valCheck As String = ""
                                     'Nombre de la tabla condicional a buscar:
@@ -5726,7 +5760,8 @@ Public Class Form1
                                         Case Else 'Internal o External
 
                                             If multiDepe.Tables.IndexOf(mixNombreTab) < 0 Then
-                                                PintaCeldaDeWarning(i, j, "Warning!!, There is no data to validate either if this field is right o wrong")
+                                                PintaCeldaDeWarning(i, j, "Warning!!, There is no data to validate either if this field is right o wrong. Conditional path not found: " & CStr(ValidaDt.Rows(z).Item(20)) & " > " & CStr(ValidaDt.Rows(z).Item(21)) & " > " & CStr(ValidaDt.Rows(z).Item(22)))
+                                                'ValidaDt.Rows(z).Item(20) & "#" & ValidaDt.Rows(z).Item(21) & "#" & ValidaDt.Rows(z).Item(22)
                                                 Continue For
                                             End If
 
@@ -6149,7 +6184,7 @@ Public Class Form1
                                 unComodin = CStr(ValidaDt.Rows(z).Item(29)) & "#" & ValidaDt.Rows(z).Item(14)
                                 If catDs.Tables.IndexOf(unComodin) < 0 Then
                                     anchoTru(j) = True 'se pone OK, pero hay warnings!
-                                    PintaCeldaDeWarning(i, j, "Unable to found catalog related!")
+                                    PintaCeldaDeWarning(i, j, "Unable to found catalog related: " & CStr(ValidaDt.Rows(z).Item(29)) & " > " & ValidaDt.Rows(z).Item(14) & " > " & ValidaDt.Rows(z).Item(15))
                                     Continue For
                                 Else
 
@@ -6208,13 +6243,15 @@ Public Class Form1
                                         End If
 
                                     Else
-
+                                        mixPobl = ""
                                         yObj = Split(CStr(ValidaDt.Rows(z).Item(31)), "-")
                                         mixCade = ""
                                         For w = 0 To UBound(yObj)
                                             zObj = Split(CStr(yObj(w)), "#")
                                             '0 para el grid, 1 para el catalogo
                                             If mixCade <> "" Then mixCade = mixCade & " AND "
+                                            If mixPobl <> "" Then mixPobl = mixPobl & " > "
+                                            mixPobl = mixPobl & CStr(zObj(1))
 
                                             If CStr(zObj(0)) = "Company Code" Then
                                                 'hace match vs el nodo!
@@ -6238,7 +6275,7 @@ Public Class Form1
                                             'validacion extra!
 
                                             If yTabla.Rows.Count = 0 Then
-                                                PintaCeldaDeWarning(i, j, "Unable yo define if the value " & valEvaluar & " is in the correct range due to missing match with catalog traceability: " & CStr(ValidaDt.Rows(z).Item(15)))
+                                                PintaCeldaDeWarning(i, j, "Unable yo define if the value " & valEvaluar & " is in the correct range due to missing match with catalog traceability: " & CStr(ValidaDt.Rows(z).Item(15)) & " " & mixPobl)
                                                 Continue For
                                             End If
 
@@ -6295,7 +6332,7 @@ Public Class Form1
                                             Next
 
                                             If yTabla.Rows.Count = 0 Then
-                                                PintaCeldaDeError(i, j, "The value " & valEvaluar & " does not exists on the " & CStr(ValidaDt.Rows(z).Item(15)) & " catalog")
+                                                PintaCeldaDeError(i, j, "The value " & valEvaluar & " does not exists on the " & CStr(ValidaDt.Rows(z).Item(15)) & " catalog  and fields " & mixPobl)
                                                 Continue For
                                             End If
 
@@ -6491,72 +6528,6 @@ Public Class Form1
 
                                                     longAcum = longAcum + partCad.Length + pedX.Length
                                                     charResta = valEvaluar.Length - longAcum
-                                                    'If partCad.Length <= numChars Then
-
-                                                    '    'gb:gb0001:A:None
-
-                                                    '    'unComodin = CStr(xTabla.Rows(r).Item(6)) 'Microsoft.VisualBasic.Left(CStr(ValidaDt.Rows(z).Item(14)), 2) & "#" & CStr(ValidaDt.Rows(z).Item(14))
-
-                                                    '    'If catDs.Tables.IndexOf(CStr(unComodin)) < 0 Then Exit For 'no se puede validar!
-
-                                                    '    'findAnother = catDs.Tables(unComodin).Rows.Find(partCad)
-
-                                                    '    'If IsNothing(findAnother) = True Then
-
-                                                    '    '    meQuedolaRegla = False
-
-                                                    '    '    cadError = "The " & partCad & " doesn't exists in the '" & catDs.Tables(unComodin).Columns(0).ColumnName & "' catalog, please review!"
-
-                                                    '    '    Exit For
-
-                                                    '    'End If
-
-                                                    '    cadFix = cadFix & partCad
-
-                                                    '    If CStr(xTabla.Rows(r).Item(8)) = "" Then
-
-                                                    '        poSiclo = poSiclo + CInt(numChars)
-
-                                                    '        cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
-
-                                                    '    Else
-
-                                                    '        partCad = Mid(cadLeft, poSiclo + CInt(numChars), Len(CStr(xTabla.Rows(r).Item(8))))
-
-                                                    '        If partCad = CStr(xTabla.Rows(r).Item(8)) Then
-
-                                                    '            'esta OK, fue igual al caracter próximo!
-
-                                                    '            cadFix = cadFix & CStr(xTabla.Rows(r).Item(8))
-
-                                                    '            poSiclo = poSiclo + CInt(numChars) + Len(CStr(xTabla.Rows(r).Item(8)))
-
-                                                    '            cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
-
-                                                    '        Else
-
-                                                    '            'NO esta OK!
-
-                                                    '            meQuedolaRegla = False
-
-                                                    '            cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(7)) & "', please check!"
-
-                                                    '            Exit For
-
-                                                    '        End If
-
-                                                    '    End If
-
-                                                    'Else
-
-                                                    '    cadError = "The length for " & partCad & " doesn't meet the current required that is as maximum " & numChars & " characters length!"
-
-                                                    '    meQuedolaRegla = False
-
-                                                    '    Exit For
-
-                                                    'End If
-
 
 
                                                 Case Is = "B - Free Text"
@@ -6644,64 +6615,6 @@ Public Class Form1
 
                                                         cadLeft = cadLeft.Substring(partCad.Length + pedX.Length)
 
-                                                        'If CStr(xTabla.Rows(r).Item(8)) = "" Then
-
-                                                        '    cadError = "There is no concatenation character to bind, please review!"
-
-                                                        '    meQuedolaRegla = False
-
-                                                        '    Exit For
-
-                                                        'Else
-
-                                                        '    miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
-
-                                                        '    partCad = CStr(miObjeto(0))
-
-                                                        '    pedX = Mid(cadLeft, poSiclo + Len(partCad), Len(CStr(xTabla.Rows(r).Item(8))))
-
-                                                        '    If pedX = CStr(xTabla.Rows(r).Item(8)) Then
-
-                                                        '        'coincide, todo ok!
-
-                                                        '        If Len(partCad) <= CInt(numChars) Then
-
-                                                        '            'ok
-
-                                                        '            cadFix = cadFix & partCad
-
-                                                        '            poSiclo = poSiclo + Len(CStr(miObjeto(0))) + Len(CStr(xTabla.Rows(r).Item(8)))
-
-                                                        '            cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
-
-                                                        '        Else
-
-                                                        '            'error
-
-                                                        '            cadError = "The length of " & partCad & " exceeds the limit of " & CInt(numChars) & " characters length!"
-
-                                                        '            meQuedolaRegla = False
-
-                                                        '            Exit For
-
-                                                        '        End If
-
-                                                        '    Else
-
-                                                        '        'NO coincide!
-
-                                                        '        cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please check!"
-
-                                                        '        meQuedolaRegla = False
-
-                                                        '        Exit For
-
-                                                        '    End If
-
-
-
-                                                        'End If
-
 
 
                                                     End If
@@ -6736,24 +6649,6 @@ Public Class Form1
                                                                 Exit For
 
                                                             End If
-
-                                                            'If Len(partCad) <= CInt(numChars) Then
-
-
-                                                            '    poSiclo = poSiclo + Len(partCad) + Len(CStr(xTabla.Rows(r).Item(8)))
-
-                                                            '    cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
-
-                                                            'Else
-
-                                                            '    cadError = "This part of the construction rule exceeds the maximum character limit : '" & CInt(numChars) & "', please check!"
-
-                                                            '    meQuedolaRegla = False
-
-                                                            '    Exit For
-
-                                                            'End If
-
 
 
                                                         Else
@@ -6820,73 +6715,6 @@ Public Class Form1
                                                         End If
 
 
-                                                        'If CStr(xTabla.Rows(r).Item(8)) = "" Then
-
-                                                        '    'error!
-
-                                                        '    cadError = "There is no concatenation character to bind, please review with dev team!"
-
-                                                        '    meQuedolaRegla = False
-
-                                                        '    Exit For
-
-                                                        'Else
-
-                                                        '    miObjeto = Split(cadLeft, CStr(xTabla.Rows(r).Item(8)))
-
-                                                        '    partCad = CStr(miObjeto(0))
-
-                                                        '    pedX = Mid(cadLeft, poSiclo + Len(partCad), Len(CStr(xTabla.Rows(r).Item(8))))
-
-                                                        '    If pedX = CStr(xTabla.Rows(r).Item(8)) Then
-
-
-
-                                                        '        If IsNumeric(partCad) = True Then
-
-                                                        '            'es numero
-
-                                                        '            If Len(partCad) <= CInt(numChars) Then
-
-                                                        '                poSiclo = poSiclo + Len(partCad) + Len(CStr(xTabla.Rows(r).Item(8)))
-
-                                                        '                cadLeft = Mid(cadLeft, poSiclo, Len(cadLeft) - (poSiclo - 1))
-
-                                                        '            Else
-
-                                                        '                cadError = "This part of the construction rule exceeds the maximum character limit : '" & CInt(numChars) & "', please check!"
-
-                                                        '                meQuedolaRegla = False
-
-                                                        '                Exit For
-
-                                                        '            End If
-
-                                                        '        Else
-
-                                                        '            'No es numero!
-
-                                                        '            cadError = "This part of the construction rule must be a valid running number, curently you have: '" & partCad & "', please check!"
-
-                                                        '            meQuedolaRegla = False
-
-                                                        '            Exit For
-
-                                                        '        End If
-
-                                                        '    Else
-
-                                                        '        'NO coincide!
-
-                                                        '        cadError = "The concatenation character doesn't match the required by rule: '" & CStr(xTabla.Rows(r).Item(8)) & "', please check!"
-
-                                                        '        meQuedolaRegla = False
-
-                                                        '        Exit For
-
-                                                        '    End If
-
-                                                        'End If
 
                                                     End If
 
@@ -7043,18 +6871,6 @@ Public Class Form1
                                                     End If
 
 
-
-                                                    'If r = xTabla.Rows.Count - 1 Then
-                                                    '    'es el último, NO lleva al final caracter de concatenación!
-                                                    '    partCad = cadLeft
-                                                    'Else
-
-                                                    '    partCad = cadLeft.Substring(0, numChars)
-                                                    '    pedX = cadLeft.Substring(numChars, CStr(xTabla.Rows(r).Item(8)).Length)
-                                                    '    'primero evaluarmos partcad
-
-                                                    'End If
-
                                                     If CStr(xObj(1)) = objetoSelek And CStr(xObj(2)) = tableSelek Then
                                                         'es local, misma template, misma hoja
                                                         'se supone que SIEMPRE sera con None en match fields
@@ -7201,6 +7017,7 @@ Public Class Form1
                             DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Value = "Ok. No repeteability detected on key field"
                             DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Style.ForeColor = Color.DarkGreen
                             DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Style.Font = New System.Drawing.Font("Calibri", 10, FontStyle.Bold)
+                            DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Tag = "Ok. No repeteability detected on key field"
                         Catch ex As Exception
 
                             'PintaCeldaDeError(i, j, "")
@@ -7212,6 +7029,7 @@ Public Class Form1
                                 DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Value = "NO OK. Key field repeteability detected on row " & posOtro
                                 DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Style.ForeColor = Color.Crimson
                                 DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Style.Font = New System.Drawing.Font("Calibri", 10, FontStyle.Bold)
+                                DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Tag = "NO OK. Key field repeteability detected on row " & posOtro
                             End If
                         End Try
                     Else
@@ -7219,6 +7037,7 @@ Public Class Form1
                         DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Value = "Ok. No repeteability is configured for this template"
                         DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Style.ForeColor = Color.Black
                         DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Style.Font = New System.Drawing.Font("Calibri", 10, FontStyle.Bold)
+                        DataGridView1.Rows(i).Cells(DataGridView1.Columns.Count - 2).Tag = "Ok. No repeteability is configured for this template"
                     End If
 
                     'se evalua!
@@ -7307,6 +7126,9 @@ Public Class Form1
 
                 Next
 
+                ToolStripLabel1.Text = "Ready"
+                ToolStripLabel1.Visible = False
+                DoneEvaluacion = True
                 toyTrabajando = False
 
 
@@ -7327,12 +7149,14 @@ Public Class Form1
         DataGridView1.Rows(rowInd).Cells(colInd).Style.BackColor = Color.FromArgb(250, 173, 20)
         DataGridView1.Rows(rowInd).Cells(colInd).Style.ForeColor = Color.White
         DataGridView1.Rows(rowInd).Cells(colInd).ToolTipText = xError
+        DataGridView1.Rows(rowInd).Cells(colInd).Tag = xError.Replace(",", "-")
     End Sub
 
     Private Sub PintaCeldaDeError(ByVal rowInd As Integer, ByVal colInd As Integer, ByVal xError As String)
         DataGridView1.Rows(rowInd).Cells(colInd).Style.BackColor = Color.Crimson
         DataGridView1.Rows(rowInd).Cells(colInd).Style.ForeColor = Color.White
         DataGridView1.Rows(rowInd).Cells(colInd).ToolTipText = xError
+        DataGridView1.Rows(rowInd).Cells(colInd).Tag = xError.Replace(",", "-")
     End Sub
 
     Private Sub LimpiaCeldaDeError(ByVal rowInd As Integer, ByVal colInd As Integer)
@@ -7340,7 +7164,7 @@ Public Class Form1
         DataGridView1.Rows(rowInd).Cells(colInd).Style.BackColor = Color.White
         DataGridView1.Rows(rowInd).Cells(colInd).Style.ForeColor = Color.Black
         DataGridView1.Rows(rowInd).Cells(colInd).ToolTipText = ""
-
+        DataGridView1.Rows(rowInd).Cells(colInd).Tag = "Ok!"
     End Sub
 
     Private Async Sub DataGridView1_CellEnter(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellEnter
@@ -7770,6 +7594,7 @@ Public Class Form1
     End Sub
 
     Private Async Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
+
 
 
     End Sub
@@ -8692,5 +8517,35 @@ Public Class Form1
 
     End Sub
 
+    Private Sub ToolStripButton24_Click(sender As Object, e As EventArgs) Handles ToolStripButton24.Click
 
+        If ToolStripComboBox1.SelectedIndex <> 3 Then Exit Sub
+
+        If DoneEvaluacion = False Then
+            MsgBox("Please evaluate first the records of this object!!", vbExclamation, TitBox)
+            Exit Sub
+        End If
+
+        If DataGridView1.Rows.Count - 1 < 0 Then
+            MsgBox("Deploy some information first!!", vbCritical, TitBox)
+            Exit Sub
+        End If
+
+        Dim lCol As Integer = 1
+
+        'If ToolStripComboBox1.SelectedIndex = 3 Then lCol = 4
+
+        Dim diLOg As New SaveFileDialog
+        Dim oFileName As String
+        oFileName = ""
+        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
+        diLOg.Filter = "Excel CSV File (*.csv)|*.csv" '"Excel File (*.xls)|*.xls"
+        'diLOg.Filter = "Excel File (*.xls)|*.xls|Todos los archivos (*.*)|*.*"
+        If diLOg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+
+            Call ExportErrors(DataGridView1, diLOg.FileName, 1)
+
+        End If
+
+    End Sub
 End Class
