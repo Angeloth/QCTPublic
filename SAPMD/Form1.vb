@@ -4317,8 +4317,7 @@ Public Class Form1
 
             Next
 
-            If yavEField = "" Then yavEField = Guid.NewGuid().ToString()
-
+            yavEField = Guid.NewGuid().ToString()
             MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(0) = yavEField
         Next
 
