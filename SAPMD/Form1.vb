@@ -1621,13 +1621,38 @@ Public Class Form1
             Case Is = 3
                 'records
                 xObj = Split(e.Node.FullPath, "\")
-                If xObj.Length < 4 Then
+
+                If xObj.Length < 2 Then
+                    DoneEvaluacion = False
                     NodoNameActual = ""
                     DataGridView1.DataSource = Nothing
                     DataGridView1.Rows.Clear()
                     DataGridView1.Columns.Clear()
                     pathFinduse = ""
+                    PussyTemp = -1
                     Exit Sub
+                End If
+
+                If xObj.Length = 3 Then
+                    DoneEvaluacion = False
+                    NodoNameActual = ""
+                    DataGridView1.DataSource = Nothing
+                    DataGridView1.Rows.Clear()
+                    DataGridView1.Columns.Clear()
+                    pathFinduse = ""
+
+                    For i = 0 To tempDs.Tables.Count - 1
+                        yObj = Nothing
+                        yObj = Split(tempDs.Tables(i).TableName, "#")
+                        If yObj(0) = elNode.Name Then
+                            PussyTemp = i
+                            moduloSelek = CStr(yObj(2))
+                            Exit For
+                        End If
+                    Next
+
+                    Exit Sub
+
                 End If
 
                 'primero mostramos las columnas!
@@ -1669,6 +1694,7 @@ Public Class Form1
 
                     If xObj(0) = elNode.Parent.Name Then
 
+                        PussyTemp = i
                         moduloSelek = CStr(xObj(2))
 
                         ValidaDt.PrimaryKey = Nothing
@@ -1687,7 +1713,7 @@ Public Class Form1
 
                         DataGridView1.ColumnHeadersDefaultCellStyle.Font = New System.Drawing.Font("Calibri", 12, FontStyle.Bold)
                         'OJO, dar formato!
-                        DataGridView1.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(255, 54, 96, 146)
+                        DataGridView1.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(255, 242, 242, 242)
 
                         For j = 0 To DataGridView1.Columns.Count - 1
                             DataGridView1.Columns(j).AutoSizeMode = DataGridViewAutoSizeColumnMode.None
@@ -1699,20 +1725,48 @@ Public Class Form1
                             DataGridView1.Columns(DataGridView1.Columns.Count - 1).Tag = filterDT.Rows(j).Item(5) 'si es campo Yave o no!
                             'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell = New DataGridViewAutoFilter.DataGridViewAutoFilterColumnHeaderCell
                             DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderText = filterDT.Rows(j).Item(4)
+                            DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.ToolTipText = CStr(filterDT.Rows(j).Item(8))
+                            DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+
+                            Select Case CStr(filterDT.Rows(j).Item(8))
+                                Case Is = "Mandatory"
+                                    DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.BackColor = Color.FromArgb(255, 199, 206)
+                                    DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.ForeColor = Color.FromArgb(156, 0, 6)
+
+                                Case Is = "Optional"
+                                    DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.BackColor = Color.FromArgb(198, 239, 206)
+                                    DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.ForeColor = Color.FromArgb(0, 97, 0)
+
+
+                                Case Is = "Conditional"
+                                    DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.BackColor = Color.FromArgb(255, 235, 156)
+                                    DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.ForeColor = Color.FromArgb(156, 87, 0)
+
+                            End Select
+
                         Next
 
                         'agregar 3 columnas extras para validar!
                         DataGridView1.Columns.Add("ROWOK", "¿Row Ok?")
+                        DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.BackColor = Color.FromArgb(242, 242, 242)
+                        DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.ForeColor = Color.FromArgb(63, 63, 63)
+                        DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = "ROWOK"
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell = New DataGridViewAutoFilter.DataGridViewAutoFilterColumnHeaderCell
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderText = "¿Row Ok?"
 
                         DataGridView1.Columns.Add("ROWREP", "Repeteability?")
+                        DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.BackColor = Color.FromArgb(242, 242, 242)
+                        DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.ForeColor = Color.FromArgb(63, 63, 63)
+                        DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = "ROWREP"
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell = New DataGridViewAutoFilter.DataGridViewAutoFilterColumnHeaderCell
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderText = "Repeteability?"
 
                         DataGridView1.Columns.Add("ROWCOMMS", "Internal-Relations Ok?")
+                        DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.BackColor = Color.FromArgb(242, 242, 242)
+                        DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.ForeColor = Color.FromArgb(63, 63, 63)
+                        DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).DataPropertyName = "ROWCOMMS"
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderCell = New DataGridViewAutoFilter.DataGridViewAutoFilterColumnHeaderCell
                         'DataGridView1.Columns(DataGridView1.Columns.Count - 1).HeaderText = "Internal-Relations Ok?"
@@ -4038,17 +4092,6 @@ Public Class Form1
             Next
 
 
-            'Esto era antes!
-            'For i = 0 To xDs.Tables(0).Rows.Count - 1
-
-            '    DataGridView1.Rows.Add()
-            '    DataGridView1.Rows(DataGridView1.Rows.Count - 1).HeaderCell.Value = CStr(i + 1)
-            '    For j = 0 To xDs.Tables(0).Columns.Count - 1
-            '        DataGridView1.Rows(DataGridView1.Rows.Count - 1).Cells(xDs.Tables(0).Columns(j).ColumnName).Value = xDs.Tables(0).Rows(i).Item(j)
-            '    Next
-
-            'Next
-
         Else
             MsgBox("No records found for this object!!", vbInformation, TitBox)
         End If
@@ -4100,6 +4143,61 @@ Public Class Form1
                     Exit Sub
                 End If
 
+                Dim diLOg As New OpenFileDialog
+                Dim oFileName As String
+                oFileName = ""
+                diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
+                diLOg.Filter = "Excel CSV File (*.csv)|*.csv" '"Excel File (*.xls)|*.xls"
+
+                'al importar hay varias opciones
+                '1. Importar una hoja simple
+                '2. Importar todo el template!
+                '3. Darle en importar y guardar
+                '4. Exportar una hoja simple
+                '5. Exportar todo el template!
+
+                Dim borroRecords As Boolean = False
+
+                If diLOg.ShowDialog() = Windows.Forms.DialogResult.OK Then
+
+                    Dim path As String = diLOg.FileName
+
+                    Dim elDt As New DataTable
+
+                    elDt = LoadFromCSV(path)
+
+                    If elDt.Rows.Count = 0 Then Exit Sub
+
+                    DataGridView1.DataSource = Nothing
+                    If borroRecords = True Then
+                        DataGridView1.Rows.Clear()
+                    End If
+
+                    estoyAgregandoRows = True
+
+                    DataGridView1.AllowUserToAddRows = False
+                    DataGridView1.AllowUserToDeleteRows = False
+
+                    Dim bS As New BindingSource
+
+                    bS.DataSource = elDt
+
+                    DataGridView1.AutoGenerateColumns = False
+
+                    DataGridView1.DataSource = bS
+
+                    For i = 0 To DataGridView1.Rows.Count - 1
+                        DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
+                    Next
+
+                    estoyAgregandoRows = False
+
+                    DataGridView1.AllowUserToAddRows = puedoEditar ' True
+                    DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
+
+                End If
+
+
             Case Is = 2
 
 
@@ -4107,17 +4205,94 @@ Public Class Form1
                 'records
 
                 'moduloSelek
+                Select Case xObj.Length
+                    Case Is = 1
+                        'crazy!!, importar todas las companias con todos sus objetos!
 
-                If xObj.Length < 4 Then
-                    MsgBox("Please select a node at a table level!", vbCritical, TitBox)
-                    Exit Sub
-                End If
 
-                enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
-                If IsNothing(enCuentra) = True Then
-                    MsgBox("Sorry you are not allowed to import record to the selected module!!", vbCritical, TitBox)
-                    Exit Sub
-                End If
+                    Case Is = 2
+                        'No tan crazy, importar todos los objetos de 1 compañía
+                        'este seria un ciclo por excel!
+
+
+                    Case Is = 3
+                        'Here, importar todas las tablas de un objeto completo!
+                        enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+                        If IsNothing(enCuentra) = True Then
+                            MsgBox("Sorry you are not allowed to import record to the selected module!!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
+
+
+
+
+                    Case Is = 4
+                        'importar una tabla de un objeto!
+                        enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
+                        If IsNothing(enCuentra) = True Then
+                            MsgBox("Sorry you are not allowed to import record to the selected module!!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
+                        Dim diLOg As New OpenFileDialog
+                        Dim oFileName As String
+                        oFileName = ""
+                        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
+                        diLOg.Filter = "Excel CSV File (*.csv)|*.csv" '"Excel File (*.xls)|*.xls"
+
+                        'al importar hay varias opciones
+                        '1. Importar una hoja simple
+                        '2. Importar todo el template!
+                        '3. Darle en importar y guardar
+                        '4. Exportar una hoja simple
+                        '5. Exportar todo el template!
+
+                        Dim borroRecords As Boolean = False
+
+                        If diLOg.ShowDialog() = Windows.Forms.DialogResult.OK Then
+
+                            Dim path As String = diLOg.FileName
+
+                            Dim elDt As New DataTable
+
+                            elDt = LoadFromCSV(path)
+
+                            If elDt.Rows.Count = 0 Then Exit Sub
+
+                            DataGridView1.DataSource = Nothing
+                            If borroRecords = True Then
+                                DataGridView1.Rows.Clear()
+                            End If
+
+                            estoyAgregandoRows = True
+
+                            DataGridView1.AllowUserToAddRows = False
+                            DataGridView1.AllowUserToDeleteRows = False
+
+                            Dim bS As New BindingSource
+
+                            bS.DataSource = elDt
+
+                            DataGridView1.AutoGenerateColumns = False
+
+                            DataGridView1.DataSource = bS
+
+                            For i = 0 To DataGridView1.Rows.Count - 1
+                                DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
+                            Next
+
+                            estoyAgregandoRows = False
+
+                            DataGridView1.AllowUserToAddRows = puedoEditar ' True
+                            DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
+
+                        End If
+
+                End Select
+
+
+
 
 
         End Select
@@ -4132,61 +4307,7 @@ Public Class Form1
 
 
 
-        Dim diLOg As New OpenFileDialog
-        Dim oFileName As String
-        oFileName = ""
-        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
-        diLOg.Filter = "Excel CSV File (*.csv)|*.csv" '"Excel File (*.xls)|*.xls"
 
-        'al importar hay varias opciones
-        '1. Importar una hoja simple
-        '2. Importar todo el template!
-        '3. Darle en importar y guardar
-        '4. Exportar una hoja simple
-        '5. Exportar todo el template!
-
-        Dim borroRecords As Boolean = False
-
-        If diLOg.ShowDialog() = Windows.Forms.DialogResult.OK Then
-
-            Dim path As String = diLOg.FileName
-
-            Dim elDt As New DataTable
-
-            elDt = LoadFromCSV(path)
-
-            If elDt.Rows.Count = 0 Then Exit Sub
-
-            DataGridView1.DataSource = Nothing
-            If borroRecords = True Then
-                DataGridView1.Rows.Clear()
-            End If
-
-            estoyAgregandoRows = True
-
-            DataGridView1.AllowUserToAddRows = False
-            DataGridView1.AllowUserToDeleteRows = False
-
-            Dim bS As New BindingSource
-
-            bS.DataSource = elDt
-
-            DataGridView1.AutoGenerateColumns = False
-
-            DataGridView1.DataSource = bS
-
-            For i = 0 To DataGridView1.Rows.Count - 1
-                DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
-            Next
-
-            estoyAgregandoRows = False
-
-            DataGridView1.AllowUserToAddRows = puedoEditar ' True
-            DataGridView1.AllowUserToDeleteRows = puedoEditar ' True
-
-
-
-        End If
 
     End Sub
 
@@ -4410,7 +4531,7 @@ Public Class Form1
 
     End Sub
 
-    Private Sub ToolStripButton12_Click(sender As Object, e As EventArgs) Handles ToolStripButton12.Click
+    Private Async Sub ToolStripButton12_Click(sender As Object, e As EventArgs) Handles ToolStripButton12.Click
 
 
         'Exportar registros
@@ -4419,13 +4540,48 @@ Public Class Form1
         'Si selecciona un nodo tabla continua con el unitario
         'Si selecciona el nodo objeto, exporta todo lo de ese objeto
         'Si tiene seleccionado el nodo compañía, exporta la compañía completa con todos sus hijos
+        If ToolStripComboBox1.SelectedIndex = 0 Then Exit Sub
 
+        If IsNothing(elNode) = True Then
+            'error!!
+            MsgBox("Please select a node with data to export a report!", vbCritical, TitBox)
+            Exit Sub
+        End If
+
+        Dim xObj As Object
+        xObj = Split(elNode.FullPath, "\")
+
+        Dim lCol As Integer = 1
 
         Select Case ToolStripComboBox1.SelectedIndex
-            Case Is = 0 'nada
+
+            Case Is = 1 'catalogos
+                'los catalogos también podría ser una onda de exportar todos los catalogos de un nodo!
+                Select Case xObj.Length
+                    Case Is = 1
+                        'selecciono un nodo de un catalogo!
 
 
-            Case Is = 1
+                    Case Is = 2
+                        'seleccionó una tabla!
+                        If DataGridView1.Rows.Count - 1 < 0 Then
+                            MsgBox("Deploy some information first!!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
+                        Dim diLOg As New SaveFileDialog
+                        Dim oFileName As String
+                        oFileName = ""
+                        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
+                        diLOg.Filter = "Excel CSV File (*.csv)|*.csv" '"Excel File (*.xls)|*.xls"
+                        'diLOg.Filter = "Excel File (*.xls)|*.xls|Todos los archivos (*.*)|*.*"
+                        If diLOg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+
+                            Call ExportToCsv2(DataGridView1, diLOg.FileName, lCol)
+
+                        End If
+
+                End Select
 
 
 
@@ -4433,37 +4589,211 @@ Public Class Form1
 
 
 
-            Case Is = 3
+            Case Is = 3 'registros
+                'todos las hojas y objetos de un nodo!
+                Select Case xObj.Length
+                    Case Is = 1
+                        'seleccionó all companies
 
 
-            Case Is = 4
 
+                    Case Is = 2
+                        'seleccionó 1 compañia
+
+
+
+                    Case Is = 3
+                        'seleccionó un objeto
+                        'sería hacer un ciclo de esa companía, de ese objeto!
+                        If PussyTemp < 0 Then
+                            MsgBox("No template found!", vbExclamation, TitBox)
+                            Exit Sub
+                        End If
+
+
+                        If elNode.Nodes.Count = 0 Then
+                            MsgBox("This object does not contain any tables!!, choose another one!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
+                        Dim filtrosDt As DataTable = tempDs.Tables(PussyTemp).Clone()
+
+                        Dim diLOg As New SaveFileDialog
+
+                        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
+                        diLOg.Filter = "Excel File (*.xlsx)|*.xlsx" '"Excel File (*.xls)|*.xls"
+
+                        If diLOg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+
+                            Dim allDs As New DataSet
+                            Dim xDs As New DataSet
+                            Dim elCamino As String = "" ' RaizFire
+                            Dim xError As String = ""
+                            allDs.ExtendedProperties.Add("TemplateCode", elNode.Name)
+                            allDs.ExtendedProperties.Add("TemplateName", elNode.Text)
+
+                            allDs.ExtendedProperties.Add("CompanyCode", elNode.Parent.Name)
+                            allDs.ExtendedProperties.Add("CompanyName", elNode.Parent.Text)
+                            allDs.ExtendedProperties.Add("Module", moduloSelek)
+
+                            For i = 0 To elNode.Nodes.Count - 1
+                                elCamino = RaizFire
+                                elCamino = elCamino & "/records/" & elNode.Parent.Name 'compania
+                                elCamino = elCamino & "/" & elNode.Name 'objeto
+                                elCamino = elCamino & "/" & elNode.Nodes(i).Name
+
+                                elCamino = elCamino & "/records"
+
+                                usaDataset.Tables(0).Rows.Clear()
+                                usaDataset.Tables(0).Rows.Add({"records"})
+                                usaDataset.Tables(0).Rows.Add({elNode.Parent.Name}) 'compania
+                                usaDataset.Tables(0).Rows.Add({elNode.Name}) 'objeto
+                                usaDataset.Tables(0).Rows.Add({elNode.Nodes(i).Name}) 'tabla
+                                usaDataset.Tables(0).Rows.Add({"records"})
+
+                                'xdepeds
+                                xDs.Tables.Clear()
+                                xDs = Await PullUrlWs(usaDataset, "records")
+
+                                If xDs.Tables.Count = 0 Then
+
+                                    filtrosDt.Rows.Clear()
+                                    Dim result() As DataRow = tempDs.Tables(PussyTemp).Select("TableCode = '" & elNode.Nodes(i).Name & "'", "Position ASC")
+                                    For Each row As DataRow In result
+                                        filtrosDt.ImportRow(row)
+                                    Next
+
+                                    allDs.Tables.Add(elNode.Nodes(i).Name)
+                                    allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("TableCode", elNode.Nodes(i).Name)
+                                    allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("TableName", "")
+
+                                    For j = 0 To filtrosDt.Rows.Count - 1
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns.Add(filtrosDt.Rows(j).Item("FieldCode"))
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns(allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1).ExtendedProperties.Add("FieldCode", filtrosDt.Rows(j).Item("FieldCode"))
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns(allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1).ExtendedProperties.Add("HeaderText", filtrosDt.Rows(j).Item("FieldName"))
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns(allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1).ExtendedProperties.Add("MOC", filtrosDt.Rows(j).Item("MOC"))
+                                        allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Item("TableName") = filtrosDt.Rows(j).Item("TableName")
+                                    Next
+
+                                    allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("FromCol", 0)
+                                    allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("ToCol", allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1)
+
+                                Else
+
+                                    allDs.Tables.Add(xDs.Tables(0).Copy())
+                                    allDs.Tables(allDs.Tables.Count - 1).TableName = elNode.Nodes(i).Name
+                                    allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("TableCode", elNode.Nodes(i).Name)
+                                    allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("TableName", "")
+                                    allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("FromCol", 1)
+                                    allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("ToCol", allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1)
+
+                                    For j = 0 To allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1
+
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns(j).ExtendedProperties.Add("FieldCode", "")
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns(j).ExtendedProperties.Add("HeaderText", "")
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns(j).ExtendedProperties.Add("MOC", "")
+
+                                        filtrosDt.Rows.Clear()
+                                        Dim result() As DataRow = tempDs.Tables(PussyTemp).Select("TableCode = '" & elNode.Nodes(i).Name & "' AND FieldCode='" & allDs.Tables(allDs.Tables.Count - 1).Columns(j).ColumnName & "'")
+                                        For Each row As DataRow In result
+                                            filtrosDt.ImportRow(row)
+                                        Next
+
+                                        If filtrosDt.Rows.Count = 0 Then Continue For
+
+                                        allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Item("TableName") = filtrosDt.Rows(0).Item("TableName")
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns(j).ExtendedProperties.Item("FieldCode") = filtrosDt.Rows(0).Item("FieldCode")
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns(j).ExtendedProperties.Item("HeaderText") = filtrosDt.Rows(0).Item("FieldName")
+                                        allDs.Tables(allDs.Tables.Count - 1).Columns(j).ExtendedProperties.Item("MOC") = filtrosDt.Rows(0).Item("MOC")
+
+                                    Next
+
+                                End If
+
+                            Next
+
+                            Dim xStat As String = ""
+                            ToolStripLabel1.Visible = True
+                            ToolStripLabel1.Text = "Ready"
+                            If ExportaRecordsReport(allDs, diLOg.FileName, ToolStripLabel1, xError) = True Then
+
+                                Dim X As Integer
+                                X = MsgBox("Report exported at: " & diLOg.FileName & " !" & vbCrLf & "You want to open the file now?", vbQuestion + vbYesNo, TitBox)
+                                If X = 6 Then
+                                    System.Diagnostics.Process.Start(diLOg.FileName)
+                                End If
+
+                            End If
+
+                            ToolStripLabel1.Text = "Ready"
+                            ToolStripLabel1.Visible = False
+
+
+                        End If
+
+
+
+                    Case Is = 4
+                        'seleccionó una hoja
+                        If DataGridView1.Rows.Count - 1 < 0 Then
+                            MsgBox("Deploy some information first!!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
+                        Dim diLOg As New SaveFileDialog
+                        Dim oFileName As String
+                        oFileName = ""
+                        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
+                        diLOg.Filter = "Excel CSV File (*.csv)|*.csv" '"Excel File (*.xls)|*.xls"
+                        'diLOg.Filter = "Excel File (*.xls)|*.xls|Todos los archivos (*.*)|*.*"
+                        If diLOg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+
+                            Call ExportToCsv2(DataGridView1, diLOg.FileName, lCol)
+
+                        End If
+
+                End Select
+
+
+            Case Is = 4 'templates
+
+                Select Case xObj.Length
+                    Case Is = 1
+                        'seleccionó All templates
+
+
+                    Case Is = 2
+                        'selecciono 1 template
+
+
+                    Case Is = 3, 4
+                        'selecciono una hoja!
+                        If DataGridView1.Rows.Count - 1 < 0 Then
+                            MsgBox("Deploy some information first!!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
+                        Dim diLOg As New SaveFileDialog
+                        Dim oFileName As String
+                        oFileName = ""
+                        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
+                        diLOg.Filter = "Excel CSV File (*.csv)|*.csv" '"Excel File (*.xls)|*.xls"
+                        'diLOg.Filter = "Excel File (*.xls)|*.xls|Todos los archivos (*.*)|*.*"
+                        If diLOg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+
+                            Call ExportToCsv2(DataGridView1, diLOg.FileName, lCol)
+
+                        End If
+
+                End Select
 
 
         End Select
 
 
 
-        If DataGridView1.Rows.Count - 1 < 0 Then
-            MsgBox("Deploy some information first!!", vbCritical, TitBox)
-            Exit Sub
-        End If
 
-        Dim lCol As Integer = 1
 
-        'If ToolStripComboBox1.SelectedIndex = 3 Then lCol = 4
-
-        Dim diLOg As New SaveFileDialog
-        Dim oFileName As String
-        oFileName = ""
-        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
-        diLOg.Filter = "Excel CSV File (*.csv)|*.csv" '"Excel File (*.xls)|*.xls"
-        'diLOg.Filter = "Excel File (*.xls)|*.xls|Todos los archivos (*.*)|*.*"
-        If diLOg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
-
-            Call ExportToCsv2(DataGridView1, diLOg.FileName, lCol)
-
-        End If
     End Sub
 
     Private Sub DataGridView1_CurrentCellDirtyStateChanged(sender As Object, e As EventArgs) Handles DataGridView1.CurrentCellDirtyStateChanged

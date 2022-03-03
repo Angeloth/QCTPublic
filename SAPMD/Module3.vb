@@ -302,7 +302,7 @@ Module Module3
 
     End Function
 
-    Public Function ExportaExcelReport(ByVal elSetDa As DataSet, ByVal elFilNam As String, ByRef elError As String) As Boolean
+    Public Function ExportaRecordsReport(ByVal elSetDa As DataSet, ByVal elFilNam As String, ByRef elTool As Object, ByRef elError As String) As Boolean
 
         Dim elRes As Boolean = False
 
@@ -316,61 +316,160 @@ Module Module3
             Dim i As Integer
             Dim j As Integer
             Dim k As Integer
-            'Dim w As Integer
-            'Dim r As Integer
+            Dim w As Long
+            Dim r As Long
             Dim celIni As String
             Dim celFin As String
+
+            Dim iniCol As Integer = 0
+            Dim rowIni As Integer = 0
+
+
             Dim unNombre As String
 
             xlWorkBook = xlApp.Workbooks.Add(misValue)
 
             For i = 0 To elSetDa.Tables.Count - 1
 
+
+                elTool.Text = "Building table structure..." & elSetDa.Tables(i).ExtendedProperties.Item("TableName")
+                Application.DoEvents()
+
                 unNombre = elSetDa.Tables(i).ExtendedProperties.Item("TableCode")
                 xlWorkSheet(i) = xlWorkBook.Sheets.Add()
                 xlWorkSheet(i).Name = unNombre
 
-                xlWorkSheet(i).Cells(1, 1).Value = elSetDa.Tables(i).ExtendedProperties.Item("TableName")
-                xlWorkSheet(i).Cells(1, 1).Interior.Color = RGB(112, 173, 71)
+                xlWorkSheet(i).Cells(1, 1).Value = "Object: " & elSetDa.Tables(i).ExtendedProperties.Item("TableName")
+
+                xlWorkSheet(i).Cells(2, 1).Value = "Module:"
+                xlWorkSheet(i).Cells(2, 2).Value = elSetDa.ExtendedProperties.Item("Module")
+
+                xlWorkSheet(i).Cells(2, 3).Value = "Template code:"
+                xlWorkSheet(i).Cells(2, 4).Value = elSetDa.ExtendedProperties.Item("TemplateCode")
+
+                xlWorkSheet(i).Cells(2, 5).Value = "Template Name:"
+                xlWorkSheet(i).Cells(2, 6).Value = elSetDa.ExtendedProperties.Item("TemplateName")
+
+                xlWorkSheet(i).Cells(2, 7).Value = "Table Code:"
+                xlWorkSheet(i).Cells(2, 8).Value = elSetDa.Tables(i).ExtendedProperties.Item("TableCode")
+
+                xlWorkSheet(i).Cells(2, 9).Value = "Table Name:"
+                xlWorkSheet(i).Cells(2, 10).Value = elSetDa.Tables(i).ExtendedProperties.Item("TableName")
+
+                xlWorkSheet(i).Cells(1, 1).Interior.Color = RGB(66, 124, 172)
                 xlWorkSheet(i).Cells(1, 1).Font.Name = "Calibri"
-                xlWorkSheet(i).Cells(1, 1).Font.Size = 14
+                xlWorkSheet(i).Cells(1, 1).Font.Size = 24
                 xlWorkSheet(i).Cells(1, 1).Font.Bold = True
                 xlWorkSheet(i).Cells(1, 1).Font.Color = RGB(255, 255, 255)
+                xlWorkSheet(i).Cells(1, 1).HorizontalAlignment = -4108
 
                 celIni = xlWorkSheet(i).Cells(1, 1).Address()
-                celFin = xlWorkSheet(i).Cells(1, 5).Address()
+                celFin = xlWorkSheet(i).Cells(1, 10).Address()
 
                 xlWorkSheet(i).Range(celIni & ":" & celFin).Merge()
 
-                For j = 0 To elSetDa.Tables(i).Columns.Count - 1
-                    xlWorkSheet(i).Cells(2, j + 1).Value = elSetDa.Tables(i).Columns(j).ColumnName
-                    xlWorkSheet(i).Cells(3, j + 1).Value = elSetDa.Tables(i).Columns(j).ExtendedProperties.Item("HeaderText")
-                Next
-
                 celIni = xlWorkSheet(i).Cells(2, 1).Address()
-                celFin = xlWorkSheet(i).Cells(2, j + 1).Address()
+                celFin = xlWorkSheet(i).Cells(2, 10).Address()
 
-                xlWorkSheet(i).Range(celIni & ":" & celFin).Interior.Color = RGB(128, 128, 128)
-                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Name = "Calibri"
-                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Size = 10
-                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Bold = True
                 xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Color = RGB(255, 255, 255)
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Interior.Color = RGB(66, 124, 172)
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Size = 12
+                xlWorkSheet(i).Range(celIni & ":" & celFin).HorizontalAlignment = -4108
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Bold = True
+
+
+                xlWorkSheet(i).Cells(3, 1).Value = "Company Code:"
+                xlWorkSheet(i).Cells(3, 2).Value = elSetDa.ExtendedProperties.Item("CompanyCode")
+
+                xlWorkSheet(i).Cells(3, 3).Value = "Company Name:"
+                xlWorkSheet(i).Cells(3, 4).Value = elSetDa.ExtendedProperties.Item("CompanyName")
 
                 celIni = xlWorkSheet(i).Cells(3, 1).Address()
-                celFin = xlWorkSheet(i).Cells(3, j + 1).Address()
+                celFin = xlWorkSheet(i).Cells(3, 4).Address()
 
-                xlWorkSheet(i).Range(celIni & ":" & celFin).Interior.Color = RGB(68, 114, 196)
-                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Name = "Calibri"
-                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Size = 10
-                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Bold = True
                 xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Color = RGB(255, 255, 255)
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Interior.Color = RGB(112, 173, 71)
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Size = 12
+                xlWorkSheet(i).Range(celIni & ":" & celFin).HorizontalAlignment = -4108
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Bold = True
+
+                xlWorkSheet(i).Range("D3:E3").Merge()
+
+                xlWorkSheet(i).Cells(3, 6).Value = "Refer Tab: 'Field List' for further reference on filling rules"
+                xlWorkSheet(i).Cells(3, 6).Interior.Color = RGB(255, 255, 0)
+                xlWorkSheet(i).Cells(3, 6).Font.Size = 14
+                xlWorkSheet(i).Cells(3, 6).Font.Color = RGB(0, 0, 0)
+                xlWorkSheet(i).Cells(3, 6).Font.Bold = True
+                xlWorkSheet(i).Cells(3, 6).HorizontalAlignment = -4108
+
+                celIni = xlWorkSheet(i).Cells(3, 6).Address()
+                celFin = xlWorkSheet(i).Cells(3, 10).Address()
+
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Merge()
+
+
+
+
+
+
+                k = 1 'FromCol
+                For j = CInt(elSetDa.Tables(i).ExtendedProperties.Item("FromCol")) To CInt(elSetDa.Tables(i).ExtendedProperties.Item("ToCol")) ' elSetDa.Tables(i).Columns.Count - 1
+                    xlWorkSheet(i).Cells(4, k).Value = elSetDa.Tables(i).Columns(j).ColumnName
+                    xlWorkSheet(i).Cells(5, k).Value = elSetDa.Tables(i).Columns(j).ExtendedProperties.Item("HeaderText")
+                    xlWorkSheet(i).Cells(6, k).Value = elSetDa.Tables(i).Columns(j).ExtendedProperties.Item("MOC")
+
+                    Select Case elSetDa.Tables(i).Columns(j).ExtendedProperties.Item("MOC")
+
+                        Case Is = "Mandatory"
+                            xlWorkSheet(i).Cells(6, k).Interior.Color = RGB(255, 199, 206)
+                            xlWorkSheet(i).Cells(6, k).Font.Color = RGB(156, 0, 6)
+
+                        Case Is = "Optional"
+                            xlWorkSheet(i).Cells(6, k).Interior.Color = RGB(198, 239, 206)
+                            xlWorkSheet(i).Cells(6, k).Font.Color = RGB(0, 97, 0)
+
+                        Case Is = "Conditional"
+                            xlWorkSheet(i).Cells(6, k).Interior.Color = RGB(255, 235, 156)
+                            xlWorkSheet(i).Cells(6, k).Font.Color = RGB(156, 87, 0)
+
+                    End Select
+
+                    xlWorkSheet(i).Cells(6, k).HorizontalAlignment = -4108
+
+                    k = k + 1
+
+                Next
+
+                celIni = xlWorkSheet(i).Cells(4, 1).Address()
+                celFin = xlWorkSheet(i).Cells(4, k - 1).Address()
+
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Color = RGB(0, 0, 0)
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Interior.Color = RGB(191, 191, 191)
+                'xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Size = 12
+                xlWorkSheet(i).Range(celIni & ":" & celFin).HorizontalAlignment = -4108
+                'xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Bold = True
+
+                celIni = xlWorkSheet(i).Cells(5, 1).Address()
+                celFin = xlWorkSheet(i).Cells(5, k - 1).Address()
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Color = RGB(255, 255, 255)
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Interior.Color = RGB(79, 129, 189)
+                'xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Size = 12
+                xlWorkSheet(i).Range(celIni & ":" & celFin).HorizontalAlignment = -4108
+                xlWorkSheet(i).Range(celIni & ":" & celFin).Font.Bold = True
+
+                elTool.Text = "Writting records of table " & elSetDa.Tables(i).ExtendedProperties.Item("TableName")
+                Application.DoEvents()
+
+                w = 0
+                r = 0
 
                 For k = 0 To elSetDa.Tables(i).Rows.Count - 1
-
-                    For j = 0 To elSetDa.Tables(i).Columns.Count - 1
-                        xlWorkSheet(i).Cells(4 + k, j + 1).Value = elSetDa.Tables(i).Rows(k).Item(j).ToString()
+                    r = 0
+                    For j = CInt(elSetDa.Tables(i).ExtendedProperties.Item("FromCol")) To CInt(elSetDa.Tables(i).ExtendedProperties.Item("ToCol")) ' elSetDa.Tables(i).Columns.Count - 1
+                        xlWorkSheet(i).Cells(7 + w, r + 1).Value = elSetDa.Tables(i).Rows(k).Item(j).ToString()
+                        r = r + 1
                     Next
-
+                    w = w + 1
                 Next
 
                 xlWorkSheet(i).Cells.Columns.AutoFit()
@@ -400,7 +499,7 @@ Module Module3
 
     End Function
 
-    Public Sub ImportaExcel(ByVal elArchivo As String, ByRef elSet As DataSet)
+    Public Sub ImportaExcelRecords(ByVal elArchivo As String, ByRef elSet As DataSet)
 
         'debería venir un match del objeto a matchear junto con sus hijos!
         'o venir la tabla con sus objetos y buscar
@@ -432,13 +531,13 @@ Module Module3
                 'el ultimo renglon!
                 lastRow = xSh.UsedRange.Rows(xSh.UsedRange.Rows.Count).Row 'suponiendo que este funcione!
 
-                For k = 4 To lastRow
+                For k = 7 To lastRow
 
                     elSet.Tables(xSh.Name).Rows.Add()
 
                     j = 1
-                    Do While xSh.Cells(2, j).Value <> ""
-                        colName = xSh.Cells(2, j).Value
+                    Do While xSh.Cells(4, j).Value <> ""
+                        colName = xSh.Cells(4, j).Value
                         If elSet.Tables(xSh.Name).Columns.IndexOf(colName) < 0 Then Continue Do
                         elSet.Tables(xSh.Name).Rows(elSet.Tables(xSh.Name).Rows.Count - 1).Item(colName) = xSh.Cells(k, j).Value
                     Loop
