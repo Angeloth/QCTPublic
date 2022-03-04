@@ -499,72 +499,150 @@ Module Module3
 
     End Function
 
-    Public Sub ImportaExcelRecords(ByVal elArchivo As String, ByRef elSet As DataSet)
+    Public Function ImportaExcelRecords(ByVal elArchivo As String, ByRef elSet As DataSet, ByRef resTexto As String, ByRef elLabel As Object) As Boolean
 
         'debería venir un match del objeto a matchear junto con sus hijos!
         'o venir la tabla con sus objetos y buscar
         'https://www.freecodespot.com/blog/csharp-import-excel/
         Dim xlApp As New oxCel.Application
         Dim xlWorkBook As oxCel.Workbook
-        Dim xlWorkSheet(elSet.Tables.Count) As oxCel.Worksheet
+        'Dim xlWorkSheet(elSet.Tables.Count) As oxCel.Worksheet
         Dim misValue As Object = System.Reflection.Missing.Value
 
+        Dim siPude As Boolean = False
+
+        Dim indSh As Integer
         Dim i As Integer = 0
         Dim j As Integer = 0
         Dim k As Long = 0
+        Dim w As Integer = 0
         Dim lastRow As Long
         Dim colName As String = ""
         Dim posCOl As Integer = 0
+        Dim allFound As Boolean = False
+        Dim cadSol As String = ""
         'https://www.wallstreetmojo.com/vba-last-row/#:~:text=In%20VBA%20when%20we%20have,get%20to%20the%20last%20row.
 
+        'hay 2 enfoques,
+        'Pasarle el DS al metodo con la estructura de las tablas que debería de tener
+        'ó que se regrese el dataset con las hojas y tablas que encontro!
 
         Try
 
             xlWorkBook = xlApp.Workbooks.Open(elArchivo)
-
-            For i = 0 To xlWorkBook.Sheets.Count - 1
+            w = -1
+            For i = 1 To xlWorkBook.Worksheets.Count
 
                 Dim xSh As oxCel.Worksheet = xlWorkBook.Sheets(i)
-                If elSet.Tables.IndexOf(xSh.Name) < 0 Then Continue For
+                indSh = elSet.Tables.IndexOf(xSh.Name)
+                If indSh < 0 Then
+                    releaseObject(xSh)
+                    Continue For
+                End If
+                w = w + 1
+                'xlWorkSheet(w) = xSh
+
+                elLabel.Text = "Reading table..." & xSh.Name
+                Application.DoEvents()
+
+                elSet.Tables(xSh.Name).ExtendedProperties.Item("Found") = True 'se debe pasar inicializada en false
+
+                'todas las hojas deben estar presentes, y todas las columnas de todas las hojas tambien deben estar presentes!
+
+                'If elSet.Tables.IndexOf(xSh.Name) < 0 Then Continue For
                 'SI lo encuentra, entonces lo pone!
                 'como detectar el total de registros en un excel
                 'el ultimo renglon!
+
+                'Primero verificamos que todas las columnas esten presentes
+
+                For j = CInt(elSet.Tables(xSh.Name).ExtendedProperties.Item("FromCol")) + 1 To CInt(elSet.Tables(xSh.Name).ExtendedProperties.Item("ToCol")) + 1
+                    colName = xSh.Cells(4, j).Value
+                    If elSet.Tables(xSh.Name).Columns.IndexOf(colName) >= 0 Then
+                        elSet.Tables(xSh.Name).Columns(colName).ExtendedProperties.Item("Found") = True
+                    End If
+                Next
+
+
                 lastRow = xSh.UsedRange.Rows(xSh.UsedRange.Rows.Count).Row 'suponiendo que este funcione!
 
-                For k = 7 To lastRow
+                elLabel.Text = "Fetching records of table..." & xSh.Name
+                Application.DoEvents()
 
+                For k = 7 To lastRow
                     elSet.Tables(xSh.Name).Rows.Add()
 
-                    j = 1
-                    Do While xSh.Cells(4, j).Value <> ""
+                    For j = CInt(elSet.Tables(xSh.Name).ExtendedProperties.Item("FromCol")) + 1 To CInt(elSet.Tables(xSh.Name).ExtendedProperties.Item("ToCol")) + 1
                         colName = xSh.Cells(4, j).Value
-                        If elSet.Tables(xSh.Name).Columns.IndexOf(colName) < 0 Then Continue Do
+                        If elSet.Tables(xSh.Name).Columns.IndexOf(colName) < 0 Then Continue For
                         elSet.Tables(xSh.Name).Rows(elSet.Tables(xSh.Name).Rows.Count - 1).Item(colName) = xSh.Cells(k, j).Value
-                    Loop
+                    Next
+
+                    elSet.Tables(xSh.Name).Rows(elSet.Tables(xSh.Name).Rows.Count - 1).Item("CampoYave") = Guid.NewGuid().ToString()
 
                 Next
 
+                releaseObject(xSh)
+
             Next
 
+            GC.Collect()
+            GC.WaitForPendingFinalizers()
 
-            xlWorkBook.Close()
-            xlApp.Quit()
-
-            For i = 0 To elSet.Tables.Count - 1
-                releaseObject(xlWorkSheet(i))
-            Next
-
+            xlWorkBook.Close(False, misValue, misValue)
             releaseObject(xlWorkBook)
+
+            xlApp.Quit()
             releaseObject(xlApp)
+
+            cadSol = ""
+
+            allFound = True
+            For i = 0 To elSet.Tables.Count - 1
+                If elSet.Tables(i).ExtendedProperties.Item("Found") = False Then
+                    If cadSol <> "" Then cadSol = cadSol & vbCrLf
+                    cadSol = cadSol & "Table/Sheet: " & elSet.Tables(i).TableName & " was not found on the excel file!!"
+                    allFound = False
+                End If
+            Next
+            elSet.ExtendedProperties.Item("TabsFound") = allFound
+
+
+            'Lo mismo para las columnas!
+            allFound = True
+            For i = 0 To elSet.Tables.Count - 1
+                For j = 0 To elSet.Tables(i).Columns.Count - 1
+                    If elSet.Tables(i).Columns(j).ExtendedProperties.Item("Found") = False Then
+                        If cadSol <> "" Then cadSol = cadSol & vbCrLf
+                        cadSol = cadSol & "The column: " & elSet.Tables(i).Columns(j).ColumnName & " was not found on the table " & elSet.Tables(i).TableName
+                        allFound = False
+                    End If
+                Next
+            Next
+            elSet.ExtendedProperties.Item("ColsFound") = allFound
+
+            If elSet.ExtendedProperties.Item("TabsFound") = True And elSet.ExtendedProperties.Item("ColsFound") = True Then
+                elSet.ExtendedProperties.Item("AllOk") = True
+            Else
+                elSet.ExtendedProperties.Item("AllOk") = False
+            End If
+
+            elLabel.text = "All done!"
+
+            resTexto = cadSol
+
+            siPude = elSet.ExtendedProperties.Item("AllOk")
 
         Catch ex As Exception
 
-
+            MsgBox(ex.Message, vbCritical, TitBox)
 
         End Try
 
 
-    End Sub
+        Return siPude
+
+    End Function
 
     Private Sub releaseObject(ByVal obj As Object)
         Try

@@ -54,6 +54,8 @@ Public Class Form1
     Private editDs As New DataSet 'set para ver los datos si se puede editar o no!
     Private puedoEditar As Boolean
     Private lastNodeEdit As String
+    Private inUseDt As New DataTable
+
 
     Private DoneEvaluacion As Boolean
 
@@ -82,6 +84,21 @@ Public Class Form1
         ToolStripLabel2.Text = ""
         editDs.Clear()
         Label3.Text = ""
+
+        inUseDt.Columns.Clear()
+        inUseDt.Rows.Clear()
+
+        inUseDt.Columns.Add("LastUsed")
+        inUseDt.Columns.Add("TableName")
+        inUseDt.Columns.Add("User")
+        inUseDt.Columns.Add("UserName")
+        inUseDt.Columns.Add("inUse")
+        inUseDt.ExtendedProperties.Add("inEdit", False)
+        inUseDt.ExtendedProperties.Add("Key", "")
+        inUseDt.ExtendedProperties.Add("lastPath", "")
+
+        inUseDt.Rows.Clear()
+        inUseDt.Rows.Add({"", "", "", "", ""}) 'vacío!
 
         If RoleUsuario = "Viewer" Or RoleUsuario = "Admin" Then
 
@@ -1148,8 +1165,12 @@ Public Class Form1
 
 
             Case Is = 4 'templates!
+
                 DataGridView1.ColumnHeadersDefaultCellStyle.Font = New System.Drawing.Font("Calibri", 12, FontStyle.Bold)
+                DataGridView1.DataSource = Nothing
+                DataGridView1.Rows.Clear()
                 DataGridView1.Columns.Clear()
+
                 Dim cHekKeyField As New DataGridViewCheckBoxColumn
                 Dim EntryKind As New DataGridViewComboBoxColumn
                 Dim FillRule As New DataGridViewComboBoxColumn
@@ -1316,6 +1337,8 @@ Public Class Form1
                     DataGridView1.Columns(i).HeaderCell.Style.BackColor = Color.FromArgb(255, 255, 140, 0)
                 Next
 
+
+
         End Select
 
     End Sub
@@ -1421,30 +1444,43 @@ Public Class Form1
                     If puedoEditar = True Then
                         'escribo ANTES de mostrar que lo estoy usando/editando!
                         're-escribo SOLO si el usuario no era YO!
-                        editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-                        editDs.Tables(0).Rows(0).Item(1) = ""
-                        editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
-                        editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
-                        editDs.Tables(0).Rows(0).Item(4) = "X"
+                        inUseDt.Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                        inUseDt.Rows(0).Item(1) = ""
+                        inUseDt.Rows(0).Item(2) = UsuarioCorreo
+                        inUseDt.Rows(0).Item(3) = UsuarioNombre
+                        inUseDt.Rows(0).Item(4) = "X"
+
+                        'editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                        'editDs.Tables(0).Rows(0).Item(1) = ""
+                        'editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
+                        'editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
+                        'editDs.Tables(0).Rows(0).Item(4) = "X"
                         'Debo ponerlo SOLO si lo estaba editando!!
-                        retKey = Await HazPost1Set(pathFinduse, editDs.Tables(0), -1)
+                        'retKey = Await HazPost1Set(pathFinduse, editDs.Tables(0), -1)
+                        retKey = Await HazPost1Set(pathFinduse, inUseDt, -1)
 
                         If retKey = "fail" Then
-                            editDs.Tables(0).ExtendedProperties.Item("Key") = ""
+                            'editDs.Tables(0).ExtendedProperties.Item("Key") = ""
+                            inUseDt.ExtendedProperties.Item("inEdit") = False
+                            inUseDt.ExtendedProperties.Item("lastPath") = ""
+                            inUseDt.ExtendedProperties.Item("Key") = ""
                             ToolStripLabel2.ForeColor = Color.Crimson
                             ToolStripLabel2.Text = "Error ocurred"
                             puedoEditar = False
                         Else
                             ToolStripLabel2.ForeColor = Color.DarkGreen
                             ToolStripLabel2.Text = "Available for edit"
-                            editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
-                            editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
-                            editDs.Tables(0).ExtendedProperties.Item("Key") = retKey
+                            inUseDt.ExtendedProperties.Item("inEdit") = True
+                            inUseDt.ExtendedProperties.Item("lastPath") = pathFinduse
+                            inUseDt.ExtendedProperties.Item("Key") = retKey
+                            'editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
+                            'editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
+                            'editDs.Tables(0).ExtendedProperties.Item("Key") = retKey
                         End If
 
                     Else
-                        'poner que NO puede editar en el label y en rojo!
 
+                        'poner que NO puede editar en el label y en rojo!
                         NoPuedesEditar(editDs, ToolStripLabel2)
 
                     End If
@@ -1622,7 +1658,7 @@ Public Class Form1
                 'records
                 xObj = Split(e.Node.FullPath, "\")
 
-                If xObj.Length < 2 Then
+                If xObj.Length <= 2 Then
                     DoneEvaluacion = False
                     NodoNameActual = ""
                     DataGridView1.DataSource = Nothing
@@ -1650,6 +1686,14 @@ Public Class Form1
                             Exit For
                         End If
                     Next
+
+                    compaSelekted = elNode.Parent.Name
+                    objetoSelek = elNode.Name
+
+                    '///////////////////////////////7
+                    'OJJOOOOOOO, esta linea de puedoeditar NO VAA, se debe cambiar por el procedimiento
+                    'de bloqueo completo de hojas!
+                    'puedoEditar = True
 
                     Exit Sub
 
@@ -1782,40 +1826,54 @@ Public Class Form1
 
                 editDs.Clear()
                 If RoleUsuario = "Editor" Then
-
                     Dim enCuentra As DataRow
                     enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
                     If IsNothing(enCuentra) = False Then
                         'significa que SI puede editar este modulo, verificar que NO haya nadie
                         editDs = Await PullDtFb(pathFinduse, "inuse")
                         puedoEditar = Await siPuedoEditar(pathFinduse)
-
                     End If
-
                 End If
 
                 If puedoEditar = True Then
                     'escribo ANTES de mostrar que lo estoy usando/editando!
                     're-escribo SOLO si el usuario no era YO!
-                    editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-                    editDs.Tables(0).Rows(0).Item(1) = ""
-                    editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
-                    editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
-                    editDs.Tables(0).Rows(0).Item(4) = "X"
+
+                    inUseDt.Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                    inUseDt.Rows(0).Item(1) = ""
+                    inUseDt.Rows(0).Item(2) = UsuarioCorreo
+                    inUseDt.Rows(0).Item(3) = UsuarioNombre
+                    inUseDt.Rows(0).Item(4) = "X"
+
+                    'editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                    'editDs.Tables(0).Rows(0).Item(1) = ""
+                    'editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
+                    'editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
+                    'editDs.Tables(0).Rows(0).Item(4) = "X"
                     'Debo ponerlo SOLO si lo estaba editando!!
-                    retKey = Await HazPost1Set(pathFinduse, editDs.Tables(0), -1)
+                    retKey = Await HazPost1Set(pathFinduse, inUseDt, -1)
 
                     If retKey = "fail" Then
-                        editDs.Tables(0).ExtendedProperties.Item("Key") = ""
+
+                        inUseDt.ExtendedProperties.Item("lastPath") = ""
+                        inUseDt.ExtendedProperties.Item("Key") = ""
+                        inUseDt.ExtendedProperties.Item("inEdit") = False
+
+                        'editDs.Tables(0).ExtendedProperties.Item("Key") = ""
                         ToolStripLabel2.ForeColor = Color.Crimson
                         ToolStripLabel2.Text = "Error ocurred"
                         puedoEditar = False
                     Else
                         ToolStripLabel2.ForeColor = Color.DarkGreen
                         ToolStripLabel2.Text = "Available for edit"
-                        editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
-                        editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
-                        editDs.Tables(0).ExtendedProperties.Item("Key") = retKey
+
+                        inUseDt.ExtendedProperties.Item("lastPath") = pathFinduse
+                        inUseDt.ExtendedProperties.Item("Key") = ""
+                        inUseDt.ExtendedProperties.Item("inEdit") = True
+
+                        'editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
+                        'editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
+                        'editDs.Tables(0).ExtendedProperties.Item("Key") = retKey
                     End If
 
                 Else
@@ -2011,25 +2069,44 @@ Public Class Form1
                         If puedoEditar = True Then
                             'escribo ANTES de mostrar que lo estoy usando/editando!
                             're-escribo SOLO si el usuario no era YO!
-                            editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-                            editDs.Tables(0).Rows(0).Item(1) = ""
-                            editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
-                            editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
-                            editDs.Tables(0).Rows(0).Item(4) = "X"
+
+                            inUseDt.Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                            inUseDt.Rows(0).Item(1) = ""
+                            inUseDt.Rows(0).Item(2) = UsuarioCorreo
+                            inUseDt.Rows(0).Item(3) = UsuarioNombre
+                            inUseDt.Rows(0).Item(4) = "X"
+
+
+                            'editDs.Tables(0).Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                            'editDs.Tables(0).Rows(0).Item(1) = ""
+                            'editDs.Tables(0).Rows(0).Item(2) = UsuarioCorreo
+                            'editDs.Tables(0).Rows(0).Item(3) = UsuarioNombre
+                            'editDs.Tables(0).Rows(0).Item(4) = "X"
+
                             'Debo ponerlo SOLO si lo estaba editando!!
-                            retKey = Await HazPost1Set(pathFinduse, editDs.Tables(0), -1)
+                            retKey = Await HazPost1Set(pathFinduse, inUseDt, -1)
 
                             If retKey = "fail" Then
-                                editDs.Tables(0).ExtendedProperties.Item("Key") = ""
+
+                                inUseDt.ExtendedProperties.Item("Key") = ""
+                                inUseDt.ExtendedProperties.Item("inEdit") = False
+                                inUseDt.ExtendedProperties.Item("lastPath") = ""
+
+                                'editDs.Tables(0).ExtendedProperties.Item("Key") = ""
                                 ToolStripLabel2.ForeColor = Color.Crimson
                                 ToolStripLabel2.Text = "Error ocurred"
                                 puedoEditar = False
                             Else
                                 ToolStripLabel2.ForeColor = Color.DarkGreen
                                 ToolStripLabel2.Text = "Available for edit"
-                                editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
-                                editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
-                                editDs.Tables(0).ExtendedProperties.Item("Key") = retKey
+
+                                inUseDt.ExtendedProperties.Item("Key") = retKey
+                                inUseDt.ExtendedProperties.Item("inEdit") = True
+                                inUseDt.ExtendedProperties.Item("lastPath") = pathFinduse
+
+                                'editDs.Tables(0).ExtendedProperties.Item("inEdit") = True
+                                'editDs.Tables(0).ExtendedProperties.Add("lastPath", pathFinduse)
+                                'editDs.Tables(0).ExtendedProperties.Item("Key") = retKey
                             End If
 
 
@@ -3984,6 +4061,10 @@ Public Class Form1
                 'OJO, este metodo de abajo va a cambiar por uno más robusto, que tome toodos los campos necesarios!!
                 'nuevos y deleted
 
+                For i = 0 To DataGridView1.Rows.Count - 1
+                    DataGridView1.Rows(i).HeaderCell.Value = CStr(i + 1)
+                Next
+
                 Call TomaInfoParaTemplates(DataGridView1, writeDs, 3, 0, 3, 13)
 
                 'tomamos la info!!, 
@@ -4117,14 +4198,11 @@ Public Class Form1
             Exit Sub
         End If
 
-        If puedoEditar = False Then
-            MsgBox("Sorry, you are not allowed to edit this object at this time, please try again later or wait for it to be available to edit.", vbExclamation, TitBox)
-            Exit Sub
-        End If
-
         Await SigoVivo()
         Module5.AgregaTiempo()
 
+        Dim xCad As String = ""
+        Dim xPath As String = ""
         Dim xObj As Object
         xObj = Split(elNode.FullPath, "\")
         Dim enCuentra As DataRow
@@ -4140,6 +4218,12 @@ Public Class Form1
                 enCuentra = ModuPermit.Tables(0).Rows.Find(CStr(catDs.Tables(cataNombre).ExtendedProperties.Item("ModuleCode")).ToUpper())
                 If IsNothing(enCuentra) = True Then
                     MsgBox("Sorry you are not allowed to add catalogs on the selected module", vbCritical, TitBox)
+                    Exit Sub
+                End If
+
+
+                If puedoEditar = False Then
+                    MsgBox("Sorry, you are not allowed to edit this object at this time, please try again later or wait for it to be available to edit.", vbExclamation, TitBox)
                     Exit Sub
                 End If
 
@@ -4199,12 +4283,12 @@ Public Class Form1
 
 
             Case Is = 2
+                'dependencias
 
 
             Case Is = 3
                 'records
 
-                'moduloSelek
                 Select Case xObj.Length
                     Case Is = 1
                         'crazy!!, importar todas las companias con todos sus objetos!
@@ -4219,12 +4303,141 @@ Public Class Form1
                         'Here, importar todas las tablas de un objeto completo!
                         enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
                         If IsNothing(enCuentra) = True Then
-                            MsgBox("Sorry you are not allowed to import record to the selected module!!", vbCritical, TitBox)
+                            MsgBox("Sorry you are not allowed to import records to the selected module!!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
+                        If PussyTemp < 0 Then
+                            MsgBox("Please choose a valid template!!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
+                        If elNode.Nodes.Count = 0 Then
+                            MsgBox("This template does not contain any tables!!, please choose another one!!", vbCritical, TitBox)
                             Exit Sub
                         End If
 
 
+                        'aquii, AAANTESS de iniciar, verificar que TOODAS las hojas esten NO ocupadas
+                        'SOLO si NO estan ocupadas, entonces permite la importación masiva!!
+                        'Si NO estan ocupadas deben 'ocuparse' para que nadie mas las pueda editar!
+                        'ciclo para validar que NO esten ocupados!!
 
+                        'primero!!, crear el dataset con la estructura del template vacío!!
+                        Dim puedoAvanzar As Boolean = True
+                        Dim cadX As String = ""
+                        Dim allDs As New DataSet
+                        Dim filtrosDt As New DataTable
+                        filtrosDt = tempDs.Tables(PussyTemp).Clone()
+
+                        '.ExtendedProperties.Item("Found")
+                        allDs.ExtendedProperties.Add("AllOk", False)
+                        allDs.ExtendedProperties.Add("TabsFound", False)
+                        allDs.ExtendedProperties.Add("ColsFound", False)
+
+                        For i = 0 To elNode.Nodes.Count - 1
+                            filtrosDt.Rows.Clear()
+                            Dim result() As DataRow = tempDs.Tables(PussyTemp).Select("TableCode = '" & elNode.Nodes(i).Name & "'", "Position ASC")
+                            For Each row As DataRow In result
+                                filtrosDt.ImportRow(row)
+                            Next
+
+                            allDs.Tables.Add(elNode.Nodes(i).Name)
+                            allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("TableCode", elNode.Nodes(i).Name)
+                            allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("TableName", "")
+                            allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("Found", False)
+                            allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("PuedoEdit", False)
+
+                            For j = 0 To filtrosDt.Rows.Count - 1
+                                allDs.Tables(allDs.Tables.Count - 1).Columns.Add(filtrosDt.Rows(j).Item("FieldCode"))
+                                allDs.Tables(allDs.Tables.Count - 1).Columns(allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1).ExtendedProperties.Add("FieldCode", filtrosDt.Rows(j).Item("FieldCode"))
+                                allDs.Tables(allDs.Tables.Count - 1).Columns(allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1).ExtendedProperties.Add("HeaderText", filtrosDt.Rows(j).Item("FieldName"))
+                                allDs.Tables(allDs.Tables.Count - 1).Columns(allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1).ExtendedProperties.Add("MOC", filtrosDt.Rows(j).Item("MOC"))
+                                allDs.Tables(allDs.Tables.Count - 1).Columns(allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1).ExtendedProperties.Add("Found", False)
+                                allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Item("TableName") = filtrosDt.Rows(j).Item("TableName")
+                            Next
+
+                            allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("FromCol", 0)
+                            allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Add("ToCol", allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1)
+
+                            'agregar un campo llave!!?
+                            allDs.Tables(allDs.Tables.Count - 1).Columns.Add("CampoYave")
+                            allDs.Tables(allDs.Tables.Count - 1).Columns(allDs.Tables(allDs.Tables.Count - 1).Columns.Count - 1).ExtendedProperties.Add("Found", True)
+
+                            xPath = RaizFire
+                            xPath = xPath & "/" & "inuse"
+                            xPath = xPath & "/" & "records"
+                            xPath = xPath & "/" & compaSelekted
+                            xPath = xPath & "/" & objetoSelek
+                            xPath = xPath & "/" & elNode.Nodes(i).Name
+                            editDs.Clear()
+                            editDs = Await PullDtFb(xPath, "inuse")
+
+                            allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Item("PuedoEdit") = Await siPuedoEditar(xPath)
+
+                            If allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Item("PuedoEdit") = False Then
+                                cadX = cadX & ""
+                                puedoAvanzar = False
+                            End If
+
+                        Next
+
+
+                        If puedoAvanzar = False Then
+
+
+
+                            Exit Sub
+                        End If
+
+                        Dim diLOg As New OpenFileDialog
+                        diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
+                        diLOg.Filter = "Excel File (*.xlsx)|*.xlsx" '"Excel File (*.xls)|*.xls"
+
+                        If diLOg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+
+                            ToolStripLabel1.Text = "Ready"
+                            ToolStripLabel1.Visible = True
+                            cadX = ""
+
+                            If ImportaExcelRecords(diLOg.FileName, allDs, cadX, ToolStripLabel1) = True Then
+                                MsgBox("All tables and columns found correctly on the archive!!", vbInformation, TitBox)
+                                'solo aqui deberia continuar al guardado!
+
+                                For i = 0 To allDs.Tables.Count - 1
+                                    ToolStripLabel1.Text = "Uploading data of table..." & allDs.Tables(i).TableName
+                                    Application.DoEvents()
+                                    xCad = ""
+                                    xPath = RaizFire
+                                    xPath = xPath & "/records/" & compaSelekted
+                                    xPath = xPath & "/" & objetoSelek
+                                    xPath = xPath & "/" & allDs.Tables(i).TableName
+                                    xPath = xPath & "/" & "records"
+
+                                    xCad = DtToJsonWithKey(allDs.Tables(i), "CampoYave")
+                                    cadX = Await HazPostMasivoFbSingleJson(xPath, xCad)
+
+                                Next
+
+                                MsgBox("Update complete!", vbInformation, TitBox)
+
+                            Else
+                                MsgBox("ATTENTION!!" & vbCrLf & "Some tables/sheets or columns/fields were not found on the archive you provided, please refer below detailed report." & vbCrLf & cadX, vbExclamation, TitBox)
+                            End If
+
+                            ToolStripLabel1.Text = "Ready"
+                            ToolStripLabel1.Visible = False
+
+                            'aqui dependiendo de lo que se busque sería la onda de crear el
+                            'procedimiento de forma masiva para postear toda la info!!
+
+                            'O si no un visor de state completo?,
+                            'Pero que onda con los bloqueos de hojas?, que pasa si alguien mas está editando el objeto!?, tendría que
+                            'bloquearse, subirse y posteriormente liberarse!!
+                            'si Solo es para simulacion, 
+
+
+                        End If
 
 
                     Case Is = 4
@@ -4232,6 +4445,11 @@ Public Class Form1
                         enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
                         If IsNothing(enCuentra) = True Then
                             MsgBox("Sorry you are not allowed to import record to the selected module!!", vbCritical, TitBox)
+                            Exit Sub
+                        End If
+
+                        If puedoEditar = False Then
+                            MsgBox("Sorry, you are not allowed to edit this object at this time, please try again later or wait for it to be available to edit.", vbExclamation, TitBox)
                             Exit Sub
                         End If
 
@@ -4503,6 +4721,7 @@ Public Class Form1
 
             'Me tapo los ojos!:
             xResp = Await HazPostMasivoFbSingleJson(elCamino, cadComp)
+
         Else
             xResp = "ok"
         End If
@@ -8452,7 +8671,7 @@ Public Class Form1
 
     Private Async Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
 
-        If RoleUsuario = "Editor" Then Module5.AgregaTiempo()
+        If RoleUsuario = "Editor" Then Module5.TerminaTime()
 
         Await DejoDeUsar()
 
@@ -8461,23 +8680,13 @@ Public Class Form1
     Private Async Function DejoDeUsar() As Task(Of String)
 
         Dim elRet As String = ""
-        If editDs.Tables.Count = 1 Then
-            If editDs.Tables(0).Rows.Count = 1 Then
-                If editDs.Tables(0).ExtendedProperties.Item("inEdit") = True Then
+        If inUseDt.ExtendedProperties.Item("inEdit") = True Then
+            If inUseDt.ExtendedProperties.Item("lastPath") <> "" Then
 
-                    If editDs.Tables(0).ExtendedProperties.Item("lastPath") <> "" Then
-
-                        elRet = Await HazDeleteEnFbSimple(editDs.Tables(0).ExtendedProperties.Item("lastPath"), "")
-                        'OJO, tmb cuando cambie de nodo o se salga del catalogo!
-                        editDs.Tables(0).ExtendedProperties.Item("inEdit") = False
-                    End If
-
-                End If
-            Else
-                elRet = "Ok"
+                elRet = Await HazDeleteEnFbSimple(inUseDt.ExtendedProperties.Item("lastPath"), "")
+                'OJO, tmb cuando cambie de nodo o se salga del catalogo!
+                inUseDt.ExtendedProperties.Item("inEdit") = False
             End If
-        Else
-            elRet = "Ok"
         End If
 
         Return elRet
@@ -8578,15 +8787,20 @@ Public Class Form1
 
     Private Async Function SigoVivo() As Task(Of String)
         Dim elReg As String = "fail"
-        If editDs.Tables.Count = 0 Then Return elReg
-        If IsNothing(editDs.Tables(0).ExtendedProperties.Item("Key")) = True Then Return elReg
-        If IsNothing(editDs.Tables(0).ExtendedProperties.Item("lastPath")) = True Then Return elReg
+        If inUseDt.ExtendedProperties.Item("Key") = "" Then Return elReg
+        If inUseDt.ExtendedProperties.Item("lastPath") = "" Then Return elReg
 
-        If editDs.Tables(0).ExtendedProperties.Item("Key") = "" Then Return elReg
+        elReg = Await HazPutEnFbSimple(inUseDt.ExtendedProperties.Item("lastPath") & "/" & inUseDt.ExtendedProperties.Item("Key"), "LastUsed", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
 
-        If editDs.Tables(0).ExtendedProperties.Item("lastPath") = "" Then Return elReg
+        'If editDs.Tables.Count = 0 Then Return elReg
+        'If IsNothing(editDs.Tables(0).ExtendedProperties.Item("Key")) = True Then Return elReg
+        'If IsNothing(editDs.Tables(0).ExtendedProperties.Item("lastPath")) = True Then Return elReg
 
-        elReg = Await HazPutEnFbSimple(editDs.Tables(0).ExtendedProperties.Item("lastPath") & "/" & editDs.Tables(0).ExtendedProperties.Item("Key"), "LastUsed", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+        'If editDs.Tables(0).ExtendedProperties.Item("Key") = "" Then Return elReg
+
+        'If editDs.Tables(0).ExtendedProperties.Item("lastPath") = "" Then Return elReg
+
+        'elReg = Await HazPutEnFbSimple(editDs.Tables(0).ExtendedProperties.Item("lastPath") & "/" & editDs.Tables(0).ExtendedProperties.Item("Key"), "LastUsed", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
 
         Return elReg
 
