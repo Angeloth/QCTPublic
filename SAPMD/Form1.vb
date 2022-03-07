@@ -4376,7 +4376,8 @@ Public Class Form1
                             allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Item("PuedoEdit") = Await siPuedoEditar(xPath)
 
                             If allDs.Tables(allDs.Tables.Count - 1).ExtendedProperties.Item("PuedoEdit") = False Then
-                                cadX = cadX & ""
+                                If cadX <> "" Then cadX = cadX & vbCrLf
+                                cadX = cadX & "Table " & allDs.Tables(allDs.Tables.Count - 1).TableName & " is currently in use by " & editDs.Tables(0).Rows(0).Item(3)
                                 puedoAvanzar = False
                             End If
 
@@ -4384,11 +4385,29 @@ Public Class Form1
 
 
                         If puedoAvanzar = False Then
-
-
-
+                            MsgBox("Massive import not possible!!" & vbCrLf & "One or more tables are currently in use by your colleages, below the detail" & vbCrLf & cadX & vbCrLf & "Please wait for them to become available!, try again later", vbExclamation, TitBox)
                             Exit Sub
                         End If
+
+                        inUseDt.Rows(0).Item(0) = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                        inUseDt.Rows(0).Item(1) = ""
+                        inUseDt.Rows(0).Item(2) = UsuarioCorreo
+                        inUseDt.Rows(0).Item(3) = UsuarioNombre
+                        inUseDt.Rows(0).Item(4) = "X"
+
+                        'OJO, aqui antes falta bloquear masivo también!!
+                        For i = 0 To allDs.Tables.Count - 1
+
+                            xPath = RaizFire
+                            xPath = xPath & "/" & "inuse"
+                            xPath = xPath & "/" & "records"
+                            xPath = xPath & "/" & compaSelekted
+                            xPath = xPath & "/" & objetoSelek
+                            xPath = xPath & "/" & allDs.Tables(i).TableName
+
+                            Await HazPost1Set(xPath, inUseDt, -1)
+
+                        Next
 
                         Dim diLOg As New OpenFileDialog
                         diLOg.InitialDirectory = Environment.SpecialFolder.MyDocuments
@@ -4398,9 +4417,11 @@ Public Class Form1
 
                             ToolStripLabel1.Text = "Ready"
                             ToolStripLabel1.Visible = True
+
                             cadX = ""
 
                             If ImportaExcelRecords(diLOg.FileName, allDs, cadX, ToolStripLabel1) = True Then
+
                                 MsgBox("All tables and columns found correctly on the archive!!", vbInformation, TitBox)
                                 'solo aqui deberia continuar al guardado!
 
@@ -4419,10 +4440,32 @@ Public Class Form1
 
                                 Next
 
-                                MsgBox("Update complete!", vbInformation, TitBox)
-
+                                cadX = "Update complete!"
+                                'MsgBox("Update complete!", vbInformation, TitBox)
                             Else
-                                MsgBox("ATTENTION!!" & vbCrLf & "Some tables/sheets or columns/fields were not found on the archive you provided, please refer below detailed report." & vbCrLf & cadX, vbExclamation, TitBox)
+                                puedoAvanzar = False
+                                cadX = "ATTENTION!!" & vbCrLf & "Some tables/sheets or columns/fields were not found on the archive you provided, because of that import was NOT possible!!, please refer below detailed report." & vbCrLf & cadX
+                                'MsgBox("ATTENTION!!" & vbCrLf & "Some tables/sheets or columns/fields were not found on the archive you provided, please refer below detailed report." & vbCrLf & cadX, vbExclamation, TitBox)
+                            End If
+
+                            'Y aqui falta desbloquear masivo!!
+                            For i = 0 To allDs.Tables.Count - 1
+
+                                xPath = RaizFire
+                                xPath = xPath & "/" & "inuse"
+                                xPath = xPath & "/" & "records"
+                                xPath = xPath & "/" & compaSelekted
+                                xPath = xPath & "/" & objetoSelek
+                                xPath = xPath & "/" & allDs.Tables(i).TableName
+
+                                Await HazDeleteEnFbSimple(xPath, "")
+
+                            Next
+
+                            If puedoAvanzar = True Then
+                                MsgBox(cadX, vbInformation, TitBox)
+                            Else
+                                MsgBox(cadX, vbExclamation, TitBox)
                             End If
 
                             ToolStripLabel1.Text = "Ready"
@@ -4941,7 +4984,8 @@ Public Class Form1
                                 If X = 6 Then
                                     System.Diagnostics.Process.Start(diLOg.FileName)
                                 End If
-
+                            Else
+                                MsgBox("Sorry there was an error loading excel", vbExclamation, TitBox)
                             End If
 
                             ToolStripLabel1.Text = "Ready"
