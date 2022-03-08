@@ -4771,12 +4771,9 @@ Public Class Form1
 
         If MutaDs.Tables(0).Rows.Count > 0 Then
 
-            'Await HazPostMasivoFbWithKeysPathYColumnas(elCamino, MutaDs.Tables(0), 0, -1)
+            Await HazPostMasivoFbWithKeysPathYColumnas(elCamino, MutaDs.Tables(0), 0, -1)
 
-            Dim cadComp As String = DtToJsonWithKey(MutaDs.Tables(0), "CampoYave")
 
-            'Me tapo los ojos!:
-            xResp = Await HazPostMasivoFbSingleJson(elCamino, cadComp)
         Else
             xResp = "ok"
         End If
