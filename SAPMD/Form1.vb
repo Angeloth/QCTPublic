@@ -4478,7 +4478,20 @@ Public Class Form1
                             'Pero que onda con los bloqueos de hojas?, que pasa si alguien mas está editando el objeto!?, tendría que
                             'bloquearse, subirse y posteriormente liberarse!!
                             'si Solo es para simulacion, 
+                        Else
 
+                            For i = 0 To allDs.Tables.Count - 1
+
+                                xPath = RaizFire
+                                xPath = xPath & "/" & "inuse"
+                                xPath = xPath & "/" & "records"
+                                xPath = xPath & "/" & compaSelekted
+                                xPath = xPath & "/" & objetoSelek
+                                xPath = xPath & "/" & allDs.Tables(i).TableName
+
+                                Await HazPost1Set(xPath, inUseDt, -1)
+
+                            Next
 
                         End If
 
@@ -4756,23 +4769,17 @@ Public Class Form1
         ToolStripButton10.Enabled = False
         ToolStripButton11.Enabled = False
 
-        'xResp = Await HazPostMasivoFbArraysConPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
-
         If MutaDs.Tables(0).Rows.Count > 0 Then
+
+            'Await HazPostMasivoFbWithKeysPathYColumnas(elCamino, MutaDs.Tables(0), 0, -1)
 
             Dim cadComp As String = DtToJsonWithKey(MutaDs.Tables(0), "CampoYave")
 
             'Me tapo los ojos!:
             xResp = Await HazPostMasivoFbSingleJson(elCamino, cadComp)
-
         Else
             xResp = "ok"
         End If
-
-        'xResp = Await HazPostMasivoFbWithKeysPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
-
-        'OJOO; este si estaba:
-        'xResp = Await HazPostEnFireBaseConPathYColumnas(elCamino, MutaDs.Tables(0), "records", 0)
 
         toyTrabajando = False
 
