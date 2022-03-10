@@ -214,16 +214,7 @@
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
-        If ComboBox2.SelectedIndex = 0 Then
 
-            If ComboBox1.SelectedIndex <> 1 And ComboBox1.SelectedIndex <> 2 Then
-                If TextBox10.Text = "" Then
-                    MsgBox("Please define a Conditional Value to Match a condition rule!!", vbCritical, TitBox)
-                    Exit Sub
-                End If
-            End If
-
-        End If
 
 
         If depFieldOk = True And conFieldOk = True Then

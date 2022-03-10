@@ -244,41 +244,6 @@
         Dim descri As String = ""
         For i = 0 To DataGridView1.Rows.Count - 1
 
-            If IsNothing(DataGridView1.Rows(i).Cells(0).Value) = True Then
-                MsgBox("The row " & CStr(i + 1) & " must have the Field Code defined!!, please review!", vbCritical, "DQCT")
-                Exit Sub
-            End If
-
-            If DataGridView1.Rows(i).Cells(0).Value = "" Then
-                MsgBox("The row " & CStr(i + 1) & " must have the Field Code defined!!, please review!", vbCritical, "DQCT")
-                Exit Sub
-            End If
-
-            If IsNothing(DataGridView1.Rows(i).Cells(1).Value) = True Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the Field Name!, please define a name for this row", vbCritical, "DQCT")
-                Exit Sub
-            End If
-
-            If DataGridView1.Rows(i).Cells(1).Value = "" Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the Field Name!, please define a name for this row", vbCritical, "DQCT")
-                Exit Sub
-            End If
-
-            If IsNothing(DataGridView1.Rows(i).Cells(2).Value) = True Then
-                descri = ""
-            Else
-                If DataGridView1.Rows(i).Cells(2).Value = "" Then
-                    descri = ""
-                Else
-                    descri = CStr(DataGridView1.Rows(i).Cells(2).Value)
-                End If
-            End If
-
-            If IsNothing(DataGridView1.Rows(i).Cells(3).Value) = True Then
-                MsgBox("The row " & CStr(i + 1) & " is missing the Field Type!, please define a field type for this row", vbCritical, "DQCT")
-                Exit Sub
-            End If
-
             If DataGridView1.Rows(i).Cells(3).Value = "" Then
                 MsgBox("The row " & CStr(i + 1) & " is missing the Field Type!, please define a field type for this row", vbCritical, "DQCT")
                 Exit Sub

@@ -9,9 +9,7 @@
 
     Private Sub Form5_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        If RoleUsuario = "Admin" Then Button2.Enabled = True Else Button2.Enabled = False
 
-        Me.CenterToScreen()
 
     End Sub
 End Class

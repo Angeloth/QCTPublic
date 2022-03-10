@@ -250,13 +250,7 @@
     End Sub
 
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
-        DataGridView1.Rows.Add()
 
-        For i = 0 To DataGridView1.Rows.Count - 1
-
-            DataGridView1.Rows(i).Cells(0).Value = CStr(i + 1)
-
-        Next
     End Sub
 
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click

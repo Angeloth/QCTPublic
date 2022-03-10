@@ -3783,20 +3783,7 @@ Public Class Form1
 
     Private Async Sub ToolStripButton8_Click(sender As Object, e As EventArgs) Handles ToolStripButton8.Click
 
-        If CategSelected = 0 Then
-            MsgBox("Please select a category first!!", vbCritical, TitBox)
-            Exit Sub
-        End If
 
-        If NodoNameActual = "" Then
-            MsgBox("Please select a catalog to update first!!", vbCritical, TitBox)
-            Exit Sub
-        End If
-
-        If IsNothing(elNode) = True Then
-            MsgBox("No node detected!", vbCritical, TitBox)
-            Exit Sub
-        End If
 
         Dim xObj As Object
         Dim i As Integer
@@ -4191,7 +4178,7 @@ Public Class Form1
     Private Async Sub ToolStripButton11_Click(sender As Object, e As EventArgs) Handles ToolStripButton11.Click
 
         'este boton va ser para importar registros de un excel
-        If CategSelected <> 3 And CategSelected <> 1 Then Exit Sub
+
 
         If IsNothing(elNode) = True Then
             MsgBox("Please select a valid node!", vbCritical, TitBox)
@@ -4667,7 +4654,6 @@ Public Class Form1
             'SI hay campos llave!
             ToolStripLabel1.Text = "Finding duplicates..."
 
-            Call QuitaDuplicadosMultiplesGrid(DataGridView1, cadYave, xResp)
             MsgBox(xResp, vbInformation, TitBox)
 
         End If
@@ -4691,24 +4677,7 @@ Public Class Form1
                 'quitar las comillas
                 MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1) = Replace(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1), """", "")
 
-                If IsDBNull(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1)) = False Then
-                    If CStr(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1)).Contains("\") = True Then
-                        MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1) = Replace(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1), "\", "")
-                    End If
 
-                    If CStr(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1)).Contains(vbLf) = True Then
-                        MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1) = Replace(MutaDs.Tables(0).Rows(MutaDs.Tables(0).Rows.Count - 1).Item(j + 1), vbLf, "")
-                    End If
-                End If
-
-                If DataGridView1.Columns(j).Tag = "X" Then
-                    k = k + 1
-                    If k = 1 Then
-                        yavEField = DataGridView1.Rows(i).Cells(j).Value
-                    Else
-                        yavEField = yavEField & "#" & DataGridView1.Rows(i).Cells(j).Value
-                    End If
-                End If
 
             Next
 
@@ -4771,10 +4740,6 @@ Public Class Form1
 
         If MutaDs.Tables(0).Rows.Count > 0 Then
 
-            Dim cadComp As String = DtToJsonWithKey(MutaDs.Tables(0), "CampoYave")
-
-            'Me tapo los ojos!:
-            xResp = Await HazPostMasivoFbSingleJson(elCamino, cadComp)
 
         Else
             xResp = "ok"
@@ -4808,13 +4773,7 @@ Public Class Form1
         'Si selecciona un nodo tabla continua con el unitario
         'Si selecciona el nodo objeto, exporta todo lo de ese objeto
         'Si tiene seleccionado el nodo compañía, exporta la compañía completa con todos sus hijos
-        If ToolStripComboBox1.SelectedIndex = 0 Then Exit Sub
 
-        If IsNothing(elNode) = True Then
-            'error!!
-            MsgBox("Please select a node with data to export a report!", vbCritical, TitBox)
-            Exit Sub
-        End If
 
         Dim xObj As Object
         xObj = Split(elNode.FullPath, "\")
@@ -5947,33 +5906,6 @@ Public Class Form1
             Case Is = 3
                 'records!!
                 'obtener la tabla de tempds con el detalle de la tabla, compañía,
-
-                If depeDs.Tables.Count = 0 Then
-                    usaDataset.Tables(0).Rows.Clear()
-                    usaDataset.Tables(0).Rows.Add({"dependencies"})
-                    depeDs.Tables.Clear()
-                    depeDs = Await PullUrlWs(usaDataset, "dependencies")
-                End If
-
-                filtDepe.PrimaryKey = Nothing
-                filtDepe.Columns.Clear()
-                filtDepe.Rows.Clear()
-                filtDepe = depeDs.Tables(0).Clone()
-
-                For i = 0 To depeDs.Tables.Count - 1
-                    xObj = Split(depeDs.Tables(i).TableName, "#")
-                    If CStr(xObj(0)) = objetoSelek Then
-                        'es el mismo objeto, filtramos sus dependencias de esa tabla!
-                        Dim resultados() As DataRow = depeDs.Tables(i).Select("DepTableCode = '" & tableSelek & "'")
-                        For Each row As DataRow In resultados
-                            filtDepe.ImportRow(row)
-                        Next
-                        Exit For
-                    End If
-                Next
-
-                multiDepe.Tables.Clear()
-                xDepeDs.Tables.Clear()
 
                 Dim yDs As New DataSet
                 'Dim xtraFilt As New DataTable
@@ -8010,19 +7942,9 @@ Public Class Form1
 
     Private Async Sub ToolStripButton15_Click(sender As Object, e As EventArgs) Handles ToolStripButton15.Click
 
-        If ToolStripComboBox1.SelectedIndex <> 4 Then Exit Sub
-        'debe tener seleccionado templates!!
-        If objetoSelek = "" Then
-            MsgBox("Please select a object first!! ", vbCritical, TitBox)
-            Exit Sub
-        End If
 
-        Dim enCuentra As DataRow
-        enCuentra = ModuPermit.Tables(0).Rows.Find(moduloSelek.ToUpper())
-        If IsNothing(enCuentra) = True Then
-            MsgBox("Sorry you are not allowed to add/change table relations to the selected module", vbCritical, TitBox)
-            Exit Sub
-        End If
+
+
 
         Await SigoVivo()
         Module5.AgregaTiempo()

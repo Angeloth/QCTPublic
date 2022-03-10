@@ -306,9 +306,6 @@
 
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
 
-        Dim Uni As String = Guid.NewGuid().ToString()
-        ListView1.Items.Add(Uni, "New rule", 0)
-
     End Sub
 
     Private Async Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
